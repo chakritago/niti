@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light dark">
-<script>(function(){var s="large";try{var x=localStorage.getItem("niti-font-level-v1");if(["normal","comfortable","large","extra","max"].includes(x))s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
+<script>(function(){var s="normal";try{var x=localStorage.getItem("niti-font-level-v1");if(["normal","comfortable","large","extra","max"].includes(x))s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
 <script>(function(){try{var v=localStorage.getItem("niti-theme-v1");var m=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",v==="dark"||v!=="light"&&m?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}}());</script>
 
 <meta name="description" content="ฝึกเขียนคำตอบข้อสอบกฎหมายว่าด้วยทรัพย์สินและที่ดิน LAW2101 LAW2001 พร้อมลิงก์ต้นทางทุกข้อ โครงสร้างประเด็น-หลักกฎหมาย-ปรับบท-สรุป">
@@ -98,7 +98,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
         <div class="font-controls" role="group" aria-label="ปรับขนาดตัวอักษรเพื่อให้อ่านได้สบายตา">
           <span class="font-label">ตัวอักษร</span>
           <button id="font-decrease" class="font-button" type="button" aria-label="ลดขนาดตัวอักษร" title="ลดขนาดตัวอักษร">ก−</button>
-          <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">24 px</output>
+          <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">20 px</output>
           <button id="font-increase" class="font-button" type="button" aria-label="เพิ่มขนาดตัวอักษร" title="เพิ่มขนาดตัวอักษร">ก+</button>
         </div></div></nav></header>
 <section class="hero"><div class="wrap"><div class="kicker">LAW2101 · LAW2001 · THAI PROPERTY LAW</div><h1>สนามฝึกเขียนข้อสอบ<br><span>กฎหมายลักษณะทรัพย์สินและที่ดิน</span></h1><p>อ่านข้อเท็จจริงที่ถอดความจากข้อสอบซึ่งเผยแพร่ในแหล่งอ้างอิง ฝึกวินิจฉัยตามลำดับ ประเด็น → หลักกฎหมาย → ปรับบท → สรุป และตรวจองค์ประกอบคำตอบด้วยตนเอง</p><div class="hero-actions"><span class="chip">อ้างอิงข้อสอบรายข้อ</span><span class="chip">คำตอบบันทึกในเครื่องของคุณ</span></div></div></section>
@@ -131,7 +131,18 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 </section>
 <h3 class="box-title">สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)</h3><div id="scenario" class="scenario"></div>
 <div class="prompt"><div class="box-title">ประเด็นที่ต้องวินิจฉัย</div><div id="issue"></div></div>
-<section id="exam-insight" class="exam-insight" aria-labelledby="exam-insight-title" hidden>
+<section class="exam-statute-card" id="exam-statute-card" aria-labelledby="exam-statute-title">
+    <h3 id="exam-statute-title">มาตราที่ใช้ตอบข้อนี้ — สรุปสำหรับเขียนข้อสอบ</h3>
+    <p>อ่านหลักกฎหมายแบบย่อ แล้วตรวจตัวบทภาษาไทยฉบับเต็มตามลิงก์ทุกมาตรา</p>
+    <div id="exam-statute-list"></div>
+    <p class="law-source-disclaimer">ลิงก์ตัวบทรายมาตราเป็นเว็บไซต์รวบรวมกฎหมายภายนอก โปรดตรวจฉบับใช้บังคับจากหน่วยงานทางการอีกครั้ง</p>
+  </section>
+  <section id="exam-ranking" class="exam-ranking" aria-label="อันดับความสำคัญเพื่อจัดเวลาอ่าน">
+    <strong id="exam-ranking-value"></strong>
+    <p id="exam-ranking-description"></p>
+    <a href="./study.html#ranking">ดูอันดับแนวโจทย์ในคลังทั้งหมด ↗</a>
+  </section>
+  <section id="exam-insight" class="exam-insight" aria-labelledby="exam-insight-title" hidden>
   <div class="insight-title"><span class="insight-label">จุดที่ควรโฟกัสก่อนตอบ</span><h3 id="exam-insight-title">แนวคิดของโจทย์นี้</h3></div>
   <p id="exam-insight-hook"></p>
   <p><strong>เริ่มตรงนี้:</strong> <span id="exam-insight-first"></span></p>
@@ -282,10 +293,12 @@ var examId=new URLSearchParams(window.location.search).get("exam");
 if(examId&&data.some(function(q){return q.id===examId;}))load(examId);
 })();
 </script>
+<script src="./statute-notes.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./tutor-answers.js"></script>
 <script src="./tutor.js"></script>
 <script src="./study-companion.js"></script>
+<script src="./study-extensions.js"></script>
 <script src="./theme.js"></script>
 </body>
 </html>
