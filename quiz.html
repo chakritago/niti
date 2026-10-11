@@ -50,6 +50,39 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 @media(max-width:750px){.layout{display:flex;flex-direction:column}.layout>*{width:100%}.question-list{max-height:230px}.summary{gap:8px}.summary-item{padding:13px;display:block}.summary-item b{display:block}.rubric{grid-template-columns:1fr}}
 @media(max-width:500px){.wrap{width:calc(100% - 26px)}.nav{padding:14px 0;min-height:auto;flex-wrap:wrap}.nav-right{gap:14px}.hero{padding:35px 0 50px}.hero h1{font-size:29px}.summary-item b{font-size:23px}.summary-item span{font-size:11px}.panel-pad{padding:16px}.scenario{padding:14px}.actions .btn{flex:1}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Interactive learning experience */
+.original-card,.coach-card,.model-card{border:1px solid #dbe2e8;border-radius:14px;margin:18px 0;overflow:hidden;background:#fff}
+.original-card{background:#f8f9fb}
+.original-heading{padding:18px 20px;display:flex;align-items:start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.original-heading h3,.coach-heading h3,.model-heading h3{font-size:18px;margin:0 0 5px}
+.original-heading p,.coach-heading p,.model-heading p{font-size:12px;color:#637487;line-height:1.8;margin:0}
+.original-buttons{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.original-wrapper{border-top:1px solid #dae3e9;padding:13px;background:#f3f6f8}
+.original-wrapper iframe{display:block;width:100%;height:550px;border:1px solid #cdd8e1;border-radius:8px;background:#fff}
+.original-wrapper p{font-size:12px;color:#586a7a;margin:7px 0 3px}
+.original-wrapper a{color:#146086;font-weight:700}
+.coach-card{box-shadow:0 15px 37px #1329480c;border-color:#d8dfe7}
+.coach-heading{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,#152c49,#254463);color:white;padding:18px 20px}
+.coach-avatar{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;flex:none;background:#d3a75e;color:#152c48;font-weight:800;font-family:Georgia,serif;font-size:22px}
+.coach-heading h3{color:white}.coach-heading p{color:#d2deeb}.coach-progress{display:inline-block;margin-left:auto;font-size:11px;color:#f5e6cc;background:#ffffff24;border:1px solid #ffffff35;border-radius:20px;padding:4px 9px;white-space:nowrap}
+.coach-log{padding:20px;display:flex;flex-direction:column;gap:13px;min-height:215px;max-height:420px;overflow-y:auto;background:#fcfdfd}
+.coach-line{display:flex;justify-content:flex-start}.coach-line.student{justify-content:flex-end}
+.coach-bubble{max-width:min(94%,690px);border:1px solid #e3e8ed;background:#f3f6f8;border-radius:15px 15px 15px 3px;padding:11px 15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.coach-line.student .coach-bubble{background:#e8eef7;border-color:#d4e0ef;border-radius:15px 15px 3px 15px}
+.coach-who{display:block;font-weight:800;font-size:11px;color:#607b96;margin-bottom:4px}.coach-bubble p{line-height:1.85;margin:0;font-size:13px}
+.coach-entry{border-top:1px solid #e0e6eb;padding:15px 19px 17px;background:#fff}.coach-entry textarea{min-height:78px;border-radius:11px;background:#fff}
+.coach-toolbar{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px;align-items:center}.coach-toolbar .coach-spacer{flex:1}
+.coach-status{font-size:11px;color:#647489;margin-top:8px;min-height:18px}.coach-hintbar{font-size:11px;color:#6b7784;padding:10px 18px;border-top:1px solid #e9edf0;background:#f9fafb}
+.model-card{background:#fffcf7;border-color:#e3d9c7}
+.model-heading{padding:18px 20px;display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.model-body{padding:0 20px 20px;border-top:1px solid #eadfcb}
+.model-part{border-bottom:1px solid #ede3d5;padding:14px 0}.model-part h4{color:#8d6939;margin:0 0 7px;font-size:14px}.model-part p{font-size:14px;line-height:1.9;margin:0;white-space:pre-line}
+.model-caution{font-size:12px;color:#856b50;padding:11px 13px;border:1px solid #efdebe;border-radius:8px;background:#fff8e8;margin:15px 0}
+.model-info{font-size:12px;color:#6e7c85;margin:15px 0 11px}
+.model-body a{font-weight:800;color:#1d628a;font-size:13px}
+@media(max-width:550px){.original-heading,.coach-entry,.model-heading{padding:14px}.original-wrapper iframe{height:380px}.coach-log{padding:12px}.coach-bubble{max-width:98%;padding:10px}.coach-progress{margin-left:0}.coach-heading{flex-wrap:wrap;padding:14px}.coach-toolbar .btn{font-size:11px;padding:9px}.coach-toolbar .coach-spacer{display:none}.coach-toolbar{gap:5px}}
+
 </style>
 </head>
 <body>
@@ -68,8 +101,48 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <div id="question-content">
 <div class="task-heading"><div><div class="meta"><span class="topic-tag" id="topic-tag"></span><span class="minor" id="exam-meta"></span></div><h2 id="question-title"></h2><p class="sub" id="question-id"></p></div></div>
 <div class="source-box"><p><b>แหล่งที่มาของข้อสอบข้อนี้:</b> เว็บไซต์ MJ Sheet Ram Free — ตรวจพบคำถามตามปี/ภาคเรียน/เลขข้อในหน้าที่ระบุ ข้อความด้านล่างเป็นสรุปถอดความ ไม่ใช่โจทย์ต้นฉบับทั้งหมด</p><a id="source" target="_blank" rel="noopener noreferrer" href="#">อ่านข้อสอบและธงคำตอบต้นทาง ↗</a></div>
+<section class="original-card" aria-labelledby="original-heading">
+  <div class="original-heading"><div>
+    <h3 id="original-heading">📄 โจทย์ต้นฉบับ + ธงคำตอบจากแหล่งเผยแพร่</h3>
+    <p id="original-caption">แสดงเว็บไซต์ต้นทางภายในหน้านี้ ไม่ใช่การคัดลอกเนื้อหามาเก็บบน GitHub</p>
+  </div><div class="original-buttons">
+    <button class="btn outline" id="original-toggle" type="button" aria-expanded="false">แสดงโจทย์ต้นฉบับ + ธงคำตอบในกรอบ ↓</button>
+    <a class="btn primary" id="original-link" target="_blank" rel="noopener noreferrer" href="#">เปิดต้นฉบับเต็ม ↗</a>
+  </div></div>
+  <div id="original-wrapper" class="original-wrapper" hidden>
+    <p><strong>การอ่านต้นฉบับ:</strong> หน้าที่ฝังแสดงข้อสอบและธงคำตอบหลายข้อในภาคเรียนเดียวกัน ให้เลื่อนไปยังเลขข้อที่ระบุด้านบน หากหน้าเว็บถูกบล็อกหรือว่าง ให้กดเปิดต้นฉบับเต็ม</p>
+    <iframe id="original-iframe" src="about:blank" title="หน้าแสดงข้อสอบต้นฉบับและธงคำตอบจาก MJ Sheet Ram Free" loading="lazy" referrerpolicy="no-referrer"></iframe>
+    <p>เอกสารนี้เผยแพร่โดยเว็บไซต์ภายนอก ไม่ใช่ไฟล์ต้นฉบับที่มหาวิทยาลัยรับรอง และเว็บไซต์ปลายทางอาจไม่อนุญาตให้แสดงในกรอบ <a id="original-link-fallback" href="https://mjsheetramfree.com/" target="_blank" rel="noopener noreferrer">เปิดหน้าข้อสอบโดยตรง ↗</a></p>
+  </div>
+</section>
 <h3 class="box-title">สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)</h3><div id="scenario" class="scenario"></div>
 <div class="prompt"><div class="box-title">ประเด็นที่ต้องวินิจฉัย</div><div id="issue"></div></div>
+<section class="coach-card" aria-labelledby="coach-title">
+  <div class="coach-heading"><span class="coach-avatar" aria-hidden="true">น</span><div><h3 id="coach-title">ผู้ช่วยติวแบบสนทนา</h3><p>ฝึกคิดเหมือนเรียนแบบถาม–ตอบ ทีละประเด็น โดยไม่ใช้ AI/API</p></div><span class="coach-progress" id="coach-progress">กำลังฝึกขั้น 1 จาก 4</span></div>
+  <div class="coach-log" id="coach-log" role="log" aria-label="บทสนทนาโค้ชและผู้เรียน" aria-live="polite" aria-relevant="additions"></div>
+  <div class="coach-entry">
+    <label for="coach-input" class="field-label">ตอบคำถามจากโค้ช</label>
+    <textarea id="coach-input" placeholder="พิมพ์ประเด็นข้อกฎหมายที่คุณเห็น..." rows="3"></textarea>
+    <div class="coach-toolbar">
+      <button class="btn primary" type="button" id="coach-send">ส่งคำตอบ ↗</button>
+      <button class="btn outline" type="button" id="coach-hint">ขอคำใบ้ ✦</button>
+      <button class="btn outline" type="button" id="coach-skip">ข้ามขั้น →</button>
+      <span class="coach-spacer"></span>
+      <button class="btn outline" type="button" id="coach-show-answer">ดูเฉลย</button>
+      <button class="btn outline" type="button" id="coach-restart">เริ่มสอนใหม่ ↻</button>
+    </div>
+    <p id="coach-status" class="coach-status" role="status"></p>
+  </div>
+  <div class="coach-hintbar">โค้ชนี้ใช้บทสนทนาและคำใบ้ที่เตรียมไว้ ไม่ใช่ ChatGPT จริง · ไม่ตรวจความถูกต้องของคำตอบด้วยโมเดลภาษา · คำตอบถูกบันทึกไว้ในเครื่อง</div>
+</section>
+<section class="model-card" aria-labelledby="model-title">
+  <div class="model-heading"><div><h3 id="model-title">เฉลยตัวอย่างแบบเขียนตอบอัตนัย</h3><p id="tutor-answer-meta">อ่านได้หลังลองเขียนคำตอบ หรือเปิดเพื่อทบทวนก่อนสอบ</p></div><button class="btn gold" id="tutor-answer-toggle" type="button" aria-expanded="false">แสดงเฉลยแบบเขียนตอบ 4 ส่วน ↓</button></div>
+  <div id="tutor-answer-body" class="model-body" hidden>
+    <p class="model-info">เฉลยต่อไปนี้เรียบเรียงใหม่เพื่อใช้ฝึกวิเคราะห์ข้อเท็จจริง ไม่ใช่สำเนาธงคำตอบจากเว็บไซต์และไม่ใช่คำตัดสินหรือคำปรึกษาทางกฎหมาย</p>
+    <div id="tutor-answer-parts"></div>
+    <a id="tutor-answer-source" target="_blank" rel="noopener noreferrer" href="#">อ่านธงคำตอบของผู้เผยแพร่ต้นฉบับและเทียบความครบถ้วน ↗</a>
+  </div>
+</section>
 <div class="workspace-head"><h3>กระดาษคำตอบของคุณ</h3><div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap"><output id="timer" class="timer" aria-label="เวลาฝึกเขียน">25:00</output><button class="btn outline" type="button" id="timer-toggle">เริ่มจับเวลา</button><button class="btn outline" type="button" id="timer-reset">รีเซ็ตเวลา</button></div></div>
 <p class="minor">เขียนให้ครบ 4 ส่วนตามแนววิธีตอบอัตนัย ข้อมูลบันทึกอัตโนมัติในเบราว์เซอร์เครื่องนี้ ไม่ได้ส่งไปยังเซิร์ฟเวอร์</p>
 <div class="answer-grid">
@@ -151,15 +224,15 @@ score();
 }
 function load(id,noList){
 var q=data.find(function(x){return x.id===id});if(!q)return;
-stopTimer();remaining=1500;updateTimer();current=id;showReview=false;$("review").hidden=true;$("review-toggle").setAttribute("aria-expanded","false");$("review-toggle").textContent="ดูแนวธงคำตอบและเกณฑ์ตรวจ ↓";
+stopTimer();remaining=1500;updateTimer();current=id;window.NITI_CURRENT_QUESTION=id;showReview=false;$("review").hidden=true;$("review-toggle").setAttribute("aria-expanded","false");$("review-toggle").textContent="ดูแนวธงคำตอบและเกณฑ์ตรวจ ↓";
 $("topic-tag").textContent=q.topic;$("exam-meta").textContent=q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
 $("question-title").textContent=q.title;$("question-id").textContent="รหัสโจทย์: "+q.id+" · เนื้อหาเรียบเรียงใหม่จากโจทย์ที่เผยแพร่บนเว็บไซต์อ้างอิง";
 $("scenario").textContent=q.synopsis;$("issue").textContent=q.issue;
-$("source").href=q.sourceUrl;$("source-again").href=q.sourceUrl;
+$("source").href=q.sourceUrl;$("source-again").href=q.sourceUrl;$("original-link-fallback").href=q.sourceUrl;
 $("statutes").innerHTML=q.sections.map(function(t){return '<span class="topic-tag">ป.พ.พ. ม. '+escapeHTML(t)+"</span>"}).join("");
 $("roadmap").innerHTML=q.roadmap.map(function(t){return "<li>"+escapeHTML(t)+"</li>"}).join("");
 $("conclusion").textContent=q.conclusion;$("pitfall").textContent=q.pitfall;
-setAnswer(q);if(!noList)refreshList();else updateNav();
+setAnswer(q);if(!noList)refreshList();else updateNav();window.dispatchEvent(new CustomEvent("niti-question-change",{detail:{id:id}}));
 }
 function updateNav(){var i=filtered.findIndex(function(q){return q.id===current});$("prev").disabled=i<=0;$("next").disabled=i<0||i===filtered.length-1;}
 function saveAnswer(){if(!current)return;var s=getState(current);parts.forEach(function(p){s[p]=areas[p].value});persist();counters();refreshList();}
@@ -184,5 +257,7 @@ $("random").addEventListener("click",function(){if(filtered.length)load(filtered
 fillFilters();counters();refreshList();
 })();
 </script>
+<script src="./tutor-answers.js"></script>
+<script src="./tutor.js"></script>
 </body>
 </html>
