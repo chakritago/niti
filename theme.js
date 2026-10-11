@@ -65,9 +65,9 @@
     try {
       var choice = window.localStorage.getItem(FONT_KEY);
       return levels.some(function (level) { return level.id === choice; })
-        ? choice : "large";
+        ? choice : "normal";
     } catch (_) {
-      return "large";
+      return "normal";
     }
   }
   function saveFont(choice) {
@@ -75,7 +75,7 @@
   }
   function setFontLevel(choice, save) {
     var index = levels.findIndex(function (level) { return level.id === choice; });
-    if (index < 0) index = 2;
+    if (index < 0) index = 0;
     var active = levels[index];
     root.setAttribute("data-font-level", active.id);
     if (sizeLabel) {
@@ -90,7 +90,7 @@
   function changeFont(by) {
     var current = root.getAttribute("data-font-level");
     var index = levels.findIndex(function (level) { return level.id === current; });
-    if (index < 0) index = 2;
+    if (index < 0) index = 0;
     setFontLevel(levels[Math.max(0, Math.min(levels.length - 1, index + by))].id, true);
   }
   setFontLevel(fontPreference(), false);
