@@ -838,3 +838,46 @@ header{box-shadow:0 1px 0 var(--md-border)}
  .tutor-page .exam-insight{padding:17px}
  .tutor-page .exam-insight p{font-size:1.04rem!important}
 }
+
+
+/* Inline legal-rule notes and sample-priority indicator */
+:root{--read-base:20px}
+.tutor-page .exam-statute-card{
+ border:1px solid var(--md-border);border-top:5px solid var(--study-teal);
+ background:var(--md-surface-low);border-radius:17px;
+ padding:22px;margin:23px 0;
+}
+.tutor-page .exam-statute-card>h3{
+ font-family:var(--thai-display)!important;
+ font-size:1.22rem!important;margin:0 0 7px;
+}
+.tutor-page .exam-statute-card>p{font-size:.98rem!important;margin:4px 0 15px;color:var(--md-text-secondary)}
+.tutor-page #exam-statute-list{display:grid;gap:13px}
+.tutor-page .statute-small{
+ background:var(--md-surface)!important;
+ padding:18px 21px!important;
+ border-left-color:var(--study-teal)!important;
+}
+.tutor-page .statute-small:nth-child(2n){border-left-color:var(--study-orange)!important}
+.tutor-page .statute-small .statute-plain{
+ color:var(--md-text);font-size:1.04rem!important;line-height:1.9!important;
+}
+.tutor-page .statute-small .statute-example p{
+ color:var(--md-text);font-size:1.06rem!important;line-height:2!important;
+}
+.tutor-page .statute-small .statute-head h3{
+ font-size:1.17rem!important;margin:0 0 10px;
+}
+.tutor-page .statute-small .statute-link{
+ color:var(--md-primary)!important;
+ font-size:.92rem!important;white-space:normal;
+}
+.tutor-page .law-source-disclaimer{font-size:.86rem!important;line-height:1.8!important;margin:13px 0 0!important}
+.tutor-page .exam-ranking{
+ margin:20px 0 24px;border-radius:13px;
+ background:var(--study-orange-soft);border-left:5px solid var(--study-orange);
+ padding:17px 20px;color:var(--md-text);
+}
+.tutor-page .exam-ranking strong{font-size:1.07rem;color:var(--study-orange)}
+.tutor-page .exam-ranking p{font-size:.94rem;line-height:1.84;margin:7px 0}
+.tutor-page .exam-ranking a{font-size:.94rem;font-weight:750;color:var(--md-primary)}
