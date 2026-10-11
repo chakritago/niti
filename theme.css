@@ -425,3 +425,195 @@ footer strong{color:var(--md-text)!important}
 @media(prefers-reduced-motion:reduce){
  *,*::before,*::after{transition:none!important;scroll-behavior:auto!important}
 }
+
+
+/* ================================================
+ * Readability edition / Thai typography for 50+
+ * Readable by default: 20 px; options 18 / 20 / 22 / 24 px.
+ * No increase in tiny labels at the expense of main text.
+ * ================================================ */
+:root{
+  --read-base:20px;
+  --thai-body:"Sarabun","Noto Sans Thai",Tahoma,sans-serif;
+  --thai-display:"IBM Plex Sans Thai","Sarabun",Tahoma,sans-serif;
+  --md-text-secondary:#4c5867;
+}
+html[data-theme="dark"]{--md-text-secondary:#c4ccd6}
+html[data-font-level="normal"]{--read-base:18px}
+html[data-font-level="comfortable"]{--read-base:20px}
+html[data-font-level="large"]{--read-base:22px}
+html[data-font-level="extra"]{--read-base:24px}
+html{font-size:var(--read-base)!important;text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--thai-body)!important;
+  font-size:1rem!important;
+  font-weight:400;
+  line-height:1.83!important;
+  word-break:normal;
+  overflow-wrap:break-word;
+}
+h1,h2,h3,h4,h5,h6,.brand,.brand strong,.topic h3,.task-heading h2{
+  font-family:var(--thai-display)!important;
+  line-height:1.46!important;
+  font-weight:700!important;
+  letter-spacing:0!important;
+}
+p,li,.scenario,.coach-bubble p,.model-part p{
+  line-height:1.9!important;
+}
+button,input,select,textarea{
+  font-family:var(--thai-body)!important;
+  font-size:.9rem!important;
+  line-height:1.6!important;
+}
+input,select,textarea{min-height:50px}
+textarea{font-size:1rem!important;line-height:1.93!important;padding:14px 16px!important}
+button,.btn{
+  font-size:.9rem!important;
+  min-height:48px!important;
+  font-weight:600!important;
+}
+.btn{padding:11px 18px!important}
+a{overflow-wrap:anywhere}
+.font-controls{
+  display:inline-flex;gap:4px;align-items:center;
+  border:1px solid var(--md-outline);
+  background:var(--md-surface);
+  color:var(--md-text);
+  border-radius:999px;
+  padding:3px 5px 3px 11px;
+  min-height:49px;
+  flex-shrink:0;
+}
+.font-label{font-size:.78rem;font-weight:650;white-space:nowrap;color:var(--md-text-secondary)}
+.font-button{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:42px;min-width:42px;height:42px;min-height:42px!important;
+  padding:0!important;border:0;border-radius:50%;
+  background:transparent;color:var(--md-primary);
+  font-family:var(--thai-display)!important;
+  font-size:.92rem!important;font-weight:750!important;line-height:1!important;
+}
+.font-button:hover:not(:disabled){background:var(--md-primary-container)}
+.font-button:disabled{opacity:.34;cursor:not-allowed}
+.font-current{
+  font:700 .8rem/1.2 var(--thai-display);
+  min-width:51px;text-align:center;
+  color:var(--md-text);white-space:nowrap;
+}
+.theme-toggle{min-height:49px!important;font-size:.82rem!important;font-weight:650!important}
+.theme-toggle-icon{font-size:1.08rem}
+header .nav-links,header .nav-right{font-size:.86rem!important}
+header .nav-links a,header .nav-right a{font-size:.85rem!important;line-height:1.4!important}
+header .brand{font-size:1.18rem!important}
+header .brand strong{font-size:1.15rem!important}
+header .brand small,header .brand > small{font-size:.76rem!important;letter-spacing:0!important}
+footer,footer p,footer a{font-size:.82rem!important}
+.home-page .hero h1{
+  font-size:clamp(2.15rem,4.6vw,3.1rem)!important;
+  line-height:1.29!important;
+}
+.home-page .hero p{font-size:1rem!important;line-height:1.86!important}
+.home-page .eyebrow,.home-page .overline,.tutor-page .kicker{
+  font-size:.79rem!important;letter-spacing:0!important;
+}
+.home-page h2,.home-page .section h2{font-size:clamp(1.45rem,3vw,1.83rem)!important}
+.home-page .study-card h2{font-size:1.31rem!important}
+.home-page .study-overline{font-size:.78rem!important}
+.home-page .study-step{font-size:.9rem!important}
+.home-page .quiz-promo h2{font-size:1.32rem!important}
+.home-page .quiz-promo p{font-size:.94rem!important}
+.home-page .section-desc{font-size:.98rem!important}
+.home-page .topic h3{font-size:1.14rem!important}
+.home-page .topic p{font-size:.96rem!important;line-height:1.85!important}
+.home-page .tags span{font-size:.82rem!important;padding:7px 12px!important}
+.home-page .result-line{font-size:.83rem!important}
+.home-page .card-index,.home-page .step-num{font-size:.78rem!important}
+.home-page .step h3{font-size:1.12rem!important}
+.home-page .step p{font-size:.95rem!important}
+.home-page .source strong{font-size:.98rem!important}
+.home-page .source small{font-size:.82rem!important}
+.home-page .search-box{min-height:52px!important}
+.home-page .search-box input{font-size:.95rem!important;min-height:46px}
+.home-page .clear-search{font-size:.9rem!important}
+.tutor-page .hero h1{font-size:clamp(1.55rem,3.6vw,2.15rem)!important}
+.tutor-page .hero p{font-size:.97rem!important}
+.tutor-page .chip{font-size:.79rem!important;padding:9px 13px!important}
+.tutor-page .summary-item b{font-size:1.58rem!important}
+.tutor-page .summary-item span{font-size:.84rem!important}
+.tutor-page .layout{grid-template-columns:315px minmax(0,1fr)}
+.tutor-page .aside-head h2{font-size:1.13rem!important}
+.tutor-page .aside-head p{font-size:.83rem!important}
+.tutor-page .field-label,.tutor-page .results{font-size:.84rem!important}
+.tutor-page .q-item{padding:15px!important}
+.tutor-page .q-item strong{font-size:.94rem!important;line-height:1.7!important}
+.tutor-page .q-item-top,.tutor-page .q-item small{font-size:.8rem!important}
+.tutor-page .topic-tag{font-size:.81rem!important;padding:7px 12px!important}
+.tutor-page .task-heading h2{font-size:1.44rem!important;line-height:1.45!important}
+.tutor-page .sub,.tutor-page .minor{font-size:.83rem!important}
+.tutor-page .source-box p,.tutor-page .source-box a{font-size:.88rem!important}
+.tutor-page .box-title{font-size:1.08rem!important}
+.tutor-page .scenario{font-size:1.08rem!important;line-height:1.94!important;padding:20px 22px}
+.tutor-page .prompt{font-size:1.03rem!important;line-height:1.84!important}
+.tutor-page .workspace-head h3{font-size:1.26rem!important}
+.tutor-page .answer-box label{font-size:.99rem!important}
+.tutor-page .answer-box label span{font-size:.78rem!important}
+.tutor-page .timer{font-size:.99rem!important}
+.tutor-page .status{font-size:.85rem!important}
+.tutor-page .original-heading h3,.tutor-page .coach-heading h3,.tutor-page .model-heading h3{
+  font-size:1.15rem!important;
+}
+.tutor-page .original-heading p,.tutor-page .coach-heading p,.tutor-page .model-heading p{
+  font-size:.86rem!important;line-height:1.82!important;
+}
+.tutor-page .original-wrapper p,.tutor-page .original-wrapper a{font-size:.85rem!important}
+.tutor-page .coach-progress{font-size:.8rem!important;white-space:normal;text-align:center}
+.tutor-page .coach-who{font-size:.81rem!important}
+.tutor-page .coach-bubble p{font-size:1rem!important;line-height:1.92!important}
+.tutor-page .coach-entry label{font-size:.91rem!important}
+.tutor-page .coach-entry textarea{font-size:1rem!important;min-height:140px}
+.tutor-page .coach-status,.tutor-page .coach-hintbar{font-size:.85rem!important}
+.tutor-page .model-part h4{font-size:1.05rem!important}
+.tutor-page .model-part p{font-size:1.06rem!important;line-height:1.98!important}
+.tutor-page .model-caution,.tutor-page .model-info,.tutor-page .model-body a{font-size:.91rem!important}
+.tutor-page .review h3{font-size:1.26rem!important}
+.tutor-page .key-points h4{font-size:1.04rem!important}
+.tutor-page .key-points li,.tutor-page .key-points p{font-size:1.02rem!important}
+.tutor-page .rubric label{font-size:.96rem!important;line-height:1.8!important}
+.tutor-page .rubric input{width:23px!important;height:23px!important;flex-shrink:0!important}
+.tutor-page .score{font-size:.92rem!important}
+.tutor-page .score strong{font-size:1.3rem!important}
+.tutor-page .info{font-size:.88rem!important;line-height:1.86!important}
+.tutor-page .coach-toolbar .btn{font-size:.84rem!important}
+.tutor-page .original-buttons .btn{font-size:.85rem!important}
+@media(max-width:1080px){
+  html[data-font-level="large"] .tutor-page .layout,
+  html[data-font-level="extra"] .tutor-page .layout{
+    display:flex;flex-direction:column;
+  }
+  html[data-font-level="large"] .tutor-page .layout>*,
+  html[data-font-level="extra"] .tutor-page .layout>*{width:100%}
+}
+@media(max-width:820px){
+  .tutor-page .layout{display:flex;flex-direction:column}
+  .tutor-page .layout>*{width:100%}
+}
+@media(max-width:600px){
+  header{position:relative}
+  .home-page .nav-links,.tutor-page .nav-right{justify-content:flex-start!important}
+  .home-page .hero h1{font-size:2rem!important}
+  .tutor-page .hero h1{font-size:1.62rem!important}
+  .font-controls{padding-left:9px}
+  .font-label{font-size:.76rem}
+  .font-button{min-width:40px;width:40px}
+  .tutor-page .summary-item{padding:12px 10px!important}
+  .tutor-page .summary-item b{font-size:1.2rem!important}
+  .tutor-page .summary-item span{font-size:.78rem!important}
+  .tutor-page .coach-toolbar .btn{flex:1 1 auto;min-height:50px}
+  .tutor-page .scenario{padding:16px}
+  .tutor-page .rubric{grid-template-columns:1fr}
+}
+@media print{
+  .theme-toggle,.font-controls{display:none!important}
+  body{background:white!important;color:black!important}
+}
