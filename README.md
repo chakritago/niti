@@ -16,11 +16,11 @@
 2. เลือก **Pages** จากเมนูด้านซ้าย
 3. ใน **Build and deployment → Source** เลือก **Deploy from a branch**
 4. ใน **Branch** เลือก **main** และ **/(root)** แล้วคลิก **Save**
-5. ตรวจสอบ URL: https://chakritago.github.io/niti.github.io/
+5. ตรวจสอบ URL: https://chakritago.github.io/niti/
 
 หากยังไม่เห็นเว็บไซต์ ให้ตรวจสอบสถานะการเผยแพร่ที่เมนู **Actions** หรือ **Settings → Pages** ก่อน
 
-> **หมายเหตุ:** Repository ชื่อ `niti.github.io` เป็น *project site* ของบัญชี `chakritago` จึงใช้ URL ที่มี `/niti.github.io/` ต่อท้าย หากต้องการ URL หลัก `https://chakritago.github.io/` ต้องใช้ Repository ชื่อ `chakritago.github.io`
+> **หมายเหตุ:** Repository ชื่อ `niti` เป็น GitHub Pages แบบ *project site* ของบัญชี `chakritago` จึงมี URL `https://chakritago.github.io/niti/` หากต้องการ URL หลัก `https://chakritago.github.io/` ต้องใช้ Repository ชื่อ `chakritago.github.io`
 
 ## ปรับแต่งเว็บไซต์
 
