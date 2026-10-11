@@ -8,7 +8,7 @@
   <meta name="description" content="แผนอ่านกฎหมายลักษณะทรัพย์สินและที่ดิน LAW2101/LAW2001 เรื่องที่พบในโจทย์ตัวอย่าง มาตราที่ควรอ่าน ทริคจำ และตารางติว 7 วัน พร้อมลิงก์ข้อสอบรายข้อ">
   <title>แผนอ่านสอบและเทคนิคจำ LAW2101 | NITI</title>
   <script>(function(){try{var v=localStorage.getItem("niti-theme-v1");var m=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",v==="dark"||(v!=="light"&&m)?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}}());</script>
-  <script>(function(){var s="large";try{var x=localStorage.getItem("niti-font-level-v1");if(["normal","comfortable","large","extra","max"].includes(x))s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
+  <script>(function(){var s="normal";try{var x=localStorage.getItem("niti-font-level-v1");if(["normal","comfortable","large","extra","max"].includes(x))s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=Sarabun:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
@@ -23,13 +23,13 @@
     <div class="study-links">
       <a href="./index.html">หน้าหลัก</a>
       <a href="./quiz.html">ฝึกข้อสอบ</a>
-      <a href="#frequency">สถิติในคลัง</a>
+      <a href="#frequency">สถิติในคลัง</a><a href="#statute-notes">สรุปมาตรา</a>
       <a href="#schedule">แผน 7 วัน</a>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button>
       <div class="font-controls" role="group" aria-label="ปรับขนาดตัวอักษร">
         <span class="font-label">ตัวอักษร</span>
         <button id="font-decrease" class="font-button" type="button" aria-label="ลดขนาดตัวอักษร">ก−</button>
-        <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">24 px</output>
+        <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">20 px</output>
         <button id="font-increase" class="font-button" type="button" aria-label="เพิ่มขนาดตัวอักษร">ก+</button>
       </div>
     </div>
@@ -49,6 +49,13 @@
     <div class="stat"><b id="total-topics">—</b><span>หมวดสำหรับไล่อ่าน</span></div>
     <div class="stat"><b>7 วัน</b><span>แผนทวนและฝึกเขียน</span></div>
   </div>
+  <section id="ranking" class="wrap section-space" aria-labelledby="rank-title">
+    <p class="section-label">จัดอันดับเพื่ออ่านสอบให้คุ้มเวลา</p>
+    <h2 id="rank-title">อันดับแนวโจทย์ที่ควรจำก่อน</h2>
+    <p class="lead">จัดอันดับจากจำนวนครั้งที่หัวข้อปรากฏในคลังตัวอย่าง 15 ข้อเท่านั้น หัวข้อที่จำนวนเท่ากันถือเป็นอันดับร่วม ไม่ใช่ร้อยละโอกาสออกสอบจริง และไม่ใช่ความเห็นของผู้ออกข้อสอบ</p>
+    <div class="rank-grid" id="rank-grid"></div>
+    <p class="notice"><strong>วิธีอ่านอันดับ:</strong> A = พบอย่างน้อย 3 ข้อในชุดนี้, B = พบ 2 ข้อ, C = พบ 1 ข้อ จัดเพื่อเลือกเริ่มอ่านก่อนเท่านั้น ส่วนข้อสอบที่ไม่ได้อยู่ในชุดตัวอย่างอาจออกได้เช่นกัน โปรดอ่านครบทุกหมวดตามขอบเขตวิชา</p>
+  </section>
   <section id="frequency" class="wrap section-space" aria-labelledby="freq-title">
     <p class="section-label">01 / เริ่มจากข้อมูลจริง</p>
     <h2 id="freq-title">หัวข้อไหนพบมากในคลังข้อสอบ?</h2>
@@ -66,6 +73,18 @@
       <p class="lead">แต่ละการ์ดจะอธิบายว่าโจทย์มักตั้งข้อพิพาทในลักษณะใดในชุดที่รวบรวมไว้ ต้องอ่านองค์ประกอบของมาตราไหน และมีจุดไหนที่ห้ามตอบพลาด</p>
       <div class="topic-cards" id="topic-cards"></div>
     </div>
+  </section>
+  <section id="statute-notes" class="wrap section-space" aria-labelledby="statute-title">
+    <p class="section-label">คู่มือจำตัวบทกฎหมาย</p>
+    <h2 id="statute-title">สรุปมาตรา พร้อมประโยคใช้เขียนตอบข้อสอบ</h2>
+    <p class="lead">แยกให้เห็น 3 ส่วน: ความหมายแบบเข้าใจง่าย หลักกฎหมายที่สามารถนำไปเรียบเรียงในข้อสอบ และองค์ประกอบที่ต้องปรับบท พร้อมลิงก์เปิดตัวบทเต็มภาษาไทย <strong>ลิงก์รายมาตราเป็นเว็บไซต์เผยแพร่กฎหมายภายนอก ไม่ใช่เว็บไซต์ทางการ</strong></p>
+    <div class="statute-controls">
+      <label for="statute-search">ค้นหามาตราหรือคำสำคัญ</label>
+      <input id="statute-search" type="search" placeholder="เช่น มาตรา 1299, ครอบครองปรปักษ์, ภาระจำยอม">
+      <output id="statute-count" role="status">กำลังโหลดมาตรา…</output>
+    </div>
+    <div id="statute-list" class="statute-list"></div>
+    <p class="notice">เพื่อความถูกต้อง ให้ตรวจสอบตัวบทที่มีผลใช้บังคับและกฎหมายแก้ไขเพิ่มเติมกับ <a href="https://www.krisdika.go.th/" target="_blank" rel="noopener noreferrer">สำนักงานคณะกรรมการกฤษฎีกา</a> หรือ <a href="https://ratchakitcha.soc.go.th/" target="_blank" rel="noopener noreferrer">ราชกิจจานุเบกษา</a> ก่อนใช้ในคดีจริง สรุปด้านบนเป็นภาษาช่วยจำ ไม่ใช่ถ้อยคำตัวบทมาตราโดยตรง</p>
   </section>
   <section id="method" class="wrap section-space" aria-labelledby="method-title">
     <p class="section-label">03 / วิธีทำข้อสอบอัตนัย</p>
@@ -93,8 +112,10 @@
 </main>
 <footer><div class="wrap">NITI · ตัวเลขจากชุดโจทย์ที่รวบรวมเพื่อการศึกษา ไม่ใช่การคาดการณ์ข้อสอบของสถาบัน · <a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">คลังข้อสอบอ้างอิง</a> · <a href="https://www.krisdika.go.th/" target="_blank" rel="noopener noreferrer">ตรวจสอบตัวบทกฎหมาย</a></div></footer>
 <script src="./exam-data.js"></script>
+<script src="./statute-notes.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./study.js"></script>
+<script src="./study-extensions.js"></script>
 <script src="./theme.js"></script>
 </body>
 </html>
