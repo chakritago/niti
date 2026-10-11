@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#12243e">
   <meta name="description" content="NITI — พื้นที่รวบรวมหัวข้อศึกษากฎหมายไทย พร้อมทางลัดไปยังแหล่งข้อมูลกฎหมายจากหน่วยงานทางการ">
-  <meta name="color-scheme" content="light">
+  <meta name="color-scheme" content="light dark">
+  <script>(function(){try{var v=localStorage.getItem("niti-theme-v1");var m=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",v==="dark"||v!=="light"&&m?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}}());</script>
+
   <title>NITI — คลังความรู้กฎหมายไทย</title>
   <style>
     :root {
@@ -133,8 +135,12 @@
       *,*::before,*::after { transition:none!important }
     }
   </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Noto+Sans+Thai:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./theme.css">
 </head>
-<body>
+<body class="home-page">
   <a class="skip" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
   <header>
     <nav class="nav container" aria-label="เมนูหลัก">
@@ -148,6 +154,7 @@
         <a href="#how-to">วิธีใช้งาน</a>
         <a href="#sources">แหล่งข้อมูลทางการ</a>
         <a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button>
       </div>
     </nav>
   </header>
@@ -164,16 +171,16 @@
             <a class="btn btn-ghost" href="#sources">แหล่งข้อมูลอ้างอิง <span aria-hidden="true">→</span></a>
           </div>
         </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="art-card">
-            <div class="art-top"><span>LEX · THAILAND</span><span>01 / NITI</span></div>
-            <div class="art-line"></div>
-            <svg class="scales" viewBox="0 0 180 150" aria-hidden="true">
-              <path d="M90 22v105M57 128h66M72 117h36M38 48h104M90 22l-52 26M90 22l52 26M38 48l-24 52M38 48l24 52M142 48l-24 52M142 48l24 52M5 100h66c-4 17-18 25-33 25S9 117 5 100ZM109 100h66c-4 17-18 25-33 25s-29-8-33-25Z"></path>
-              <circle cx="90" cy="18" r="7"></circle>
-            </svg>
-            <div class="art-title">N I T I</div>
-            <div class="art-sub">KNOWLEDGE · JUSTICE · REASON</div>
+        <div class="hero-art" aria-label="ขั้นตอนการเรียนรู้กฎหมายสามขั้น">
+          <div class="study-card">
+            <div class="study-icon" aria-hidden="true">§</div>
+            <div class="study-overline">LEARN WITH CLARITY</div>
+            <h2>คิดอย่างมีเหตุผล<br>เขียนอย่างมีโครงสร้าง</h2>
+            <div class="study-steps">
+              <div class="study-step"><span>01</span>ค้นหาประเด็นกฎหมาย</div>
+              <div class="study-step"><span>02</span>ตรวจหลักกฎหมายและเหตุผล</div>
+              <div class="study-step"><span>03</span>ฝึกเขียนตอบข้อสอบ</div>
+            </div>
           </div>
         </div>
       </div>
@@ -284,5 +291,6 @@
       filter();
     }());
   </script>
+  <script src="./theme.js"></script>
 </body>
 </html>
