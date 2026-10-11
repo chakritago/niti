@@ -51,10 +51,11 @@
   // The choice is independent from light/dark theme and shared by all pages.
   var FONT_KEY = "niti-font-level-v1";
   var levels = [
-    { id: "normal", px: 18 },
-    { id: "comfortable", px: 20 },
-    { id: "large", px: 22 },
-    { id: "extra", px: 24 }
+    { id: "normal", px: 20 },
+    { id: "comfortable", px: 22 },
+    { id: "large", px: 24 },
+    { id: "extra", px: 26 },
+    { id: "max", px: 28 }
   ];
   var smaller = document.getElementById("font-decrease");
   var larger = document.getElementById("font-increase");
@@ -64,9 +65,9 @@
     try {
       var choice = window.localStorage.getItem(FONT_KEY);
       return levels.some(function (level) { return level.id === choice; })
-        ? choice : "comfortable";
+        ? choice : "large";
     } catch (_) {
-      return "comfortable";
+      return "large";
     }
   }
   function saveFont(choice) {
@@ -74,7 +75,7 @@
   }
   function setFontLevel(choice, save) {
     var index = levels.findIndex(function (level) { return level.id === choice; });
-    if (index < 0) index = 1;
+    if (index < 0) index = 2;
     var active = levels[index];
     root.setAttribute("data-font-level", active.id);
     if (sizeLabel) {
@@ -89,7 +90,7 @@
   function changeFont(by) {
     var current = root.getAttribute("data-font-level");
     var index = levels.findIndex(function (level) { return level.id === current; });
-    if (index < 0) index = 1;
+    if (index < 0) index = 2;
     setFontLevel(levels[Math.max(0, Math.min(levels.length - 1, index + by))].id, true);
   }
   setFontLevel(fontPreference(), false);
