@@ -795,3 +795,46 @@ header{box-shadow:0 1px 0 var(--md-border)}
  .theme-toggle{min-height:46px!important}
  .font-controls{max-width:100%}
 }
+
+
+/* Study guide navigation and per-exercise memory cues */
+.home-page .home-cta-stack{display:flex;flex-direction:column;gap:12px;align-items:stretch;flex-shrink:0}
+.home-page .home-cta-stack .btn{white-space:normal!important;text-align:center;max-width:100%}
+.home-page .home-cta-stack .btn-ghost{
+ border-color:var(--study-orange)!important;
+ color:var(--study-orange)!important;
+ background:var(--md-surface)!important;
+}
+.home-page .home-cta-stack .btn-ghost:hover{
+ background:var(--study-orange-soft)!important;
+}
+.tutor-page .exam-insight{
+ background:linear-gradient(125deg,var(--study-violet-soft),var(--md-primary-container));
+ border:1px solid var(--md-border);
+ border-left:6px solid var(--study-violet);
+ border-radius:17px;
+ padding:22px 25px;
+ margin:24px 0;
+ color:var(--md-text);
+}
+.tutor-page .insight-label{font-size:.9rem;color:var(--study-violet);font-weight:800}
+.tutor-page .exam-insight h3{
+ font-family:var(--thai-display)!important;
+ font-size:1.28rem!important;margin:2px 0 12px;
+}
+.tutor-page .exam-insight p{
+ font-size:1.11rem!important;line-height:1.95!important;
+ margin:9px 0!important;
+}
+.tutor-page .exam-insight strong{color:var(--study-violet)}
+.tutor-page .insight-actions{display:flex;gap:10px 18px;flex-wrap:wrap;margin-top:17px}
+.tutor-page .insight-actions a{
+ color:var(--md-primary);font-size:1rem;font-weight:750;
+ text-decoration:underline;text-underline-offset:4px;line-height:1.6;
+}
+.home-page .nav-links{column-gap:17px!important}
+@media(max-width:650px){
+ .home-page .home-cta-stack{width:100%}
+ .tutor-page .exam-insight{padding:17px}
+ .tutor-page .exam-insight p{font-size:1.04rem!important}
+}
