@@ -134,5 +134,29 @@ $("coach-restart").addEventListener("click",restart);
 $("original-toggle").addEventListener("click",toggleOriginal);
 $("tutor-answer-toggle").addEventListener("click",function(){toggleAnswer()});
 $("coach-show-answer").addEventListener("click",function(){toggleAnswer(true)});
+$("coach-copy-chatgpt").addEventListener("click",function(){
+var q=question();if(!q)return;
+var task=[
+"คุณคือผู้ช่วยติวสอบกฎหมายลักษณะทรัพย์สินและที่ดินของประเทศไทย (LAW2101/LAW2001)",
+"ขอให้สอนแบบ Socratic เหมือน Study Mode: เริ่มถามผู้เรียนทีละคำถาม ห้ามเฉลยทันที ปรับคำถามตามคำตอบของผู้เรียน",
+"เน้น 4 ส่วน: ประเด็นปัญหา หลักกฎหมายพร้อมเลขมาตรา การปรับบทข้อเท็จจริง และสรุป โดยตรวจเหตุผลและชี้ส่วนที่ยังไม่ครบ",
+"ถ้าไม่แน่ใจเรื่องตัวบทหรือฎีกา ห้ามแต่งขึ้น ให้แนะนำแหล่งกฎหมายที่ตรวจสอบได้",
+"",
+"ข้อสอบ: "+q.course+" ภาค "+q.semester+"/"+q.year+" ข้อ "+q.number,
+"แหล่งต้นทางพร้อมธงคำตอบ: "+q.sourceUrl,
+"โจทย์สรุปเรียบเรียงใหม่เพื่อการศึกษา: "+q.synopsis,
+"",
+"เริ่มต้นด้วยคำถามชี้นำสั้นๆ เพียงข้อเดียว และรอคำตอบของฉันก่อน"
+].join("\n");
+function success(){$("coach-status").textContent="คัดลอกโจทย์พร้อมคำสั่งสอนแล้ว เปิด ChatGPT ด้านล่างและวางข้อความได้เลย";}
+function fail(){$("coach-status").textContent="ไม่สามารถคัดลอกอัตโนมัติได้ โปรดลองเปิดเว็บผ่าน HTTPS หรืออนุญาต Clipboard ในเบราว์เซอร์";}
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(task).then(success).catch(fail);
+}else{
+var t=document.createElement("textarea");t.value=task;t.style.position="fixed";t.style.opacity="0";document.body.appendChild(t);t.select();
+try{document.execCommand("copy")?success():fail();}catch(e){fail();}t.remove();
+}
+});
+
 if(currentFromMain()){currentId=currentFromMain();render();}
 })();
