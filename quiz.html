@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#ffffff">
 <meta name="color-scheme" content="light dark">
+<script>(function(){var s="comfortable";try{var x=localStorage.getItem("niti-font-level-v1");if(x==="normal"||x==="comfortable"||x==="large"||x==="extra")s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
 <script>(function(){try{var v=localStorage.getItem("niti-theme-v1");var m=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",v==="dark"||v!=="light"&&m?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}}());</script>
 
 <meta name="description" content="ฝึกเขียนคำตอบข้อสอบกฎหมายว่าด้วยทรัพย์สินและที่ดิน LAW2101 LAW2001 พร้อมลิงก์ต้นทางทุกข้อ โครงสร้างประเด็น-หลักกฎหมาย-ปรับบท-สรุป">
@@ -89,11 +90,17 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Noto+Sans+Thai:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=Sarabun:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./theme.css">
 </head>
 <body class="tutor-page">
-<header><nav class="wrap nav" aria-label="เมนูหลัก"><a class="brand" href="./index.html"><span class="monogram" aria-hidden="true">น</span>NITI <small style="font:12px Arial,sans-serif;letter-spacing:.04em;color:#cbd7e1">LAW LAB</small></a><div class="nav-right"><a href="./index.html">← หน้าหลัก</a><a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">คลังแหล่งข้อสอบ ↗</a><a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button></div></nav></header>
+<header><nav class="wrap nav" aria-label="เมนูหลัก"><a class="brand" href="./index.html"><span class="monogram" aria-hidden="true">น</span>NITI <small style="font:12px Arial,sans-serif;letter-spacing:.04em;color:#cbd7e1">LAW LAB</small></a><div class="nav-right"><a href="./index.html">← หน้าหลัก</a><a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">คลังแหล่งข้อสอบ ↗</a><a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button>
+        <div class="font-controls" role="group" aria-label="ปรับขนาดตัวอักษรเพื่อให้อ่านได้สบายตา">
+          <span class="font-label">ตัวอักษร</span>
+          <button id="font-decrease" class="font-button" type="button" aria-label="ลดขนาดตัวอักษร" title="ลดขนาดตัวอักษร">ก−</button>
+          <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">20 px</output>
+          <button id="font-increase" class="font-button" type="button" aria-label="เพิ่มขนาดตัวอักษร" title="เพิ่มขนาดตัวอักษร">ก+</button>
+        </div></div></nav></header>
 <section class="hero"><div class="wrap"><div class="kicker">LAW2101 · LAW2001 · THAI PROPERTY LAW</div><h1>สนามฝึกเขียนข้อสอบ<br><span>กฎหมายลักษณะทรัพย์สินและที่ดิน</span></h1><p>อ่านข้อเท็จจริงที่ถอดความจากข้อสอบซึ่งเผยแพร่ในแหล่งอ้างอิง ฝึกวินิจฉัยตามลำดับ ประเด็น → หลักกฎหมาย → ปรับบท → สรุป และตรวจองค์ประกอบคำตอบด้วยตนเอง</p><div class="hero-actions"><span class="chip">อ้างอิงข้อสอบรายข้อ</span><span class="chip">คำตอบบันทึกในเครื่องของคุณ</span></div></div></section>
 <div class="wrap summary" aria-label="ภาพรวมคลังโจทย์"><div class="summary-item"><b id="total-stat">—</b><span>โจทย์พร้อมแหล่งอ้างอิง</span></div><div class="summary-item"><b id="draft-stat">0</b><span>ข้อที่เคยเริ่มเขียน</span></div><div class="summary-item"><b id="complete-stat">0</b><span>ข้อที่ประเมินตนเองแล้ว</span></div></div>
 <main class="wrap layout">
