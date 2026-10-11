@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12243e">
+  <meta name="description" content="NITI — พื้นที่รวบรวมหัวข้อศึกษากฎหมายไทย พร้อมทางลัดไปยังแหล่งข้อมูลกฎหมายจากหน่วยงานทางการ">
+  <meta name="color-scheme" content="light">
+  <title>NITI — คลังความรู้กฎหมายไทย</title>
+  <style>
+    :root {
+      --navy:#12243e; --navy-deep:#0c192c; --ink:#17283b; --muted:#617083;
+      --gold:#c6a365; --gold-light:#e7d7b8; --paper:#f8f7f3; --line:#e5e5df;
+      --white:#fff; --radius:19px; --shadow:0 20px 50px rgba(19,35,56,.08);
+    }
+    *, *::before, *::after { box-sizing:border-box }
+    html { scroll-behavior:smooth }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:"Noto Sans Thai","Leelawadee UI",Tahoma,sans-serif; line-height:1.65 }
+    a { color:inherit; text-decoration:none }
+    button, input { font:inherit }
+    button { cursor:pointer }
+    :focus-visible { outline:3px solid var(--gold); outline-offset:3px }
+    .container { width:min(1120px,calc(100% - 44px)); margin-inline:auto }
+    .skip { position:absolute; left:12px; top:-70px; background:white; padding:8px 15px; z-index:100 }
+    .skip:focus { top:12px }
+    header { background:var(--navy); color:#fff; border-bottom:1px solid rgba(255,255,255,.12) }
+    .nav { min-height:85px; display:flex; align-items:center; justify-content:space-between; gap:24px }
+    .brand { display:inline-flex; align-items:center; gap:13px; white-space:nowrap }
+    .brand-mark { width:45px; height:45px; display:grid; place-items:center; font:bold 26px Georgia,serif; color:var(--gold-light); border:1.5px solid var(--gold); border-radius:12px }
+    .brand strong { display:block; font:700 21px Georgia,serif; line-height:1.2; letter-spacing:.15em }
+    .brand small { display:block; font-size:11px; letter-spacing:.08em; color:#afc0d2 }
+    .nav-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:12px 29px; font-size:14px; color:#dce4ed }
+    .nav-links a:hover, .nav-links a:focus-visible { color:var(--gold-light) }
+    .hero { color:#fff; background:radial-gradient(circle at 89% 20%,rgba(198,163,101,.11),transparent 34%),linear-gradient(135deg,#142b48,#0d1b2e); overflow:hidden }
+    .hero-grid { display:grid; grid-template-columns:1.15fr .85fr; align-items:center; gap:70px; padding-block:87px 93px }
+    .eyebrow { color:var(--gold-light); text-transform:uppercase; font-size:12px; letter-spacing:.23em; font-weight:700 }
+    .short-rule { width:39px; height:2px; margin:24px 0; background:var(--gold) }
+    h1, h2, h3, p { margin-top:0 }
+    h1 { font-size:clamp(37px,5.3vw,67px); line-height:1.24; letter-spacing:-.045em; font-weight:730; margin-bottom:22px }
+    h1 em { color:var(--gold-light); font-style:normal }
+    .hero p { max-width:550px; color:#c1cedb; font-size:17px; margin-bottom:32px }
+    .hero-actions { display:flex; flex-wrap:wrap; gap:13px }
+    .btn { display:inline-flex; justify-content:center; align-items:center; gap:12px; min-height:48px; padding:10px 21px; border:1px solid transparent; border-radius:10px; font-size:14px; font-weight:700; transition:transform .2s,background .2s }
+    .btn:hover { transform:translateY(-2px) }
+    .btn-gold { background:var(--gold); color:#112035 }
+    .btn-gold:hover { background:#d8b577 }
+    .btn-ghost { border-color:#53677b; color:white }
+    .btn-ghost:hover { background:rgba(255,255,255,.08) }
+    .hero-art { min-height:320px; display:grid; place-items:center; position:relative; isolation:isolate }
+    .hero-art::before { content:""; position:absolute; inset:2% 10%; border:1px solid rgba(220,192,140,.18); border-radius:50%; transform:rotate(-19deg) }
+    .hero-art::after { content:""; position:absolute; inset:13% 0; border:1px solid rgba(220,192,140,.12); border-radius:50%; transform:rotate(22deg) }
+    .art-card { position:relative; z-index:1; width:min(320px,100%); min-height:330px; padding:29px; background:linear-gradient(140deg,#203952,#14263c); box-shadow:0 28px 66px #07122277; border:1px solid rgba(221,194,148,.3); border-radius:15px; transform:rotate(3deg) }
+    .art-top { display:flex; justify-content:space-between; color:var(--gold-light); font:12px Georgia,serif; letter-spacing:.12em }
+    .art-line { height:1px; background:linear-gradient(90deg,var(--gold),transparent); margin:18px 0 25px }
+    .scales { display:block; width:180px; height:150px; margin:0 auto 9px; stroke:var(--gold-light); fill:none; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round }
+    .art-title { text-align:center; font:24px Georgia,serif; letter-spacing:.1em }
+    .art-sub { text-align:center; color:#a6b5c7; font-size:12px; letter-spacing:.05em; margin-top:7px }
+    section { scroll-margin-top:20px }
+    .section { padding-block:85px }
+    .section-heading { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:end; gap:24px; margin-bottom:30px }
+    .overline { color:#947243; font-size:12px; font-weight:800; letter-spacing:.13em }
+    h2 { font-size:clamp(26px,3vw,38px); line-height:1.3; letter-spacing:-.03em; margin:8px 0 10px }
+    .section-desc { color:var(--muted); max-width:670px; margin:0 }
+    .search-box { background:white; display:flex; align-items:center; gap:12px; width:min(350px,100%); min-height:49px; padding:4px 9px 4px 16px; border:1px solid #d9dcd9; border-radius:11px; box-shadow:0 3px 12px #17283b09 }
+    .search-icon { width:18px; height:18px; fill:none; stroke:#758292; stroke-width:2 }
+    .search-box input { outline:0; border:0; flex:1; min-width:0; color:var(--ink); background:transparent; font-size:14px }
+    .search-box:focus-within { border-color:var(--gold); box-shadow:0 0 0 3px #c6a36533 }
+    .clear-search { background:transparent; border:0; border-radius:6px; color:#637287; padding:3px 8px; display:none }
+    .clear-search.show { display:block }
+    .result-line { font-size:13px; color:var(--muted); margin-bottom:17px }
+    .cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px }
+    .topic { background:var(--white); border:1px solid var(--line); border-radius:var(--radius); padding:29px 28px; box-shadow:0 7px 24px #13233b08; transition:border-color .2s,transform .2s,box-shadow .2s }
+    .topic:hover { border-color:#cdbb9a; box-shadow:var(--shadow); transform:translateY(-3px) }
+    .topic[hidden] { display:none!important }
+    .card-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px }
+    .card-icon { display:grid; place-items:center; width:48px; height:48px; background:#f7f3e9; border-radius:13px; color:#956f35; font:25px Georgia,serif }
+    .card-index { color:#b3bcc5; font:15px Georgia,serif }
+    h3 { font-size:20px; margin-bottom:8px }
+    .topic p { min-height:46px; color:#687687; font-size:14px; margin-bottom:19px }
+    .tags { display:flex; flex-wrap:wrap; gap:8px }
+    .tags span { display:inline-block; color:#536578; background:#f2f5f7; padding:6px 10px; border-radius:7px; font-size:12px }
+    .empty { text-align:center; padding:30px; background:white; border:1px dashed #cad0d5; border-radius:14px; color:var(--muted) }
+    .empty[hidden] { display:none }
+    .how { background:#edece6; padding-block:70px }
+    .steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:26px; margin-top:30px }
+    .step { padding-left:19px; border-left:2px solid var(--gold) }
+    .step-num { color:#9b763e; font:700 13px Georgia,serif; letter-spacing:.1em }
+    .step h3 { font-size:17px; margin:11px 0 7px }
+    .step p { color:#677483; font-size:14px; margin:0 }
+    .resources { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px; margin-top:30px }
+    .source { display:flex; align-items:center; gap:14px; border:1px solid var(--line); background:#fff; border-radius:12px; padding:18px 20px; transition:border-color .2s,transform .2s }
+    .source:hover { border-color:var(--gold); transform:translateY(-2px) }
+    .source-number { color:#a78149; font:19px Georgia,serif; min-width:28px }
+    .source-copy { flex:1; min-width:0 }
+    .source strong, .source small { display:block }
+    .source strong { font-size:15px; font-weight:700 }
+    .source small { color:var(--muted); font-size:12px; word-break:break-word }
+    .external { font-size:21px; color:#8b754f }
+    footer { background:var(--navy-deep); color:#b9c7d4; padding:31px 0 37px }
+    .footer-grid { display:flex; gap:22px; justify-content:space-between; align-items:center; flex-wrap:wrap }
+    footer strong { color:#fff; letter-spacing:.12em; font:19px Georgia,serif }
+    footer p { font-size:12px; max-width:550px; margin:8px 0 0 }
+    footer a { font-size:13px; color:var(--gold-light) }
+    @media (max-width:820px) {
+      .hero-grid { grid-template-columns:1fr; padding-block:69px; gap:25px }
+      .hero-art { min-height:280px }
+      .art-card { width:265px; min-height:285px; padding:20px }
+      .scales { height:124px }
+      .section { padding-block:61px }
+      .section-heading { align-items:stretch }
+      .search-box { width:100% }
+    }
+    @media (max-width:600px) {
+      .container { width:min(100% - 32px,1120px) }
+      .nav { align-items:flex-start; flex-direction:column; gap:16px; padding-block:16px }
+      .nav-links { justify-content:flex-start; gap:16px; font-size:13px }
+      .hero-grid { padding-block:51px 59px }
+      .hero-art { display:none }
+      .hero p { font-size:15px }
+      .cards,.steps,.resources { grid-template-columns:1fr }
+      .topic { padding:25px 22px }
+      .topic p { min-height:0 }
+      .how { padding-block:53px }
+      .steps { gap:22px }
+      .btn { width:100% }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      html { scroll-behavior:auto }
+      *,*::before,*::after { transition:none!important }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">ข้ามไปยังเนื้อหาหลัก</a>
+  <header>
+    <nav class="nav container" aria-label="เมนูหลัก">
+      <a class="brand" href="#home" aria-label="NITI หน้าหลัก">
+        <span class="brand-mark" aria-hidden="true">น</span>
+        <span><strong>NITI</strong><small>LEGAL KNOWLEDGE</small></span>
+      </a>
+      <div class="nav-links">
+        <a href="#topics">หมวดกฎหมาย</a>
+        <a href="#how-to">วิธีใช้งาน</a>
+        <a href="#sources">แหล่งข้อมูลทางการ</a>
+        <a href="https://github.com/chakritago/niti.github.io" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+      </div>
+    </nav>
+  </header>
+  <main id="main">
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Explore · Understand · Apply</div>
+          <div class="short-rule" aria-hidden="true"></div>
+          <h1 id="hero-title">เข้าใจกฎหมาย<br><em>อย่างเป็นระบบ</em></h1>
+          <p>พื้นที่เริ่มต้นสำหรับค้นหาหัวข้อศึกษากฎหมายไทย จัดหมวดหมู่ให้เข้าใจง่าย และเชื่อมต่อแหล่งข้อมูลจากหน่วยงานทางการ</p>
+          <div class="hero-actions">
+            <a class="btn btn-gold" href="#topics">สำรวจหมวดกฎหมาย <span aria-hidden="true">↗</span></a>
+            <a class="btn btn-ghost" href="#sources">แหล่งข้อมูลอ้างอิง <span aria-hidden="true">→</span></a>
+          </div>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="art-card">
+            <div class="art-top"><span>LEX · THAILAND</span><span>01 / NITI</span></div>
+            <div class="art-line"></div>
+            <svg class="scales" viewBox="0 0 180 150" aria-hidden="true">
+              <path d="M90 22v105M57 128h66M72 117h36M38 48h104M90 22l-52 26M90 22l52 26M38 48l-24 52M38 48l24 52M142 48l-24 52M142 48l24 52M5 100h66c-4 17-18 25-33 25S9 117 5 100ZM109 100h66c-4 17-18 25-33 25s-29-8-33-25Z"></path>
+              <circle cx="90" cy="18" r="7"></circle>
+            </svg>
+            <div class="art-title">N I T I</div>
+            <div class="art-sub">KNOWLEDGE · JUSTICE · REASON</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="section container" id="topics" aria-labelledby="topics-title">
+      <div class="section-heading">
+        <div>
+          <div class="overline">01 / KNOWLEDGE AREAS</div>
+          <h2 id="topics-title">สำรวจหมวดกฎหมาย</h2>
+          <p class="section-desc">เลือกหัวข้อเพื่อวางแผนศึกษา หรือใช้ช่องค้นหาเพื่อกรองหมวดตามคำสำคัญ</p>
+        </div>
+        <label class="search-box" for="topic-search">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="m16 16 5 5"></path></svg>
+          <input id="topic-search" type="search" placeholder="ค้นหา เช่น คำสั่งทางปกครอง" autocomplete="off">
+          <button class="clear-search" id="clear-search" type="button" aria-label="ล้างคำค้น">✕</button>
+        </label>
+      </div>
+      <p class="result-line" id="result-count" role="status" aria-live="polite">แสดงทั้งหมด 4 หมวด</p>
+      <div class="cards" id="topic-cards">
+        <article class="topic" data-search="กฎหมายปกครอง คำสั่งทางปกครอง การใช้อำนาจรัฐ ศาลปกครอง คดีปกครอง หน่วยงานรัฐ">
+          <div class="card-top"><span class="card-icon" aria-hidden="true">§</span><span class="card-index">01</span></div>
+          <h3>กฎหมายปกครอง</h3>
+          <p>หลักเกณฑ์การใช้อำนาจของฝ่ายปกครองและการตรวจสอบการกระทำของหน่วยงานรัฐ</p>
+          <div class="tags"><span>คำสั่งทางปกครอง</span><span>การใช้อำนาจรัฐ</span><span>คดีปกครอง</span></div>
+        </article>
+        <article class="topic" data-search="กฎหมายแพ่งและพาณิชย์ นิติกรรม สัญญา หนี้ ละเมิด ทรัพย์สิน">
+          <div class="card-top"><span class="card-icon" aria-hidden="true">⌘</span><span class="card-index">02</span></div>
+          <h3>กฎหมายแพ่งและพาณิชย์</h3>
+          <p>ความสัมพันธ์ทางกฎหมายระหว่างบุคคล สิทธิ หน้าที่ และความรับผิดในทางแพ่ง</p>
+          <div class="tags"><span>นิติกรรมและสัญญา</span><span>หนี้</span><span>ละเมิด</span></div>
+        </article>
+        <article class="topic" data-search="กฎหมายอาญา ความผิด องค์ประกอบความผิด เจตนา โทษ อาญา">
+          <div class="card-top"><span class="card-icon" aria-hidden="true">¶</span><span class="card-index">03</span></div>
+          <h3>กฎหมายอาญา</h3>
+          <p>ศึกษาองค์ประกอบของความผิด หลักความรับผิดทางอาญา และโครงสร้างของบทกำหนดโทษ</p>
+          <div class="tags"><span>องค์ประกอบความผิด</span><span>เจตนา</span><span>โทษ</span></div>
+        </article>
+        <article class="topic" data-search="กฎหมายวิธีพิจารณาความ เขตอำนาจศาล คู่ความ พยานหลักฐาน ระยะเวลา ฟ้องร้อง">
+          <div class="card-top"><span class="card-icon" aria-hidden="true">⚖</span><span class="card-index">04</span></div>
+          <h3>กฎหมายวิธีพิจารณาความ</h3>
+          <p>ภาพรวมกระบวนพิจารณาคดี การดำเนินกระบวนพิจารณา และประเด็นด้านพยานหลักฐาน</p>
+          <div class="tags"><span>เขตอำนาจศาล</span><span>พยานหลักฐาน</span><span>ระยะเวลา</span></div>
+        </article>
+      </div>
+      <p class="empty" id="empty-state" hidden>ไม่พบหมวดที่ตรงกับคำค้น ลองใช้คำอื่น เช่น “สัญญา” หรือ “ศาล”</p>
+    </section>
+    <section class="how" id="how-to" aria-labelledby="how-title">
+      <div class="container">
+        <div class="overline">02 / STUDY WORKFLOW</div>
+        <h2 id="how-title">เริ่มศึกษากฎหมายอย่างไร</h2>
+        <p class="section-desc">แนวทางง่าย ๆ สำหรับตรวจสอบหัวข้อและค้นคว้าข้อมูลที่น่าเชื่อถือ</p>
+        <div class="steps">
+          <div class="step"><span class="step-num">STEP 01</span><h3>กำหนดประเด็น</h3><p>เลือกหมวดกฎหมายและระบุคำสำคัญที่ต้องการศึกษาให้ชัดเจน</p></div>
+          <div class="step"><span class="step-num">STEP 02</span><h3>ตรวจสอบกฎหมาย</h3><p>ค้นบทบัญญัติและฉบับแก้ไขเพิ่มเติมจากแหล่งข้อมูลทางการ</p></div>
+          <div class="step"><span class="step-num">STEP 03</span><h3>อ่านแนวคำวินิจฉัย</h3><p>พิจารณาข้อเท็จจริง หลักกฎหมาย และเหตุผลในคำพิพากษาที่เกี่ยวข้อง</p></div>
+        </div>
+      </div>
+    </section>
+    <section class="section container" id="sources" aria-labelledby="sources-title">
+      <div class="overline">03 / OFFICIAL RESOURCES</div>
+      <h2 id="sources-title">แหล่งข้อมูลกฎหมายทางการ</h2>
+      <p class="section-desc">ลิงก์ไปยังเว็บไซต์หน่วยงานภายนอก เพื่อใช้ตรวจสอบตัวบทกฎหมายและข้อมูลจากหน่วยงานที่เกี่ยวข้อง</p>
+      <div class="resources">
+        <a class="source" href="https://ratchakitcha.soc.go.th/" target="_blank" rel="noopener noreferrer"><span class="source-number">01</span><span class="source-copy"><strong>ราชกิจจานุเบกษา</strong><small>ratchakitcha.soc.go.th</small></span><span class="external" aria-hidden="true">↗</span></a>
+        <a class="source" href="https://www.krisdika.go.th/" target="_blank" rel="noopener noreferrer"><span class="source-number">02</span><span class="source-copy"><strong>สำนักงานคณะกรรมการกฤษฎีกา</strong><small>krisdika.go.th</small></span><span class="external" aria-hidden="true">↗</span></a>
+        <a class="source" href="https://www.admincourt.go.th/" target="_blank" rel="noopener noreferrer"><span class="source-number">03</span><span class="source-copy"><strong>ศาลปกครอง</strong><small>admincourt.go.th</small></span><span class="external" aria-hidden="true">↗</span></a>
+        <a class="source" href="https://www.coj.go.th/" target="_blank" rel="noopener noreferrer"><span class="source-number">04</span><span class="source-copy"><strong>ศาลยุติธรรม</strong><small>coj.go.th</small></span><span class="external" aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="container footer-grid">
+      <div><strong>NITI</strong><p>เว็บไซต์อิสระเพื่อการศึกษา ไม่ใช่เว็บไซต์ของหน่วยงานรัฐ และข้อมูลบนหน้านี้ไม่ใช่คำปรึกษากฎหมายเฉพาะกรณี โปรดตรวจสอบกฎหมายที่ใช้บังคับล่าสุดจากแหล่งข้อมูลทางการ</p></div>
+      <a href="https://github.com/chakritago/niti.github.io" target="_blank" rel="noopener noreferrer">ดูซอร์สโค้ดบน GitHub ↗</a>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      "use strict";
+      var search = document.getElementById("topic-search");
+      var cards = Array.from(document.querySelectorAll(".topic"));
+      var count = document.getElementById("result-count");
+      var empty = document.getElementById("empty-state");
+      var clear = document.getElementById("clear-search");
+      function filter() {
+        var q = search.value.trim().toLocaleLowerCase("th");
+        var shown = 0;
+        cards.forEach(function (card) {
+          var haystack = (card.dataset.search + " " + card.textContent).toLocaleLowerCase("th");
+          var match = !q || haystack.includes(q);
+          card.hidden = !match;
+          if (match) shown += 1;
+        });
+        count.textContent = q ? "พบ " + shown + " จาก " + cards.length + " หมวด" : "แสดงทั้งหมด " + cards.length + " หมวด";
+        empty.hidden = shown !== 0;
+        clear.classList.toggle("show", !!q);
+      }
+      search.addEventListener("input", filter);
+      clear.addEventListener("click", function () { search.value = ""; filter(); search.focus(); });
+      filter();
+    }());
+  </script>
+</body>
+</html>
