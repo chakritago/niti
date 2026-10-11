@@ -101,6 +101,10 @@
     footer strong { color:#fff; letter-spacing:.12em; font:19px Georgia,serif }
     footer p { font-size:12px; max-width:550px; margin:8px 0 0 }
     footer a { font-size:13px; color:var(--gold-light) }
+    .quiz-promo { display:flex;align-items:center;justify-content:space-between;gap:25px;flex-wrap:wrap;margin-top:37px;margin-bottom:-25px;padding:28px 32px;border:1px solid #e6dcc9;border-radius:17px;background:#fffaf1;box-shadow:0 12px 32px #13233b09 }
+    .quiz-promo h2 { font-size:clamp(21px,3vw,29px);margin:6px 0 }
+    .quiz-promo p { color:#65717c;font-size:14px;max-width:660px;margin:0 }
+    .quiz-promo .btn { white-space:nowrap }
     @media (max-width:820px) {
       .hero-grid { grid-template-columns:1fr; padding-block:69px; gap:25px }
       .hero-art { min-height:280px }
@@ -140,6 +144,7 @@
       </a>
       <div class="nav-links">
         <a href="#topics">หมวดกฎหมาย</a>
+        <a href="./quiz.html">ติวเขียนข้อสอบ</a>
         <a href="#how-to">วิธีใช้งาน</a>
         <a href="#sources">แหล่งข้อมูลทางการ</a>
         <a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
@@ -172,6 +177,14 @@
           </div>
         </div>
       </div>
+    </section>
+    <section class="container quiz-promo" aria-labelledby="promo-title">
+      <div>
+        <div class="overline">NEW / LAW2101 · LAW2001</div>
+        <h2 id="promo-title">ระบบติวเขียนข้อสอบกฎหมายลักษณะทรัพย์สินและที่ดิน</h2>
+        <p>ฝึกตอบอัตนัยจากโจทย์สรุปตามข้อสอบที่เผยแพร่จริง 15 ข้อ พร้อมลิงก์ต้นทางเฉพาะทุกข้อ ธงคำตอบแบบย่อ และเกณฑ์ประเมินตนเอง</p>
+      </div>
+      <a class="btn btn-gold" href="./quiz.html">เข้าสู่สนามฝึกเขียนข้อสอบ ↗</a>
     </section>
     <section class="section container" id="topics" aria-labelledby="topics-title">
       <div class="section-heading">
