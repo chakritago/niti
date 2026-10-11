@@ -46,4 +46,53 @@
   }
   if (media && media.addEventListener) media.addEventListener("change", systemChanged);
   else if (media && media.addListener) media.addListener(systemChanged);
+
+  // Reading accessibility: comfortable 20px default (18 / 20 / 22 / 24px).
+  // The choice is independent from light/dark theme and shared by all pages.
+  var FONT_KEY = "niti-font-level-v1";
+  var levels = [
+    { id: "normal", px: 18 },
+    { id: "comfortable", px: 20 },
+    { id: "large", px: 22 },
+    { id: "extra", px: 24 }
+  ];
+  var smaller = document.getElementById("font-decrease");
+  var larger = document.getElementById("font-increase");
+  var sizeLabel = document.getElementById("font-current");
+
+  function fontPreference() {
+    try {
+      var choice = window.localStorage.getItem(FONT_KEY);
+      return levels.some(function (level) { return level.id === choice; })
+        ? choice : "comfortable";
+    } catch (_) {
+      return "comfortable";
+    }
+  }
+  function saveFont(choice) {
+    try { window.localStorage.setItem(FONT_KEY, choice); } catch (_) {}
+  }
+  function setFontLevel(choice, save) {
+    var index = levels.findIndex(function (level) { return level.id === choice; });
+    if (index < 0) index = 1;
+    var active = levels[index];
+    root.setAttribute("data-font-level", active.id);
+    if (sizeLabel) {
+      sizeLabel.value = active.px + " px";
+      sizeLabel.textContent = active.px + " px";
+      sizeLabel.setAttribute("aria-label", "ขนาดตัวอักษรปัจจุบัน " + active.px + " พิกเซล");
+    }
+    if (smaller) smaller.disabled = index === 0;
+    if (larger) larger.disabled = index === levels.length - 1;
+    if (save) saveFont(active.id);
+  }
+  function changeFont(by) {
+    var current = root.getAttribute("data-font-level");
+    var index = levels.findIndex(function (level) { return level.id === current; });
+    if (index < 0) index = 1;
+    setFontLevel(levels[Math.max(0, Math.min(levels.length - 1, index + by))].id, true);
+  }
+  setFontLevel(fontPreference(), false);
+  if (smaller) smaller.addEventListener("click", function () { changeFont(-1); });
+  if (larger) larger.addEventListener("click", function () { changeFont(1); });
 }());
