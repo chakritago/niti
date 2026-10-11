@@ -124,3 +124,5 @@
  .study-page .trick-row summary{padding:16px}
  .study-page .trick-body{padding:16px}
 }
+.study-page .skip-link{position:absolute;top:-90px;left:12px;z-index:100;background:var(--md-surface);padding:10px 18px;border-radius:12px;color:var(--md-primary);font-weight:800}
+.study-page .skip-link:focus{top:10px}
