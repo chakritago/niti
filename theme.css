@@ -617,3 +617,181 @@ footer,footer p,footer a{font-size:.82rem!important}
   .theme-toggle,.font-controls{display:none!important}
   body{background:white!important;color:black!important}
 }
+
+
+/* Readability & color-depth update — rich structured learning surfaces */
+:root{
+ --read-base:24px;
+ --md-bg:#eaf1f7;
+ --md-surface-low:#eaf3f9;
+ --md-surface-high:#dfe9f4;
+ --md-border:#cad6e3;
+ --md-primary-container:#dbeaff;
+ --md-text-secondary:#3d4b5f;
+ --study-teal:#00695c;
+ --study-teal-soft:#d5f2e9;
+ --study-orange:#a14f13;
+ --study-orange-soft:#ffead1;
+ --study-violet:#583f9e;
+ --study-violet-soft:#ede5ff;
+ --study-coral:#ac3f43;
+ --study-coral-soft:#ffe4e4;
+ --study-blue:#1258b7;
+ --study-blue-soft:#deecff;
+ --study-green:#1b6b3a;
+ --study-green-soft:#dff4e3;
+}
+html[data-theme="dark"]{
+ --md-bg:#101d27;
+ --md-surface:#1d2a36;
+ --md-surface-low:#253744;
+ --md-surface-high:#304453;
+ --md-border:#415465;
+ --md-text-secondary:#d2dae6;
+ --md-primary-container:#1d416c;
+ --study-teal:#83ddc9;
+ --study-teal-soft:#193e3a;
+ --study-orange:#ffbf84;
+ --study-orange-soft:#553720;
+ --study-violet:#cbb7ff;
+ --study-violet-soft:#3a315b;
+ --study-coral:#ffc0c0;
+ --study-coral-soft:#593337;
+ --study-blue:#a8c7fa;
+ --study-blue-soft:#1c3e65;
+ --study-green:#93d9a6;
+ --study-green-soft:#234330;
+}
+html[data-font-level="normal"]{--read-base:20px}
+html[data-font-level="comfortable"]{--read-base:22px}
+html[data-font-level="large"]{--read-base:24px}
+html[data-font-level="extra"]{--read-base:26px}
+html[data-font-level="max"]{--read-base:28px}
+body{letter-spacing:0!important;line-height:1.88!important}
+p,li,blockquote{line-height:1.92!important}
+.font-current{min-width:55px}
+.font-button,.theme-toggle{font-size:.91rem!important}
+.font-controls{background:var(--md-surface-low);border-color:var(--md-border)}
+header{box-shadow:0 1px 0 var(--md-border)}
+.home-page .hero{
+ background:linear-gradient(135deg,var(--md-primary-container),var(--study-teal-soft))!important;
+ border-bottom:3px solid var(--md-primary)!important;
+}
+.home-page .hero p,.home-page .quiz-promo p,
+.home-page .topic p,.home-page .step p,
+.home-page .section-desc{font-size:1.08rem!important;line-height:1.88!important}
+.home-page .hero .eyebrow{font-size:.93rem!important}
+.home-page .quiz-promo{
+ background:linear-gradient(115deg,var(--study-orange-soft),var(--md-primary-container))!important;
+ border-left:5px solid var(--study-orange)!important;
+}
+.home-page .quiz-promo h2{color:var(--md-text)!important}
+.home-page .section-heading{margin-bottom:27px}
+.home-page .topic{
+ border-top:5px solid var(--md-primary)!important;
+ background:var(--md-surface)!important;
+}
+.home-page .topic:nth-child(2){border-top-color:var(--study-teal)!important}
+.home-page .topic:nth-child(3){border-top-color:var(--study-orange)!important}
+.home-page .topic:nth-child(4){border-top-color:var(--study-violet)!important}
+.home-page .topic:nth-child(2) .card-icon{background:var(--study-teal-soft)!important;color:var(--study-teal)!important}
+.home-page .topic:nth-child(3) .card-icon{background:var(--study-orange-soft)!important;color:var(--study-orange)!important}
+.home-page .topic:nth-child(4) .card-icon{background:var(--study-violet-soft)!important;color:var(--study-violet)!important}
+.home-page .topic h3{font-size:1.22rem!important}
+.home-page .tags span{font-size:.92rem!important}
+.home-page .source strong{font-size:1.08rem!important}
+.home-page .source small{font-size:.92rem!important}
+.home-page .step h3{font-size:1.2rem!important}
+.home-page .study-card{border-top:5px solid var(--study-teal);background:var(--md-surface)!important}
+.home-page .study-step{font-size:1rem!important}
+.home-page .overline,.home-page .eyebrow,.tutor-page .kicker{font-size:.91rem!important}
+.home-page .result-line{font-size:.93rem!important}
+.tutor-page .hero{
+ background:linear-gradient(110deg,var(--md-primary-container),var(--study-teal-soft))!important;
+ border-bottom:3px solid var(--md-primary)!important;
+}
+.tutor-page .hero p{font-size:1.09rem!important;color:var(--md-text)!important}
+.tutor-page .chip{font-size:.9rem!important;background:var(--md-surface)!important}
+.tutor-page .summary-item{border-top:4px solid var(--md-primary)!important}
+.tutor-page .summary-item:nth-child(2){border-top-color:var(--study-teal)!important}
+.tutor-page .summary-item:nth-child(3){border-top-color:var(--study-orange)!important}
+.tutor-page .summary-item span{font-size:.97rem!important}
+.tutor-page .aside-head{background:var(--md-primary-container)!important}
+.tutor-page .controls{background:var(--md-surface-low)!important}
+.tutor-page .aside-head h2{font-size:1.2rem!important}
+.tutor-page .aside-head p,.tutor-page .field-label,.tutor-page .results{font-size:.97rem!important}
+.tutor-page .q-item strong{font-size:1.08rem!important}
+.tutor-page .q-item small,.tutor-page .q-item-top{font-size:.92rem!important}
+.tutor-page .topic-tag{font-size:.92rem!important}
+.tutor-page .task-heading h2{font-size:1.57rem!important}
+.tutor-page .source-box{border-left:5px solid var(--md-primary)!important;background:var(--md-primary-container)!important}
+.tutor-page .source-box p,.tutor-page .source-box a{font-size:1rem!important}
+.tutor-page .scenario{
+ background:var(--study-orange-soft)!important;
+ border-left:6px solid var(--study-orange)!important;
+ font-size:1.17rem!important;line-height:2!important;
+}
+.tutor-page .prompt{
+ background:var(--study-teal-soft)!important;
+ color:var(--md-text)!important;
+ border-left:5px solid var(--study-teal);
+ font-size:1.13rem!important;
+}
+.tutor-page .box-title{font-size:1.18rem!important}
+.tutor-page .original-card{border-top:5px solid var(--study-blue)!important}
+.tutor-page .model-card{border-top:5px solid var(--study-orange)!important}
+.tutor-page .coach-card{border-top:5px solid var(--study-teal)!important}
+.tutor-page .coach-heading{background:var(--study-teal-soft)!important}
+.tutor-page .coach-heading h3,.tutor-page .coach-heading p{color:var(--md-text)!important}
+.tutor-page .coach-avatar{background:var(--study-teal)!important}
+.tutor-page .coach-log{background:var(--md-surface-low)!important}
+.tutor-page .coach-bubble{
+ background:var(--md-surface)!important;
+ border-left:4px solid var(--study-teal)!important;
+}
+.tutor-page .coach-line.student .coach-bubble{
+ border-left:0!important;border-right:4px solid var(--md-primary)!important;
+ background:var(--md-primary-container)!important;
+}
+.tutor-page .coach-bubble p{font-size:1.11rem!important;line-height:1.98!important}
+.tutor-page .coach-who{font-size:.95rem!important}
+.tutor-page .coach-entry textarea,.tutor-page .answer-grid textarea{
+ font-size:1.1rem!important;line-height:1.95!important;
+}
+.tutor-page .answer-box label{font-size:1.09rem!important}
+.tutor-page .answer-box label span{font-size:.92rem!important}
+.tutor-page .model-part h4{font-size:1.19rem!important}
+.tutor-page .model-part p{font-size:1.14rem!important;line-height:2!important}
+.tutor-page .key-points{background:var(--md-surface-low)!important}
+.tutor-page .key-points li,.tutor-page .key-points p{font-size:1.13rem!important;line-height:1.9!important}
+.tutor-page .rubric label{font-size:1.05rem!important}
+.tutor-page .coach-status,.tutor-page .coach-hintbar{font-size:.96rem!important}
+.tutor-page .original-heading h3,.tutor-page .coach-heading h3,
+.tutor-page .model-heading h3{font-size:1.29rem!important}
+.tutor-page .original-heading p,.tutor-page .coach-heading p,
+.tutor-page .model-heading p{font-size:.99rem!important}
+.tutor-page .original-wrapper p,.tutor-page .original-wrapper a{font-size:1rem!important}
+.tutor-page .info,.tutor-page .minor,.tutor-page .sub{font-size:.98rem!important}
+.tutor-page .timer,.tutor-page .status{font-size:1.01rem!important}
+.tutor-page .score{font-size:1.05rem!important}
+.tutor-page .coach-toolbar .btn,.tutor-page .original-buttons .btn{font-size:.96rem!important}
+.tutor-page .layout{grid-template-columns:minmax(285px,31%) minmax(0,1fr)}
+@media(max-width:1200px){
+ .tutor-page .layout{display:flex;flex-direction:column}
+ .tutor-page .layout>*{width:100%}
+ .tutor-page .question-list{max-height:280px}
+}
+@media(max-width:650px){
+ html{overflow-x:hidden}
+ body{overflow-x:hidden}
+ .home-page .hero h1{font-size:1.9rem!important}
+ .home-page .topic h3{font-size:1.18rem!important}
+ .tutor-page .task-heading h2{font-size:1.4rem!important}
+ .tutor-page .summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .tutor-page .summary-item b{font-size:1.24rem!important}
+ .tutor-page .summary-item span{font-size:.85rem!important}
+ .tutor-page .coach-bubble p,.tutor-page .model-part p{font-size:1.05rem!important}
+ .tutor-page .scenario{font-size:1.1rem!important}
+ .theme-toggle{min-height:46px!important}
+ .font-controls{max-width:100%}
+}
