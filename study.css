@@ -126,3 +126,73 @@
 }
 .study-page .skip-link{position:absolute;top:-90px;left:12px;z-index:100;background:var(--md-surface);padding:10px 18px;border-radius:12px;color:var(--md-primary);font-weight:800}
 .study-page .skip-link:focus{top:10px}
+
+
+/* Ranking based on 15 observed samples; not a prediction of next exam */
+.study-page .rank-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.study-page .rank-card{
+  background:var(--md-surface);border:1px solid var(--md-border);
+  border-top:6px solid var(--md-primary);border-radius:18px;padding:20px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.study-page .rank-card.rank-a{border-top-color:var(--study-teal)}
+.study-page .rank-card.rank-b{border-top-color:var(--study-orange)}
+.study-page .rank-card.rank-c{border-top-color:var(--study-violet)}
+.study-page .rank-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.study-page .rank-position{font-size:1rem;font-weight:800;color:var(--md-text)}
+.study-page .rank-band{
+ font-size:.84rem;font-weight:750;padding:5px 13px;border-radius:999px;
+ background:var(--md-primary-container);color:var(--md-on-primary-container);
+}
+.study-page .rank-a .rank-band{background:var(--study-teal-soft);color:var(--study-teal)}
+.study-page .rank-b .rank-band{background:var(--study-orange-soft);color:var(--study-orange)}
+.study-page .rank-c .rank-band{background:var(--study-violet-soft);color:var(--study-violet)}
+.study-page .rank-card h3{margin:0;font-size:1.15rem}
+.study-page .rank-card p{margin:0 0 5px;font-size:.96rem;color:var(--md-text-secondary)}
+.study-page .rank-exams{display:grid;gap:9px;margin-top:auto;padding-top:11px;border-top:1px solid var(--md-border)}
+.study-page .rank-exams a{color:var(--md-primary);font-weight:650;font-size:.89rem;text-decoration:none;line-height:1.7}
+.study-page .rank-exams a:hover{text-decoration:underline}
+.study-page .statute-controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:18px 0 22px}
+.study-page .statute-controls label{font-weight:750;font-size:.92rem}
+.study-page .statute-controls input{
+ flex:1 1 300px;max-width:520px;min-height:54px;padding:12px 16px;
+ border-radius:13px;
+}
+.study-page .statute-controls output{font-weight:700;font-size:.91rem;color:var(--md-text-secondary)}
+.study-page .statute-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.study-page .statute-card,.tutor-page .statute-small{
+ border:1px solid var(--md-border);border-left:5px solid var(--md-primary);
+ background:var(--md-surface);padding:21px;border-radius:16px;min-width:0;
+}
+.study-page .statute-card:nth-child(3n+2){border-left-color:var(--study-teal)}
+.study-page .statute-card:nth-child(3n){border-left-color:var(--study-orange)}
+.study-page .statute-head,.tutor-page .statute-head{
+ display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:11px;
+}
+.study-page .statute-head h3,.tutor-page .statute-head h3{font-size:1.16rem!important;flex:1 1 220px;margin:0 0 12px}
+.study-page .statute-link,.tutor-page .statute-link{
+ color:var(--md-primary);font-weight:800;font-size:.9rem;
+ background:var(--md-primary-container);border-radius:999px;
+ text-decoration:none;padding:7px 14px;line-height:1.6;
+}
+.study-page .statute-plain,.tutor-page .statute-plain{font-size:1.04rem;line-height:1.9}
+.study-page .statute-example,.tutor-page .statute-example{
+ border:1px solid var(--md-border);border-left:5px solid var(--study-teal);
+ background:var(--study-teal-soft);border-radius:10px;padding:15px 18px;
+}
+.study-page .statute-example strong,.tutor-page .statute-example strong{
+ color:var(--study-teal);font-size:.94rem;
+}
+.study-page .statute-example p,.tutor-page .statute-example p{
+ font-size:1.04rem;line-height:2!important;margin:9px 0 0;
+}
+.study-page .statute-conditions,.study-page .statute-warning{font-size:.96rem;line-height:1.82}
+.study-page .statute-warning{color:var(--md-text-secondary)}
+.study-page .statute-card p:last-child{margin-bottom:0}
+@media(max-width:980px){
+ .study-page .rank-grid,.study-page .statute-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .study-page .rank-grid,.study-page .statute-list{grid-template-columns:1fr}
+ .study-page .rank-card,.study-page .statute-card{padding:18px}
+}
