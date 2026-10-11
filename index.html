@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#12243e">
   <meta name="description" content="NITI — พื้นที่รวบรวมหัวข้อศึกษากฎหมายไทย พร้อมทางลัดไปยังแหล่งข้อมูลกฎหมายจากหน่วยงานทางการ">
   <meta name="color-scheme" content="light dark">
-<script>(function(){var s="large";try{var x=localStorage.getItem("niti-font-level-v1");if(["normal","comfortable","large","extra","max"].includes(x))s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
+<script>(function(){var s="normal";try{var x=localStorage.getItem("niti-font-level-v1");if(["normal","comfortable","large","extra","max"].includes(x))s=x;}catch(e){}document.documentElement.setAttribute("data-font-level",s);}());</script>
   <script>(function(){try{var v=localStorage.getItem("niti-theme-v1");var m=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;document.documentElement.setAttribute("data-theme",v==="dark"||v!=="light"&&m?"dark":"light");}catch(e){document.documentElement.setAttribute("data-theme","light");}}());</script>
 
   <title>NITI — คลังความรู้กฎหมายไทย</title>
@@ -151,6 +151,8 @@
       </a>
       <div class="nav-links">
         <a href="#topics">หมวดกฎหมาย</a>
+        <a href="./study.html#ranking">อันดับแนวข้อสอบ</a>
+        <a href="./study.html#statute-notes">สรุปมาตรา + ตัวบท</a>
         <a href="./study.html">แผนอ่านสอบ 7 วัน</a>
         <a href="./quiz.html">ติวเขียนข้อสอบ</a>
         <a href="#how-to">วิธีใช้งาน</a>
@@ -160,7 +162,7 @@
         <div class="font-controls" role="group" aria-label="ปรับขนาดตัวอักษรเพื่อให้อ่านได้สบายตา">
           <span class="font-label">ตัวอักษร</span>
           <button id="font-decrease" class="font-button" type="button" aria-label="ลดขนาดตัวอักษร" title="ลดขนาดตัวอักษร">ก−</button>
-          <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">24 px</output>
+          <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">20 px</output>
           <button id="font-increase" class="font-button" type="button" aria-label="เพิ่มขนาดตัวอักษร" title="เพิ่มขนาดตัวอักษร">ก+</button>
         </div>
       </div>
@@ -199,7 +201,8 @@
         <h2 id="promo-title">ระบบติวเขียนข้อสอบกฎหมายลักษณะทรัพย์สินและที่ดิน</h2>
         <p>ฝึกตอบอัตนัยจากโจทย์สรุปตามข้อสอบที่เผยแพร่จริง 15 ข้อ พร้อมลิงก์ต้นทางเฉพาะทุกข้อ ธงคำตอบแบบย่อ และเกณฑ์ประเมินตนเอง</p>
       </div>
-      <div class="home-cta-stack"><a class="btn btn-gold" href="./quiz.html">เข้าสู่สนามฝึกเขียนข้อสอบ ↗</a><a class="btn btn-ghost" href="./study.html">อ่านแนวข้อสอบ + มาตราที่ควรจำ ↗</a></div>
+      <div class="home-cta-stack"><a class="btn btn-gold" href="./quiz.html">เข้าสู่สนามฝึกเขียนข้อสอบ ↗</a><a class="btn btn-ghost" href="./study.html#statute-notes">อ่านหลักกฎหมายพร้อมตัวบทเต็ม ↗</a>
+        <a class="btn btn-ghost" href="./study.html">อ่านแนวข้อสอบ + มาตราที่ควรจำ ↗</a></div>
     </section>
     <section class="section container" id="topics" aria-labelledby="topics-title">
       <div class="section-heading">
