@@ -30,7 +30,7 @@ log.scrollTop=log.scrollHeight;
 }
 function answerArea(){return document.getElementById("answer-"+names[Math.min(coachStep,3)]);}
 function currentPrompt(){return prompts[Math.min(coachStep,3)];}
-function intro(){var q=question();return "สวัสดีครับ เราจะฝึกข้อ "+q.number+" ภาค "+q.semester+"/"+q.year+" เรื่อง "+q.topic+" แบบถามตอบทีละขั้น ผมเป็นระบบแนะแนวอัตโนมัติ ไม่ใช่โมเดล AI จึงไม่สามารถตัดสินถูกผิดทางกฎหมายจากภาษาธรรมชาติได้ \n\n"+prompts[0];}
+function intro(){var q=question();return "สวัสดีครับ เราจะฝึก"+(q.kind==="practice"?"โจทย์แต่งใหม่ (ไม่ใช่ข้อสอบย้อนหลัง)":"ข้อ "+q.number+" ภาค "+q.semester+"/"+q.year)+" เรื่อง "+q.topic+" แบบถามตอบทีละขั้น ผมเป็นระบบแนะแนวอัตโนมัติ ไม่ใช่โมเดล AI จึงไม่สามารถตัดสินถูกผิดทางกฎหมายจากภาษาธรรมชาติได้ \n\n"+prompts[0];}
 function render(){
 if(!currentId)return;
 var q=question(),a=meta();if(!q||!a)return;
@@ -44,9 +44,10 @@ $("coach-input").placeholder=coachStep>=4?"ฝึกครบแล้ว เป
 $("coach-input").value="";
 $("coach-hint").disabled=coachStep>=4;
 $("coach-status").textContent=coachStep>=4?"ครบ 4 ขั้นแล้ว — คุณสามารถเปิดเฉลยตัวอย่างด้านล่าง และเทียบกับคำตอบของตน":"คำตอบที่ส่งจะใส่ลงกระดาษคำตอบ 4 ส่วนให้อัตโนมัติ";
-$("original-caption").textContent="ข้อ "+q.number+" · ภาค "+q.semester+"/"+q.year+" · อ่านเนื้อหาต้นฉบับและธงคำตอบในหน้าเดียวกัน (หากเว็บไซต์ปลายทางอนุญาตให้ฝัง)";
-$("original-link").href=q.sourceUrl;
-$("tutor-answer-source").href=q.sourceUrl;
+$("original-caption").textContent=q.kind==="practice"?"โจทย์แต่งใหม่ ไม่มีต้นฉบับข้อสอบย้อนหลัง":"ข้อ "+q.number+" · ภาค "+q.semester+"/"+q.year+" · อ่านเนื้อหาต้นฉบับและธงคำตอบในหน้าเดียวกัน (หากเว็บไซต์ปลายทางอนุญาตให้ฝัง)";
+$("original-link").href=q.sourceUrl||q.lawSourceUrl;
+$("tutor-answer-source").href=q.sourceUrl||q.lawSourceUrl;
+$("tutor-answer-source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านธงคำตอบต้นทาง ↗";
 setAnswerContent(q,a);closeOriginal();
 }
 function publishCoach(text){push("coach",text);addBubble("coach",text)}
@@ -105,7 +106,7 @@ addAnswerSection(el,"2. หลักกฎหมาย",a.rule);
 addAnswerSection(el,"3. วินิจฉัยปรับบท",a.application);
 addAnswerSection(el,"4. สรุปคำตอบ",a.bottomLine);
 var note=document.createElement("p");note.className="model-caution";note.textContent="ข้อควรระวัง: "+q.pitfall;el.appendChild(note);
-$("tutor-answer-meta").textContent=q.course+" · "+q.semester+"/"+q.year+" · ข้อ "+q.number+" · เฉลยเรียบเรียงใหม่เพื่อการศึกษา";
+$("tutor-answer-meta").textContent=q.course+" · "+(q.kind==="practice"?"โจทย์ฝึกแต่งใหม่ (ไม่ใช่ข้อสอบเก่า)":"ภาค "+q.semester+"/"+q.year+" · ข้อ "+q.number)+" · เฉลยเรียบเรียงใหม่เพื่อการศึกษา";
 }
 function toggleAnswer(force){
 var panel=$("tutor-answer-body"),button=$("tutor-answer-toggle");var open=typeof force==="boolean"?force:panel.hidden;panel.hidden=!open;
@@ -117,7 +118,7 @@ $("original-iframe").src="about:blank";
 }
 function toggleOriginal(){
 if(originalOpen){closeOriginal();return;}
-var q=question();if(!q)return;
+var q=question();if(!q||q.kind==="practice")return;
 originalOpen=true;$("original-wrapper").hidden=false;$("original-toggle").textContent="ซ่อนกรอบต้นฉบับ ↑";$("original-toggle").setAttribute("aria-expanded","true");
 $("original-iframe").src=q.sourceUrl;$("original-wrapper").scrollIntoView({behavior:"smooth",block:"nearest"});
 }
@@ -137,13 +138,13 @@ $("coach-show-answer").addEventListener("click",function(){toggleAnswer(true)});
 $("coach-copy-chatgpt").addEventListener("click",function(){
 var q=question();if(!q)return;
 var task=[
-"คุณคือผู้ช่วยติวสอบกฎหมายลักษณะทรัพย์สินและที่ดินของประเทศไทย (LAW2101/LAW2001)",
+"คุณคือผู้ช่วยติวสอบกฎหมายแพ่งและพาณิชย์ของประเทศไทย วิชา "+q.course+" เรื่อง "+q.topic,
 "ขอให้สอนแบบ Socratic เหมือน Study Mode: เริ่มถามผู้เรียนทีละคำถาม ห้ามเฉลยทันที ปรับคำถามตามคำตอบของผู้เรียน",
 "เน้น 4 ส่วน: ประเด็นปัญหา หลักกฎหมายพร้อมเลขมาตรา การปรับบทข้อเท็จจริง และสรุป โดยตรวจเหตุผลและชี้ส่วนที่ยังไม่ครบ",
 "ถ้าไม่แน่ใจเรื่องตัวบทหรือฎีกา ห้ามแต่งขึ้น ให้แนะนำแหล่งกฎหมายที่ตรวจสอบได้",
 "",
-"ข้อสอบ: "+q.course+" ภาค "+q.semester+"/"+q.year+" ข้อ "+q.number,
-"แหล่งต้นทางพร้อมธงคำตอบ: "+q.sourceUrl,
+(q.kind==="practice"?"โจทย์ฝึกแต่งใหม่ ไม่ใช่ข้อสอบย้อนหลัง: "+q.course:"ข้อสอบ: "+q.course+" ภาค "+q.semester+"/"+q.year+" ข้อ "+q.number),
+(q.kind==="practice"?"แหล่งตรวจตัวบทกฎหมาย: "+q.lawSourceUrl:"แหล่งต้นทางพร้อมธงคำตอบ: "+q.sourceUrl),
 "โจทย์สรุปเรียบเรียงใหม่เพื่อการศึกษา: "+q.synopsis,
 "",
 "เริ่มต้นด้วยคำถามชี้นำสั้นๆ เพียงข้อเดียว และรอคำตอบของฉันก่อน"
