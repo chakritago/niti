@@ -182,3 +182,53 @@ window.NITI_STATUTE_SOURCES = {
   ],
   "disclaimer": "เอกสารรวมทางการและฐานค้นหาของกฤษฎีกาไม่ได้เปิดตรงเลขมาตรา; เอกสารราชกิจจานุเบกษาที่อ้างเป็นพระราชบัญญัติแก้ไขเพิ่มเติมเฉพาะบท ไม่ใช่ฉบับประมวลรวมล่าสุด; สรุปข้อสอบเป็นคำอธิบายเพื่อการศึกษา"
 };
+
+
+/* Direct government PDF pages for statute IDs in NITI (verified 2026-10-13).
+ * PDF #page is viewer navigation, not a per-section HTML URL.
+ * Act 20 B.E.2557 replaces the legacy text for 681, 714/1, 728 and 729.
+ */
+(function(){
+"use strict";
+var data=window.NITI_STATUTE_SOURCES||{};
+var codePDF="https://www.sbpac.go.th/home/wp-content/uploads/2024/02/%E0%B8%9B.%E0%B8%9E.%E0%B8%9E.pdf";
+var gazettePDF="https://www.ratchakitcha.soc.go.th/DATA/PDF/2557/A/077/14.PDF";
+var amendmentPDF="https://www.led.go.th/th/views/2567/01/37-4.pdf";
+var currentPDF="https://jla.coj.go.th/th/file/get/file/20260602dfff49c01105cbf669287811f0b3dbe4145952.pdf";
+var pages={"144":28,"146":28,"321":60,"453":80,"456":81,"458":81,"460":81,"472":83,"473":83,"483":85,"485":85,"518":89,"519":90,"523":90,"525":90,"526":90,"538":92,"552":94,"554":94,"569":96,"572":96,"574":96,"640":105,"641":105,"643":105,"645":105,"649":106,"650":106,"653":106,"680":110,"689":111,"697":112,"699":113,"702":113,"714":114,"718":115,"719":115,"733":117,"747":120,"764":122,"767":122,"769":123,"1299":206,"1311":208,"1312":208,"1332":211,"1336":212,"1367":217,"1368":217,"1374":217,"1377":217,"1378":218,"1381":218,"1382":218,"1387":219,"1401":220,"193/10":36,"193/27":38,"193/29":39,"193/9":36};
+var reformPages={"681":1,"728":4,"729":4,"714/1":3};
+var direct={};
+Object.keys(pages).forEach(function(id){
+ var page=pages[id];
+ direct[id]={
+  id:id,primaryUrl:codePDF+"#page="+page,
+  page:page,sourceType:"gov-consolidated",verifiedOn:"2026-10-13",
+  officialUrls:[
+   {url:codePDF+"#page="+page,label:"เปิดตัวบทมาตรา "+id+" · PDF หน้า "+page+" (หน่วยงานรัฐ)",sourceType:"gov-consolidated"},
+   {url:currentPDF,label:"ตรวจประมวลฉบับอัปเดตถึงฉบับที่ 25 พ.ศ. 2568 · ศาลยุติธรรม",sourceType:"gov-current-consolidated"}
+  ],
+  caution:"เอกสารรวมที่เผยแพร่ผ่านหน่วยงานรัฐอาจไม่ได้รวมการแก้ไขเพิ่มเติมล่าสุด"
+ };
+});
+Object.keys(reformPages).forEach(function(id){
+ var page=reformPages[id];
+ direct[id]={
+  id:id,primaryUrl:amendmentPDF+"#page="+page,
+  page:page,sourceType:"official-amendment-copy",verifiedOn:"2026-10-13",
+  officialUrls:[
+   {url:amendmentPDF+"#page="+page,label:"เปิดตัวบทมาตรา "+id+" ฉบับแก้ไข พ.ศ. 2557 · หน้า "+page+" (กรมบังคับคดี)",sourceType:"official-amendment-copy"},
+   {url:gazettePDF+"#page="+page,label:"ราชกิจจานุเบกษาต้นฉบับ · หน้า "+page+" (บางระบบเข้าถึงไม่ได้)",sourceType:"royal-gazette"},
+   {url:currentPDF,label:"ตรวจประมวลฉบับอัปเดตถึงฉบับที่ 25 พ.ศ. 2568 · ศาลยุติธรรม",sourceType:"gov-current-consolidated"}
+  ],
+  caution:"ใช้บทแก้ไข พ.ศ. 2557 ไม่ใช่ตัวบทเก่า; เอกสารราชกิจจานุเบกษาอาจตอบกลับ 403"
+ };
+});
+data.direct=direct;
+data.reviewDate="2026-10-13";
+data.currentConsolidated={url:currentPDF,label:"ประมวลกฎหมายแพ่งและพาณิชย์ แก้ไขถึงฉบับที่ 25 พ.ศ. 2568 · ศาลยุติธรรม",sourceType:"gov-current-consolidated"};
+data.resolve=function(id){return direct[String(id)]||null;};
+data.normalizeId=function(label){var m=String(label||"").trim().match(/^(\d+(?:\/\d+)?)/);return m?m[1]:"";};
+data.resolveLabel=function(label){return data.resolve(data.normalizeId(label));};
+if(data.titles)data.titles["718"]="ขอบเขตจำนองที่ยังครอบทรัพย์แม้ชำระหนี้บางส่วน";
+window.NITI_STATUTE_SOURCES=data;
+})();
