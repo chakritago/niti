@@ -171,3 +171,21 @@ window.NITI_STATUTE_NOTES=[
     "officialPortal": "https://www.krisdika.go.th/"
   }
 ];
+
+
+/* Set government-hosted exact PDF pages as the default full text links.
+ * Keep the former nonofficial URLs only as labelled provenance metadata. */
+(function(){
+"use strict";
+var sources=window.NITI_STATUTE_SOURCES;
+if(!sources||typeof sources.resolve!=="function"||!Array.isArray(window.NITI_STATUTE_NOTES))return;
+window.NITI_STATUTE_NOTES.forEach(function(note){
+ var direct=sources.resolve(note.id);
+ if(!direct)return;
+ if(note.fullTextUrl&&note.fullTextUrl!==direct.primaryUrl)note.secondaryTextUrl=note.fullTextUrl;
+ note.fullTextUrl=direct.primaryUrl;
+ note.officialSources=direct.officialUrls;
+ note.officialSourceType=direct.sourceType;
+ note.sourceVerifiedOn=direct.verifiedOn;
+});
+})();
