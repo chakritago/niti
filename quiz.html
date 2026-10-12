@@ -137,7 +137,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
     <h3 id="exam-statute-title">มาตราที่ใช้ตอบข้อนี้ — สรุปสำหรับเขียนข้อสอบ</h3>
     <p>อ่านหลักกฎหมายแบบย่อ (เฉพาะมาตราที่มีสรุปตรวจทาน) และตรวจเอกสารทางการตามลิงก์ของแต่ละมาตรา</p>
     <div id="exam-statute-list"></div>
-    <p class="law-source-disclaimer">ลิงก์กฤษฎีกาเป็นหน้าค้นหา และลิงก์เอกสารรวมจากหน่วยงานรัฐไม่ได้เปิดตรงเลขมาตรา; ลิงก์รายมาตราจากเอกชนเป็นแหล่งรอง สำหรับค้ำประกัน/จำนองให้เทียบกฎหมายแก้ไขเพิ่มเติม พ.ศ. 2557 และ 2558 ก่อนใช้ในคดีจริง</p>
+    <p class="law-source-disclaimer">กดที่ชื่อมาตราหรือปุ่มเปิดตัวบทเพื่ออ่าน PDF หน้าที่มีมาตรานั้นจากหน่วยงานรัฐ มาตรา 681, 714/1, 728 และ 729 ใช้ฉบับแก้ไข พ.ศ. 2557; บางโปรแกรมอ่าน PDF บนมือถืออาจไม่เลื่อนไปหน้าเป้าหมาย จึงแสดงเลขหน้ากำกับไว้ด้วย</p>
   </section>
   <section id="exam-ranking" class="exam-ranking" aria-label="อันดับความสำคัญเพื่อจัดเวลาอ่าน">
     <strong id="exam-ranking-value"></strong>
@@ -208,6 +208,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <footer><div class="wrap">NITI · แพลตฟอร์มฝึกเขียนคำตอบเพื่อการศึกษาเท่านั้น · ข้อมูลคำตอบเก็บในเบราว์เซอร์ของคุณ · <a href="./index.html">หน้าหลัก</a> · <a href="https://github.com/chakritago/niti">Source code</a></div></footer>
 <script src="./exam-data.js"></script>
 <script src="./contract-exams.js"></script>
+<script src="./statute-sources.js"></script>
 <script>
 (function(){
 "use strict";
@@ -268,7 +269,21 @@ $("scenario").textContent=q.synopsis;$("issue").textContent=q.issue;
 var link=q.sourceUrl||q.lawSourceUrl;$("source").href=link;$("source-again").href=link;$("original-link-fallback").href=link;
 $("source-description").textContent=q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
 $("source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("source-again").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("original-card").hidden=q.kind==="practice";
-$("statutes").innerHTML=q.sections.map(function(t){return '<span class="topic-tag">ป.พ.พ. ม. '+escapeHTML(t)+"</span>"}).join("");
+var statutesArea=$("statutes");statutesArea.replaceChildren();
+q.sections.forEach(function(label){
+ var sourceMap=window.NITI_STATUTE_SOURCES;
+ var ref=sourceMap&&typeof sourceMap.resolveLabel==="function"?sourceMap.resolveLabel(label):null;
+ var chip=document.createElement(ref?"a":"span");
+ chip.className="topic-tag statute-direct-chip";
+ chip.textContent="ป.พ.พ. ม. "+label+(ref?" · เปิดตัวบท ↗":"");
+ if(ref){
+  chip.href=ref.primaryUrl;
+  chip.target="_blank";
+  chip.rel="noopener noreferrer";
+  chip.title="เปิด PDF ทางการ หน้า "+ref.page+" ซึ่งมีมาตรา "+label;
+ }
+ statutesArea.appendChild(chip);
+});
 $("roadmap").innerHTML=q.roadmap.map(function(t){return "<li>"+escapeHTML(t)+"</li>"}).join("");
 $("conclusion").textContent=q.conclusion;$("pitfall").textContent=q.pitfall;
 setAnswer(q);if(!noList)refreshList();else updateNav();window.dispatchEvent(new CustomEvent("niti-question-change",{detail:{id:id}}));
@@ -301,7 +316,6 @@ if(chosen&&Array.from($("course").options).some(function(o){return o.value===cho
 refreshList();if(target)load(target.id);
 })();
 </script>
-<script src="./statute-sources.js"></script>
 <script src="./statute-notes.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./tutor-answers.js"></script>
