@@ -87,6 +87,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 .model-body a{font-weight:800;color:#1d628a;font-size:13px}
 @media(max-width:550px){.original-heading,.coach-entry,.model-heading{padding:14px}.original-wrapper iframe{height:380px}.coach-log{padding:12px}.coach-bubble{max-width:98%;padding:10px}.coach-progress{margin-left:0}.coach-heading{flex-wrap:wrap;padding:14px}.coach-toolbar .btn{font-size:11px;padding:9px}.coach-toolbar .coach-spacer{display:none}.coach-toolbar{gap:5px}}
 
+.original-card[hidden]{display:none!important}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,11 +102,12 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
           <output id="font-current" class="font-current" for="font-decrease font-increase" aria-live="polite">20 px</output>
           <button id="font-increase" class="font-button" type="button" aria-label="เพิ่มขนาดตัวอักษร" title="เพิ่มขนาดตัวอักษร">ก+</button>
         </div></div></nav></header>
-<section class="hero"><div class="wrap"><div class="kicker">LAW2101 · LAW2001 · THAI PROPERTY LAW</div><h1>สนามฝึกเขียนข้อสอบ<br><span>กฎหมายลักษณะทรัพย์สินและที่ดิน</span></h1><p>อ่านข้อเท็จจริงที่ถอดความจากข้อสอบซึ่งเผยแพร่ในแหล่งอ้างอิง ฝึกวินิจฉัยตามลำดับ ประเด็น → หลักกฎหมาย → ปรับบท → สรุป และตรวจองค์ประกอบคำตอบด้วยตนเอง</p><div class="hero-actions"><span class="chip">อ้างอิงข้อสอบรายข้อ</span><span class="chip">คำตอบบันทึกในเครื่องของคุณ</span></div></div></section>
+<section class="hero"><div class="wrap"><div class="kicker">LAW2001 · LAW2005 · LAW2008 · LAW2009 · LAW2010</div><h1>สนามฝึกเขียนข้อสอบ<br><span>กฎหมายทรัพย์สินและเอกเทศสัญญา</span></h1><p>อ่านข้อเท็จจริงที่ถอดความจากข้อสอบซึ่งเผยแพร่ในแหล่งอ้างอิง ฝึกวินิจฉัยตามลำดับ ประเด็น → หลักกฎหมาย → ปรับบท → สรุป และตรวจองค์ประกอบคำตอบด้วยตนเอง</p><div class="hero-actions"><span class="chip">อ้างอิงข้อสอบรายข้อ</span><span class="chip">คำตอบบันทึกในเครื่องของคุณ</span></div></div></section>
 <div class="wrap summary" aria-label="ภาพรวมคลังโจทย์"><div class="summary-item"><b id="total-stat">—</b><span>โจทย์พร้อมแหล่งอ้างอิง</span></div><div class="summary-item"><b id="draft-stat">0</b><span>ข้อที่เคยเริ่มเขียน</span></div><div class="summary-item"><b id="complete-stat">0</b><span>ข้อที่ประเมินตนเองแล้ว</span></div></div>
 <main class="wrap layout">
-<aside class="panel" aria-label="รายการข้อสอบ"><div class="aside-head"><h2>เลือกโจทย์ฝึก</h2><p>แต่ละข้อมีลิงก์ไปยังหน้าข้อสอบที่เผยแพร่โดย MJ Sheet Ram Free</p></div><div class="controls">
+<aside class="panel" aria-label="รายการข้อสอบ"><div class="aside-head"><h2>เลือกโจทย์ฝึก</h2><p>ข้อสอบย้อนหลังมีลิงก์รายข้อ และโจทย์ฝึกแต่งใหม่ติดป้ายแยก</p></div><div class="controls">
 <div><label class="field-label" for="search">ค้นหาคำสำคัญ</label><input id="search" type="search" placeholder="เช่น ภาระจำยอม, ที่ดิน"></div>
+<div><label class="field-label" for="course">เลือกวิชา</label><select id="course"><option value="">ทุกวิชา</option><option value="LAW2001">LAW2001 / LAW2101 · ทรัพย์สิน</option><option value="LAW2005">LAW2005 / LAW2105 · ซื้อขาย แลกเปลี่ยน ให้</option><option value="LAW2008">LAW2008 / LAW2108 · เช่าทรัพย์ เช่าซื้อ</option><option value="LAW2009">LAW2009 / LAW2109 · ยืม</option><option value="LAW2010">LAW2010 / LAW2110 · ค้ำประกัน จำนอง จำนำ</option></select></div>
 <div><label class="field-label" for="topic">หมวดกฎหมาย</label><select id="topic"><option value="">ทุกหมวด</option></select></div>
 <div><label class="field-label" for="year">ปีการศึกษา</label><select id="year"><option value="">ทุกปีการศึกษา</option></select></div>
 <div class="aside-actions"><button class="btn outline full" id="random" type="button">สุ่มโจทย์จากรายการ ↻</button></div>
@@ -114,8 +116,8 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <div id="empty" hidden>ไม่พบโจทย์ตามเงื่อนไขที่เลือก ลองปรับคำค้นหรือหมวดกฎหมาย</div>
 <div id="question-content">
 <div class="task-heading"><div><div class="meta"><span class="topic-tag" id="topic-tag"></span><span class="minor" id="exam-meta"></span></div><h2 id="question-title"></h2><p class="sub" id="question-id"></p></div></div>
-<div class="source-box"><p><b>แหล่งที่มาของข้อสอบข้อนี้:</b> เว็บไซต์ MJ Sheet Ram Free — ตรวจพบคำถามตามปี/ภาคเรียน/เลขข้อในหน้าที่ระบุ ข้อความด้านล่างเป็นสรุปถอดความ ไม่ใช่โจทย์ต้นฉบับทั้งหมด</p><a id="source" target="_blank" rel="noopener noreferrer" href="#">อ่านข้อสอบและธงคำตอบต้นทาง ↗</a></div>
-<section class="original-card" aria-labelledby="original-heading">
+<div class="source-box"><p id="source-description"><b>แหล่งที่มาของข้อสอบข้อนี้:</b> เว็บไซต์ MJ Sheet Ram Free — ตรวจพบคำถามตามปี/ภาคเรียน/เลขข้อในหน้าที่ระบุ ข้อความด้านล่างเป็นสรุปถอดความ ไม่ใช่โจทย์ต้นฉบับทั้งหมด</p><a id="source" target="_blank" rel="noopener noreferrer" href="#">อ่านข้อสอบและธงคำตอบต้นทาง ↗</a></div>
+<section class="original-card" id="original-card" aria-labelledby="original-heading">
   <div class="original-heading"><div>
     <h3 id="original-heading">📄 โจทย์ต้นฉบับ + ธงคำตอบจากแหล่งเผยแพร่</h3>
     <p id="original-caption">แสดงเว็บไซต์ต้นทางภายในหน้านี้ ไม่ใช่การคัดลอกเนื้อหามาเก็บบน GitHub</p>
@@ -205,10 +207,11 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 </section></main>
 <footer><div class="wrap">NITI · แพลตฟอร์มฝึกเขียนคำตอบเพื่อการศึกษาเท่านั้น · ข้อมูลคำตอบเก็บในเบราว์เซอร์ของคุณ · <a href="./index.html">หน้าหลัก</a> · <a href="https://github.com/chakritago/niti">Source code</a></div></footer>
 <script src="./exam-data.js"></script>
+<script src="./contract-exams.js"></script>
 <script>
 (function(){
 "use strict";
-var data=Array.isArray(window.NITI_EXAMS)?window.NITI_EXAMS.filter(function(q){return /^https:\/\/mjsheetramfree\.com\//.test(q.sourceUrl)&&q.number&&q.synopsis&&q.id}):[];
+var data=Array.isArray(window.NITI_EXAMS)?window.NITI_EXAMS.filter(function(q){return q&&q.id&&q.number&&q.synopsis&&(q.kind==="practice"&&/^https:\/\//.test(q.lawSourceUrl)||/^https:\/\/mjsheetramfree\.com\//.test(q.sourceUrl||""))}):[];
 var KEY="niti-exam-tutor-v1";
 var store={};
 try{store=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){store={};}
@@ -227,19 +230,19 @@ $("complete-stat").textContent=String(data.filter(function(q){return (store[q.id
 }
 function fillFilters(){
 var topics=[...new Set(data.map(function(q){return q.topic}))].sort();
-var years=[...new Set(data.map(function(q){return q.year}))].sort(function(a,b){return b-a});
+var years=[...new Set(data.map(function(q){return q.year}).filter(function(y){return Number(y)>0}))].sort(function(a,b){return b-a});
 topics.forEach(function(v){var e=document.createElement("option");e.value=v;e.textContent=v;$("topic").appendChild(e)});
 years.forEach(function(v){var e=document.createElement("option");e.value=String(v);e.textContent=String(v);$("year").appendChild(e)});
 }
 function refreshList(){
-var phrase=$("search").value.trim().toLocaleLowerCase("th"), topic=$("topic").value, year=$("year").value;
-filtered=data.filter(function(q){return(!topic||q.topic===topic)&&(!year||String(q.year)===year)&&(!phrase||[q.title,q.synopsis,q.topic,q.year,q.sections.join(" ")].join(" ").toLocaleLowerCase("th").includes(phrase))});
-$("result-label").textContent="พบ "+filtered.length+" ข้อ · ทุกข้อมีลิงก์อ้างอิงเฉพาะข้อ";
+var phrase=$("search").value.trim().toLocaleLowerCase("th"), subject=$("course").value, topic=$("topic").value, year=$("year").value;
+filtered=data.filter(function(q){return(!subject||(q.subject||"LAW2001")===subject)&&(!topic||q.topic===topic)&&(!year||String(q.year)===year)&&(!phrase||[q.title,q.synopsis,q.topic,q.course,q.year,q.sections.join(" ")].join(" ").toLocaleLowerCase("th").includes(phrase))});
+$("result-label").textContent="พบ "+filtered.length+" ข้อ · ข้อสอบย้อนหลังมีลิงก์ต้นทาง · โจทย์แต่งใหม่ติดป้ายแยก";
 var list=$("list");list.replaceChildren();
 filtered.forEach(function(q){
 var s=store[q.id]||{};var b=document.createElement("button");b.type="button";b.className="q-item"+(current===q.id?" active":"");b.setAttribute("aria-current",current===q.id?"true":"false");
 var status=s.completed?"finished":hasDraft(s)?"started":"";
-b.innerHTML='<span class="q-item-top"><span>'+escapeHTML(q.semester)+"/"+escapeHTML(q.year)+" · ข้อ "+escapeHTML(q.number)+'</span><span class="dot '+status+'" title="'+(s.completed?"ตรวจแล้ว":hasDraft(s)?"มีร่างคำตอบ":"ยังไม่เริ่ม")+'"></span></span><strong>'+escapeHTML(q.title)+'</strong><small>'+escapeHTML(q.topic)+"</small>";
+b.innerHTML='<span class="q-item-top"><span>'+(q.kind==="practice"?"โจทย์ฝึกแต่งใหม่":escapeHTML(q.semester)+"/"+escapeHTML(q.year)+" · ข้อ "+escapeHTML(q.number))+'</span><span class="dot '+status+'" title="'+(s.completed?"ตรวจแล้ว":hasDraft(s)?"มีร่างคำตอบ":"ยังไม่เริ่ม")+'"></span></span><strong>'+escapeHTML(q.title)+'</strong><small>'+escapeHTML(q.course)+" · "+escapeHTML(q.topic)+"</small>";
 b.addEventListener("click",function(){load(q.id)});list.appendChild(b);
 });
 $("empty").hidden=filtered.length!==0;
@@ -259,10 +262,12 @@ score();
 function load(id,noList){
 var q=data.find(function(x){return x.id===id});if(!q)return;
 stopTimer();remaining=1500;updateTimer();current=id;window.NITI_CURRENT_QUESTION=id;showReview=false;$("review").hidden=true;$("review-toggle").setAttribute("aria-expanded","false");$("review-toggle").textContent="ดูแนวธงคำตอบและเกณฑ์ตรวจ ↓";
-$("topic-tag").textContent=q.topic;$("exam-meta").textContent=q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
-$("question-title").textContent=q.title;$("question-id").textContent="รหัสโจทย์: "+q.id+" · เนื้อหาเรียบเรียงใหม่จากโจทย์ที่เผยแพร่บนเว็บไซต์อ้างอิง";
+$("topic-tag").textContent=q.topic;$("exam-meta").textContent=q.kind==="practice"?q.course+" | โจทย์ฝึกแต่งใหม่ ไม่ใช่ข้อสอบเก่า":q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
+$("question-title").textContent=q.title;$("question-id").textContent="รหัสโจทย์: "+q.id+" · "+(q.kind==="practice"?"สถานการณ์สมมติที่แต่งใหม่เพื่อฝึกเขียน":"เนื้อหาเรียบเรียงใหม่จากโจทย์ที่เผยแพร่บนเว็บไซต์อ้างอิง");
 $("scenario").textContent=q.synopsis;$("issue").textContent=q.issue;
-$("source").href=q.sourceUrl;$("source-again").href=q.sourceUrl;$("original-link-fallback").href=q.sourceUrl;
+var link=q.sourceUrl||q.lawSourceUrl;$("source").href=link;$("source-again").href=link;$("original-link-fallback").href=link;
+$("source-description").textContent=q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
+$("source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("source-again").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("original-card").hidden=q.kind==="practice";
 $("statutes").innerHTML=q.sections.map(function(t){return '<span class="topic-tag">ป.พ.พ. ม. '+escapeHTML(t)+"</span>"}).join("");
 $("roadmap").innerHTML=q.roadmap.map(function(t){return "<li>"+escapeHTML(t)+"</li>"}).join("");
 $("conclusion").textContent=q.conclusion;$("pitfall").textContent=q.pitfall;
@@ -277,7 +282,7 @@ $("mark-complete").addEventListener("click",function(){if(!current)return;getSta
 $("review-toggle").addEventListener("click",function(){showReview=!showReview;$("review").hidden=!showReview;$("review-toggle").textContent=showReview?"ซ่อนแนวธงคำตอบ ↑":"ดูแนวธงคำตอบและเกณฑ์ตรวจ ↓";$("review-toggle").setAttribute("aria-expanded",String(showReview));if(showReview)$("review").scrollIntoView({behavior:"smooth",block:"nearest"});});
 $("clear").addEventListener("click",function(){if(!current||!confirm("ล้างร่างคำตอบและผลประเมินของข้อที่เลือกใช่หรือไม่?"))return;delete store[current];persist();load(current);counters();});
 $("export").addEventListener("click",function(){if(!current)return;var q=data.find(function(x){return x.id===current});var s=getState(current);
-var body=["NITI — คำตอบฝึกเขียนกฎหมายว่าด้วยทรัพย์",q.course+" ภาค "+q.semester+"/"+q.year+" ข้อ "+q.number,q.title,"อ่านโจทย์ต้นทาง: "+q.sourceUrl,"","ประเด็นปัญหา",s.issue||"","หลักกฎหมาย",s.rule||"","ปรับบท",s.apply||"","สรุป",s.conclude||""].join("\r\n");
+var body=["NITI — คำตอบฝึกเขียนกฎหมายแพ่งและพาณิชย์",q.course+(q.kind==="practice"?" โจทย์ฝึกแต่งใหม่":" ภาค "+q.semester+"/"+q.year+" ข้อ "+q.number),q.title,(q.kind==="practice"?"ตรวจตัวบทกฎหมาย: "+q.lawSourceUrl:"อ่านโจทย์ต้นทาง: "+q.sourceUrl),"","ประเด็นปัญหา",s.issue||"","หลักกฎหมาย",s.rule||"","ปรับบท",s.apply||"","สรุป",s.conclude||""].join("\r\n");
 var url=URL.createObjectURL(new Blob(["\ufeff"+body],{type:"text/plain;charset=utf-8"}));var a=document.createElement("a");a.href=url;a.download="niti-answer-"+q.id+".txt";document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url)},1000);
 });
 function updateTimer(){var mm=String(Math.floor(remaining/60)).padStart(2,"0");var ss=String(remaining%60).padStart(2,"0");$("timer").textContent=mm+":"+ss;}
@@ -288,14 +293,18 @@ $("prev").addEventListener("click",function(){var i=filtered.findIndex(function(
 $("next").addEventListener("click",function(){var i=filtered.findIndex(function(q){return q.id===current});if(i>=0&&i<filtered.length-1)load(filtered[i+1].id)});
 $("random").addEventListener("click",function(){if(filtered.length)load(filtered[Math.floor(Math.random()*filtered.length)].id)});
 ["search","topic","year"].forEach(function(id){$(id).addEventListener(id==="search"?"input":"change",refreshList)});
-fillFilters();counters();refreshList();
-var examId=new URLSearchParams(window.location.search).get("exam");
-if(examId&&data.some(function(q){return q.id===examId;}))load(examId);
+$("course").addEventListener("change",function(){$("topic").value="";$("year").value="";refreshList();});
+fillFilters();counters();
+var params=new URLSearchParams(window.location.search),examId=params.get("exam"),target=data.find(function(q){return q.id===examId;});
+var chosen=target?(target.subject||"LAW2001"):params.get("subject");
+if(chosen&&Array.from($("course").options).some(function(o){return o.value===chosen;}))$("course").value=chosen;
+refreshList();if(target)load(target.id);
 })();
 </script>
 <script src="./statute-notes.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./tutor-answers.js"></script>
+<script src="./contract-answers.js"></script>
 <script src="./tutor.js"></script>
 <script src="./study-companion.js"></script>
 <script src="./study-extensions.js"></script>
