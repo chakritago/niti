@@ -3,7 +3,8 @@
  */
 (function(){
 "use strict";
-var exams=Array.isArray(window.NITI_EXAMS)?window.NITI_EXAMS:[];
+var allExams=Array.isArray(window.NITI_EXAMS)?window.NITI_EXAMS:[];
+var exams=allExams.filter(function(q){return q.kind!=="practice";});
 var notes=Array.isArray(window.NITI_STATUTE_NOTES)?window.NITI_STATUTE_NOTES:[];
 var $=function(id){return document.getElementById(id)};
 var countByTopic={};
@@ -76,10 +77,10 @@ function currentQ(){
  var el=$("question-id");
  id=el?(el.textContent.match(/รหัสโจทย์:\s*([^\s]+)/)||[])[1]:null;
  }
- return exams.find(function(q){return q.id===id})||null;
+ return allExams.find(function(q){return q.id===id})||null;
 }
 function renderQuiz(id){
- var q=exams.find(function(item){return item.id===id});if(!q)return;
+ var q=allExams.find(function(item){return item.id===id});if(!q)return;
  var box=$("exam-statute-list");
  if(box){
  box.replaceChildren();
@@ -88,12 +89,21 @@ function renderQuiz(id){
  var found=notes.find(function(x){return x.id===n});
  if(found)box.appendChild(makeStatuteCard(found,true));
  });
+ if(!box.children.length){
+ var info=newNode("p","statute-conditions","บทสรุปมาตรา "+wanted.join(", ")+" ยังไม่อยู่ในคลังสรุปมาตราฉบับนี้ โปรดตรวจตัวบทฉบับใช้บังคับล่าสุดจาก ");
+ info.appendChild(makeLink("https://www.krisdika.go.th/","สำนักงานคณะกรรมการกฤษฎีกา ↗"));box.appendChild(info);
+ }
  }
  var value=$("exam-ranking-value"),desc=$("exam-ranking-description");
  if(value&&desc){
+ if(q.kind==="practice"){
+ value.textContent="โจทย์ฝึกแต่งใหม่ — ไม่จัดอันดับ";
+ desc.textContent="โจทย์เรื่องแลกเปลี่ยนแต่งขึ้นเพื่อฝึกทักษะ ไม่ใช่ข้อสอบย้อนหลัง จึงไม่รวมในการนับความถี่ "+exams.length+" ข้อสอบที่มีแหล่งต้นทาง";
+ }else{
  var count=countByTopic[q.topic]||0, b=band(count);
  value.textContent="กลุ่ม "+b+" · "+bandName(b)+" — อันดับ "+rankForTopic(q.topic)+" ในคลังตัวอย่าง";
- desc.textContent="หัวข้อ “"+q.topic+"” พบ "+count+" จาก "+exams.length+" ข้อ การจัดกลุ่มนี้ใช้วางแผนอ่าน ไม่ใช่โอกาสออกสอบหรือคำยืนยันว่าข้อนี้จะออกสอบอีก";
+ desc.textContent="หัวข้อ “"+q.topic+"” พบ "+count+" จาก "+exams.length+" ข้อสอบย้อนหลังที่คัดเลือก การจัดกลุ่มนี้ใช้วางแผนอ่าน ไม่ใช่โอกาสออกสอบหรือคำยืนยันว่าข้อนี้จะออกสอบอีก";
+ }
  }
 }
 renderRanking();renderLibrary("");
