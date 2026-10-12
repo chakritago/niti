@@ -83,12 +83,18 @@ function makeStatuteCard(note,small,reference){
  appendSource("compilation","เอกสารรวมจากหน่วยงานรัฐ (เผยแพร่ 2566) ↗");
  var amendments=(referenceData.amendedBy||{})[note.id]||[];
  amendments.forEach(function(key){appendSource(key,"ราชกิจจาฯ: กฎหมายแก้ไขมาตรานี้ "+(key==="gazette2557"?"พ.ศ. 2557":"พ.ศ. 2558")+" ↗");});
+ var articleNumber=Number(String(note.id).split("/")[0]);
+ var securityLaw=articleNumber>=680&&articleNumber<=744;
+ if(securityLaw){
+  if(amendments.indexOf("gazette2557")===-1)appendSource("gazette2557","ราชกิจจาฯ: กฎหมายแก้ไขค้ำประกัน/จำนอง พ.ศ. 2557 (อ่านประกอบ) ↗");
+  appendSource("gazette2558","ราชกิจจาฯ: กฎหมายแก้ไขค้ำประกัน/จำนอง พ.ศ. 2558 (อ่านประกอบ) ↗");
+ }
  if(note.fullTextUrl&&/^https:\/\//.test(note.fullTextUrl)){
   var privateLink=makeLink(note.fullTextUrl,"อ่านรายมาตรา (เว็บไซต์เอกชน ไม่ใช่ต้นฉบับทางการ) ↗");
   privateLink.className="statute-source-link statute-source-secondary";
   links.appendChild(privateLink);
  }
- links.appendChild(newNode("p","statute-source-note","ลิงก์กฤษฎีกาเป็นหน้าค้นหา และเอกสารรวมไม่เปิดตรงเลขมาตรา"+(amendments.length?" · ฉบับแก้ไข พ.ศ. 2557 พบในดัชนีราชกิจจาฯ แต่การตรวจเปิด PDF อัตโนมัติถูกปฏิเสธ":"")));
+ links.appendChild(newNode("p","statute-source-note","ลิงก์กฤษฎีกาเป็นหน้าค้นหา และเอกสารรวมไม่เปิดตรงเลขมาตรา"+(securityLaw?" · PDF พ.ศ. 2557 พบในดัชนี แต่การตรวจเปิดอัตโนมัติถูกปฏิเสธ; กฎหมายแก้ไขที่ระบุว่าอ่านประกอบอาจไม่ได้แก้มาตรานี้โดยตรง":"")));
  detail.appendChild(links);
  return detail;
 }
