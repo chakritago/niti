@@ -50,19 +50,27 @@ function renderRanking(){
  root.appendChild(card);
  });
 }
+
 function makeStatuteCard(note,small,reference){
  var detail=newNode("article",small?"statute-small":"statute-card");
+ var direct=referenceData&&typeof referenceData.resolve==="function"?referenceData.resolve(note.id):null;
  var head=newNode("div","statute-head");
- head.appendChild(newNode("h3","","มาตรา "+(reference||note.id)+" — "+note.title));
- detail.appendChild(head);
- if(note.plain){
-  detail.appendChild(newNode("p","statute-plain",note.plain));
+ var title=newNode("h3","","");
+ var textTitle="มาตรา "+(reference||note.id)+" — "+note.title;
+ if(direct){
+  var titleLink=makeLink(direct.primaryUrl,textTitle);
+  titleLink.className="statute-heading-link";
+  title.appendChild(titleLink);
  }else{
-  detail.appendChild(newNode("p","statute-plain statute-unreviewed","ยังไม่มีคำอธิบายรายมาตราที่ตรวจทานแล้ว กรุณาอ่านถ้อยคำตัวบทจากแหล่งทางการด้านล่างก่อนนำไปเขียนคำตอบ"));
+  title.textContent=textTitle;
  }
+ head.appendChild(title);
+ detail.appendChild(head);
+ if(note.plain)detail.appendChild(newNode("p","statute-plain",note.plain));
+ else detail.appendChild(newNode("p","statute-plain statute-unreviewed","ยังไม่มีคำอธิบายรายมาตราที่ตรวจทานแล้ว ให้เปิดอ่านตัวบทจากแหล่งราชการด้านล่าง"));
  if(note.exam){
   var example=newNode("div","statute-example");
-  example.appendChild(newNode("strong","","ประโยคหลักกฎหมายที่ใช้เขียนข้อสอบ (สรุปเรียบเรียงใหม่)"));
+  example.appendChild(newNode("strong","","ประโยคหลักกฎหมายสำหรับเขียนข้อสอบ (สรุปเรียบเรียงใหม่)"));
   example.appendChild(newNode("p","",note.exam));
   detail.appendChild(example);
  }
@@ -71,30 +79,24 @@ function makeStatuteCard(note,small,reference){
   if(note.trap)detail.appendChild(newNode("p","statute-warning","จุดระวัง: "+note.trap));
  }
  var links=newNode("div","statute-sources");
- links.appendChild(newNode("strong","statute-sources-title","เอกสารอ้างอิง"));
- function appendSource(key,label){
-  var source=sourceList[key];if(!source||!/^https:\/\//.test(source.url))return;
-  var a=makeLink(source.url,label);
-  a.className="statute-source-link";
-  a.title=source.note||"";
-  links.appendChild(a);
+ links.appendChild(newNode("strong","statute-sources-title","แหล่งตัวบทกฎหมาย"));
+ if(direct){
+  var main=makeLink(direct.primaryUrl,"เปิดตัวบทมาตรา "+note.id+" โดยตรง — PDF หน้า "+direct.page+" ↗");
+  main.className="statute-source-link statute-source-primary";
+  links.appendChild(main);
+  (direct.officialUrls||[]).forEach(function(ref){
+   if(!ref.url||ref.url===direct.primaryUrl)return;
+   var copy=makeLink(ref.url,ref.label+" ↗");
+   copy.className="statute-source-link statute-source-secondary";
+   links.appendChild(copy);
+  });
+  var hint=direct.sourceType==="official-amendment-copy"
+    ?"ข้อความฉบับแก้ไข พ.ศ. 2557: ปุ่มหลักเปิดสำเนาทางการของกรมบังคับคดี ส่วนลิงก์ราชกิจจาฯ อาจเปิดไม่ได้ในบางเครือข่าย"
+    :"ปุ่มหลักเปิดเอกสารรวมจากหน่วยงานรัฐที่หน้าซึ่งมีมาตรานี้; ให้ตรวจฉบับอัปเดตของศาลยุติธรรมด้วยก่อนใช้อ้างกฎหมายปัจจุบัน";
+  links.appendChild(newNode("p","statute-source-note",hint+" · การเลื่อนสู่หน้า PDF อาจไม่ทำงานในเบราว์เซอร์มือถือบางรุ่น"));
+ }else{
+  links.appendChild(newNode("p","statute-source-note","ยังไม่มี URL ที่ยืนยันหน้าของตัวบทกฎหมาย ไม่แสดงลิงก์ที่อาจนำไปผิดมาตรา"));
  }
- appendSource("ocs","กฤษฎีกา: ค้นตัวบทฉบับใช้บังคับ ↗");
- appendSource("compilation","เอกสารรวมจากหน่วยงานรัฐ (เผยแพร่ 2566) ↗");
- var amendments=(referenceData.amendedBy||{})[note.id]||[];
- amendments.forEach(function(key){appendSource(key,"ราชกิจจาฯ: กฎหมายแก้ไขมาตรานี้ "+(key==="gazette2557"?"พ.ศ. 2557":"พ.ศ. 2558")+" ↗");});
- var articleNumber=Number(String(note.id).split("/")[0]);
- var securityLaw=articleNumber>=680&&articleNumber<=744;
- if(securityLaw){
-  if(amendments.indexOf("gazette2557")===-1)appendSource("gazette2557","ราชกิจจาฯ: กฎหมายแก้ไขค้ำประกัน/จำนอง พ.ศ. 2557 (อ่านประกอบ) ↗");
-  appendSource("gazette2558","ราชกิจจาฯ: กฎหมายแก้ไขค้ำประกัน/จำนอง พ.ศ. 2558 (อ่านประกอบ) ↗");
- }
- if(note.fullTextUrl&&/^https:\/\//.test(note.fullTextUrl)){
-  var privateLink=makeLink(note.fullTextUrl,"อ่านรายมาตรา (เว็บไซต์เอกชน ไม่ใช่ต้นฉบับทางการ) ↗");
-  privateLink.className="statute-source-link statute-source-secondary";
-  links.appendChild(privateLink);
- }
- links.appendChild(newNode("p","statute-source-note","ลิงก์กฤษฎีกาเป็นหน้าค้นหา และเอกสารรวมไม่เปิดตรงเลขมาตรา"+(securityLaw?" · PDF พ.ศ. 2557 พบในดัชนี แต่การตรวจเปิดอัตโนมัติถูกปฏิเสธ; กฎหมายแก้ไขที่ระบุว่าอ่านประกอบอาจไม่ได้แก้มาตรานี้โดยตรง":"")));
  detail.appendChild(links);
  return detail;
 }
