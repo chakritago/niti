@@ -77,14 +77,15 @@
   <section id="statute-notes" class="wrap section-space" aria-labelledby="statute-title">
     <p class="section-label">คู่มือจำตัวบทกฎหมาย</p>
     <h2 id="statute-title">สรุปมาตรา พร้อมประโยคใช้เขียนตอบข้อสอบ</h2>
-    <p class="lead">แยกให้เห็น 3 ส่วน: ความหมายแบบเข้าใจง่าย หลักกฎหมายที่สามารถนำไปเรียบเรียงในข้อสอบ และองค์ประกอบที่ต้องปรับบท พร้อมลิงก์เปิดตัวบทเต็มภาษาไทย <strong>ลิงก์รายมาตราเป็นเว็บไซต์เผยแพร่กฎหมายภายนอก ไม่ใช่เว็บไซต์ทางการ</strong></p>
+    <p class="lead">รวมเลขมาตราที่อ้างในข้อสอบทั้ง 5 วิชา พร้อมแยกแหล่งทางการกับเว็บไซต์เอกชนให้ชัดเจน มาตราที่มีคำอธิบายแล้วจะแสดงหลักกฎหมายแบบย่อและองค์ประกอบ; มาตราที่ยังไม่ได้ตรวจทานคำอธิบายจะแสดงลิงก์เอกสารให้ค้นตัวบทเอง <strong>เอกสารรวมและหน้าค้นหาของหน่วยงานรัฐไม่ใช่ลิงก์เปิดตรงเลขมาตรา</strong></p>
+    <p class="notice">แหล่งทางการที่เกี่ยวข้อง: <a href="https://www.ocs.go.th/searchlaw" target="_blank" rel="noopener noreferrer">ฐานค้นหากฎหมาย สำนักงานคณะกรรมการกฤษฎีกา ↗</a> · <a href="https://www.dgr.go.th/law/th/newsAll/405/9304" target="_blank" rel="noopener noreferrer">หน้าดาวน์โหลดประมวลกฎหมายฉบับรวม (หน่วยงานรัฐ เผยแพร่ 2566) ↗</a> · <a href="https://www.ratchakitcha.soc.go.th/DATA/PDF/2557/A/077/14.PDF" target="_blank" rel="noopener noreferrer">ราชกิจจาฯ แก้ไขค้ำประกัน/จำนอง พ.ศ. 2557 ↗</a> · <a href="https://ratchakitcha.soc.go.th/documents/2046094.pdf" target="_blank" rel="noopener noreferrer">ราชกิจจาฯ แก้ไขเพิ่มเติม พ.ศ. 2558 ↗</a> โดยลิงก์ PDF พ.ศ. 2557 ตรวจพบในดัชนี แต่ระบบตรวจเปิดอัตโนมัติได้รับการปฏิเสธ</p>
     <div class="statute-controls">
       <label for="statute-search">ค้นหามาตราหรือคำสำคัญ</label>
       <input id="statute-search" type="search" placeholder="เช่น มาตรา 1299, ครอบครองปรปักษ์, ภาระจำยอม">
       <output id="statute-count" role="status">กำลังโหลดมาตรา…</output>
     </div>
     <div id="statute-list" class="statute-list"></div>
-    <p class="notice">เพื่อความถูกต้อง ให้ตรวจสอบตัวบทที่มีผลใช้บังคับและกฎหมายแก้ไขเพิ่มเติมกับ <a href="https://www.krisdika.go.th/" target="_blank" rel="noopener noreferrer">สำนักงานคณะกรรมการกฤษฎีกา</a> หรือ <a href="https://ratchakitcha.soc.go.th/" target="_blank" rel="noopener noreferrer">ราชกิจจานุเบกษา</a> ก่อนใช้ในคดีจริง สรุปด้านบนเป็นภาษาช่วยจำ ไม่ใช่ถ้อยคำตัวบทมาตราโดยตรง</p>
+    <p class="notice">การอ้างอิงใช้ลำดับความน่าเชื่อถือ: ราชกิจจานุเบกษาฉบับแก้ไขที่ตรงบทบัญญัติ → ฉบับประมวลรวม/ฐานข้อมูลหน่วยงานรัฐ → เว็บไซต์เอกชนที่อ่านแยกมาตราได้สะดวก เอกสารรวมที่เผยแพร่ในปี 2566 อาจไม่รวมการแก้ไขภายหลัง และข้อความสรุปเพื่อการศึกษาไม่ใช่ถ้อยคำตามตัวบทหรือคำปรึกษากฎหมาย</p>
   </section>
   <section id="method" class="wrap section-space" aria-labelledby="method-title">
     <p class="section-label">03 / วิธีทำข้อสอบอัตนัย</p>
@@ -112,6 +113,7 @@
 </main>
 <footer><div class="wrap">NITI · ตัวเลขจากชุดโจทย์ที่รวบรวมเพื่อการศึกษา ไม่ใช่การคาดการณ์ข้อสอบของสถาบัน · <a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">คลังข้อสอบอ้างอิง</a> · <a href="https://www.krisdika.go.th/" target="_blank" rel="noopener noreferrer">ตรวจสอบตัวบทกฎหมาย</a></div></footer>
 <script src="./exam-data.js"></script>
+<script src="./statute-sources.js"></script>
 <script src="./statute-notes.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./study.js"></script>
