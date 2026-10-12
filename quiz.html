@@ -135,9 +135,9 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <div class="prompt"><div class="box-title">ประเด็นที่ต้องวินิจฉัย</div><div id="issue"></div></div>
 <section class="exam-statute-card" id="exam-statute-card" aria-labelledby="exam-statute-title">
     <h3 id="exam-statute-title">มาตราที่ใช้ตอบข้อนี้ — สรุปสำหรับเขียนข้อสอบ</h3>
-    <p>อ่านหลักกฎหมายแบบย่อ แล้วตรวจตัวบทภาษาไทยฉบับเต็มตามลิงก์ทุกมาตรา</p>
+    <p>อ่านหลักกฎหมายแบบย่อ (เฉพาะมาตราที่มีสรุปตรวจทาน) และตรวจเอกสารทางการตามลิงก์ของแต่ละมาตรา</p>
     <div id="exam-statute-list"></div>
-    <p class="law-source-disclaimer">ลิงก์ตัวบทรายมาตราเป็นเว็บไซต์รวบรวมกฎหมายภายนอก โปรดตรวจฉบับใช้บังคับจากหน่วยงานทางการอีกครั้ง</p>
+    <p class="law-source-disclaimer">ลิงก์กฤษฎีกาเป็นหน้าค้นหา และลิงก์เอกสารรวมจากหน่วยงานรัฐไม่ได้เปิดตรงเลขมาตรา; ลิงก์รายมาตราจากเอกชนเป็นแหล่งรอง สำหรับค้ำประกัน/จำนองให้เทียบกฎหมายแก้ไขเพิ่มเติม พ.ศ. 2557 และ 2558 ก่อนใช้ในคดีจริง</p>
   </section>
   <section id="exam-ranking" class="exam-ranking" aria-label="อันดับความสำคัญเพื่อจัดเวลาอ่าน">
     <strong id="exam-ranking-value"></strong>
@@ -301,6 +301,7 @@ if(chosen&&Array.from($("course").options).some(function(o){return o.value===cho
 refreshList();if(target)load(target.id);
 })();
 </script>
+<script src="./statute-sources.js"></script>
 <script src="./statute-notes.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./tutor-answers.js"></script>
