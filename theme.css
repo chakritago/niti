@@ -881,3 +881,14 @@ header{box-shadow:0 1px 0 var(--md-border)}
 .tutor-page .exam-ranking strong{font-size:1.07rem;color:var(--study-orange)}
 .tutor-page .exam-ranking p{font-size:.94rem;line-height:1.84;margin:7px 0}
 .tutor-page .exam-ranking a{font-size:.94rem;font-weight:750;color:var(--md-primary)}
+
+/* Official statute source links: clearly distinguish government compilations and private per-section text. */
+.study-page .statute-sources,.tutor-page .statute-sources{margin-top:14px;padding:14px 15px;border:1px solid var(--md-border);border-radius:12px;background:var(--md-surface-low);min-width:0}
+.study-page .statute-sources-title,.tutor-page .statute-sources-title{display:block;color:var(--md-text);font-size:.95rem;font-weight:800;margin-bottom:10px}
+.study-page .statute-source-link,.tutor-page .statute-source-link{display:block;width:fit-content;max-width:100%;padding:7px 0;font-size:.93rem;line-height:1.7;font-weight:700;color:var(--md-primary);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.study-page .statute-source-secondary,.tutor-page .statute-source-secondary{color:var(--md-text-secondary);font-weight:600}
+.study-page .statute-source-note,.tutor-page .statute-source-note{margin:9px 0 0!important;color:var(--md-text-secondary)!important;font-size:.86rem!important;line-height:1.7!important}
+.study-page .statute-unreviewed,.tutor-page .statute-unreviewed{color:var(--md-text-secondary);font-style:italic}
+.study-page .statute-card,.tutor-page .statute-small{min-width:0}
+.study-page .statute-sources a:focus-visible,.tutor-page .statute-sources a:focus-visible{outline:3px solid var(--md-primary);outline-offset:3px}
+@media(max-width:600px){.study-page .statute-sources,.tutor-page .statute-sources{padding:12px}.study-page .statute-source-link,.tutor-page .statute-source-link{font-size:.96rem}}
