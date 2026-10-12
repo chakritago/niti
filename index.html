@@ -108,6 +108,9 @@
     .quiz-promo h2 { font-size:clamp(21px,3vw,29px);margin:6px 0 }
     .quiz-promo p { color:#65717c;font-size:14px;max-width:660px;margin:0 }
     .quiz-promo .btn { white-space:nowrap }
+    .contract-subject-links{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+    .contract-subject-links a{display:inline-flex;align-items:center;min-height:43px;padding:8px 13px;border:1px solid #bfd2e6;border-radius:12px;background:#f5f9ff;color:#174f88;font-size:14px;font-weight:700;text-decoration:none}
+    .contract-subject-links a:hover,.contract-subject-links a:focus-visible{background:#e8f1fc;border-color:#2a68a7}
     @media (max-width:820px) {
       .hero-grid { grid-template-columns:1fr; padding-block:69px; gap:25px }
       .hero-art { min-height:280px }
@@ -154,7 +157,7 @@
         <a href="./study.html#ranking">อันดับแนวข้อสอบ</a>
         <a href="./study.html#statute-notes">สรุปมาตรา + ตัวบท</a>
         <a href="./study.html">แผนอ่านสอบ 7 วัน</a>
-        <a href="./quiz.html">ติวเขียนข้อสอบ</a>
+        <a href="./quiz.html">ติวข้อสอบ 5 วิชา</a>
         <a href="#how-to">วิธีใช้งาน</a>
         <a href="#sources">แหล่งข้อมูลทางการ</a>
         <a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
@@ -197,9 +200,10 @@
     </section>
     <section class="container quiz-promo" aria-labelledby="promo-title">
       <div>
-        <div class="overline">NEW / LAW2101 · LAW2001</div>
-        <h2 id="promo-title">ระบบติวเขียนข้อสอบกฎหมายลักษณะทรัพย์สินและที่ดิน</h2>
-        <p>ฝึกตอบอัตนัยจากโจทย์สรุปตามข้อสอบที่เผยแพร่จริง 15 ข้อ พร้อมลิงก์ต้นทางเฉพาะทุกข้อ ธงคำตอบแบบย่อ และเกณฑ์ประเมินตนเอง</p>
+        <div class="overline">LAW2001 · LAW2005 · LAW2008 · LAW2009 · LAW2010</div>
+        <h2 id="promo-title">สนามฝึกเขียนข้อสอบกฎหมายแพ่งและพาณิชย์ 5 วิชา</h2>
+        <p>รวมโจทย์ 30 ข้อ: ข้อสอบย้อนหลังที่สรุปถอดความพร้อมแหล่งรายข้อ 29 ข้อ และโจทย์ฝึกแต่งใหม่เรื่องแลกเปลี่ยน 1 ข้อ พร้อมโค้ชถามตอบเป็นขั้นและเฉลยเรียบเรียงใหม่ โดยยังเก็บคลังทรัพย์สินเดิมไว้ครบ</p>
+        <div class="contract-subject-links" role="group" aria-label="เลือกวิชาเพื่อฝึกข้อสอบ"><a href="./quiz.html?subject=LAW2001">ทรัพย์สิน LAW2001 ↗</a><a href="./quiz.html?subject=LAW2005">ซื้อขาย แลกเปลี่ยน ให้ LAW2005 ↗</a><a href="./quiz.html?subject=LAW2008">เช่าทรัพย์ เช่าซื้อ LAW2008 ↗</a><a href="./quiz.html?subject=LAW2009">ยืม LAW2009 ↗</a><a href="./quiz.html?subject=LAW2010">ค้ำประกัน จำนอง จำนำ LAW2010 ↗</a></div>
       </div>
       <div class="home-cta-stack"><a class="btn btn-gold" href="./quiz.html">เข้าสู่สนามฝึกเขียนข้อสอบ ↗</a><a class="btn btn-ghost" href="./study.html#statute-notes">อ่านหลักกฎหมายพร้อมตัวบทเต็ม ↗</a>
         <a class="btn btn-ghost" href="./study.html">อ่านแนวข้อสอบ + มาตราที่ควรจำ ↗</a></div>
