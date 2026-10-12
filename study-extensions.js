@@ -6,6 +6,14 @@
 var allExams=Array.isArray(window.NITI_EXAMS)?window.NITI_EXAMS:[];
 var exams=allExams.filter(function(q){return q.kind!=="practice";});
 var notes=Array.isArray(window.NITI_STATUTE_NOTES)?window.NITI_STATUTE_NOTES:[];
+var referenceData=window.NITI_STATUTE_SOURCES||{};
+var sourceList=referenceData.sources||{};
+var noteIndex={};notes.forEach(function(n){noteIndex[n.id]=n;});
+var allNotes=(Array.isArray(referenceData.ids)&&referenceData.ids.length?referenceData.ids:notes.map(function(n){return n.id;})).map(function(id){
+ return noteIndex[id]||{id:id,title:(referenceData.titles||{})[id]||"บทบัญญัติที่โจทย์อ้างถึง",reviewed:false};
+});
+function normalizeSection(value){var match=String(value||"").trim().match(/^(\d+(?:\/\d+)?)/);return match?match[1]:"";}
+
 var $=function(id){return document.getElementById(id)};
 var countByTopic={};
 exams.forEach(function(q){countByTopic[q.topic]=(countByTopic[q.topic]||0)+1;});
@@ -42,31 +50,55 @@ function renderRanking(){
  root.appendChild(card);
  });
 }
-function statutesFor(q){var wanted=(q.sections||[]).map(function(s){return String(s).trim().split(" ")[0]});return notes.filter(function(n){return wanted.includes(n.id)});}
-function makeStatuteCard(note,small){
+function makeStatuteCard(note,small,reference){
  var detail=newNode("article",small?"statute-small":"statute-card");
  var head=newNode("div","statute-head");
- var title=newNode("h3","", "มาตรา "+note.id+" — "+note.title);head.appendChild(title);
- var source=makeLink(note.fullTextUrl,"อ่านตัวบทเต็ม ↗");source.className="statute-link";head.appendChild(source);
+ head.appendChild(newNode("h3","","มาตรา "+(reference||note.id)+" — "+note.title));
  detail.appendChild(head);
- detail.appendChild(newNode("p","statute-plain",note.plain));
- var example=newNode("div","statute-example");
- example.appendChild(newNode("strong","","ประโยคหลักกฎหมายที่ใช้เขียนข้อสอบ"));
- example.appendChild(newNode("p","",note.exam));
- detail.appendChild(example);
- if(!small){
- detail.appendChild(newNode("p","statute-conditions","องค์ประกอบที่ต้องตรวจ: "+note.conditions));
- detail.appendChild(newNode("p","statute-warning","จุดระวัง: "+note.trap));
+ if(note.plain){
+  detail.appendChild(newNode("p","statute-plain",note.plain));
+ }else{
+  detail.appendChild(newNode("p","statute-plain statute-unreviewed","ยังไม่มีคำอธิบายรายมาตราที่ตรวจทานแล้ว กรุณาอ่านถ้อยคำตัวบทจากแหล่งทางการด้านล่างก่อนนำไปเขียนคำตอบ"));
  }
+ if(note.exam){
+  var example=newNode("div","statute-example");
+  example.appendChild(newNode("strong","","ประโยคหลักกฎหมายที่ใช้เขียนข้อสอบ (สรุปเรียบเรียงใหม่)"));
+  example.appendChild(newNode("p","",note.exam));
+  detail.appendChild(example);
+ }
+ if(!small){
+  if(note.conditions)detail.appendChild(newNode("p","statute-conditions","องค์ประกอบที่ต้องตรวจ: "+note.conditions));
+  if(note.trap)detail.appendChild(newNode("p","statute-warning","จุดระวัง: "+note.trap));
+ }
+ var links=newNode("div","statute-sources");
+ links.appendChild(newNode("strong","statute-sources-title","เอกสารอ้างอิง"));
+ function appendSource(key,label){
+  var source=sourceList[key];if(!source||!/^https:\/\//.test(source.url))return;
+  var a=makeLink(source.url,label);
+  a.className="statute-source-link";
+  a.title=source.note||"";
+  links.appendChild(a);
+ }
+ appendSource("ocs","กฤษฎีกา: ค้นตัวบทฉบับใช้บังคับ ↗");
+ appendSource("compilation","เอกสารรวมจากหน่วยงานรัฐ (เผยแพร่ 2566) ↗");
+ var amendments=(referenceData.amendedBy||{})[note.id]||[];
+ amendments.forEach(function(key){appendSource(key,"ราชกิจจาฯ: กฎหมายแก้ไขมาตรานี้ "+(key==="gazette2557"?"พ.ศ. 2557":"พ.ศ. 2558")+" ↗");});
+ if(note.fullTextUrl&&/^https:\/\//.test(note.fullTextUrl)){
+  var privateLink=makeLink(note.fullTextUrl,"อ่านรายมาตรา (เว็บไซต์เอกชน ไม่ใช่ต้นฉบับทางการ) ↗");
+  privateLink.className="statute-source-link statute-source-secondary";
+  links.appendChild(privateLink);
+ }
+ links.appendChild(newNode("p","statute-source-note","ลิงก์กฤษฎีกาเป็นหน้าค้นหา และเอกสารรวมไม่เปิดตรงเลขมาตรา"+(amendments.length?" · ฉบับแก้ไข พ.ศ. 2557 พบในดัชนีราชกิจจาฯ แต่การตรวจเปิด PDF อัตโนมัติถูกปฏิเสธ":"")));
+ detail.appendChild(links);
  return detail;
 }
 function renderLibrary(query){
  var root=$("statute-list");if(!root)return;
  var term=String(query||"").trim().toLocaleLowerCase("th");
- var filtered=notes.filter(function(note){
- return !term||[note.id,note.title,note.plain,note.exam,note.conditions].join(" ").toLocaleLowerCase("th").includes(term);
+ var filtered=allNotes.filter(function(note){
+ return !term||[note.id,note.title,note.plain||"",note.exam||"",note.conditions||""].join(" ").toLocaleLowerCase("th").includes(term);
  });
- $("statute-count").textContent="พบ "+filtered.length+" จาก "+notes.length+" มาตรา";
+ $("statute-count").textContent="พบ "+filtered.length+" จาก "+allNotes.length+" มาตรา";
  root.replaceChildren();
  if(!filtered.length){root.appendChild(newNode("p","","ไม่พบมาตราที่ตรงกับคำค้น"));return}
  filtered.forEach(function(note){root.appendChild(makeStatuteCard(note,false))});
@@ -84,14 +116,15 @@ function renderQuiz(id){
  var box=$("exam-statute-list");
  if(box){
  box.replaceChildren();
- var wanted=(q.sections||[]).map(function(s){return String(s).trim().split(" ")[0]});
- wanted.forEach(function(n){
- var found=notes.find(function(x){return x.id===n});
- if(found)box.appendChild(makeStatuteCard(found,true));
+ var wanted=(q.sections||[]).map(function(s){return {raw:String(s),id:normalizeSection(s)};});
+ wanted.forEach(function(item){
+  var found=noteIndex[item.id]||allNotes.find(function(x){return x.id===item.id;});
+  if(found)box.appendChild(makeStatuteCard(found,true,item.raw));
  });
  if(!box.children.length){
- var info=newNode("p","statute-conditions","บทสรุปมาตรา "+wanted.join(", ")+" ยังไม่อยู่ในคลังสรุปมาตราฉบับนี้ โปรดตรวจตัวบทฉบับใช้บังคับล่าสุดจาก ");
- info.appendChild(makeLink("https://www.krisdika.go.th/","สำนักงานคณะกรรมการกฤษฎีกา ↗"));box.appendChild(info);
+  var info=newNode("p","statute-conditions","ไม่พบข้อมูลเลขมาตราที่อ้างในโจทย์ โปรดค้นจากฐานข้อมูลกฤษฎีกา");
+  if(sourceList.ocs)info.appendChild(makeLink(sourceList.ocs.url," สำนักงานคณะกรรมการกฤษฎีกา ↗"));
+  box.appendChild(info);
  }
  }
  var value=$("exam-ranking-value"),desc=$("exam-ranking-description");
