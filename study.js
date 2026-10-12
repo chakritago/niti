@@ -27,10 +27,13 @@
     var statutes=Object.entries(sectionCounts).sort(function(a,b){return b[1]-a[1]||a[0].localeCompare(b[0],"th");}).slice(0,10);
     var cells=$("article-frequency");cells.replaceChildren();
     statutes.forEach(function(e){
-      var span=document.createElement("span");span.className="article-chip";
+      var sourceMap=window.NITI_STATUTE_SOURCES;
+      var source=sourceMap&&typeof sourceMap.resolveLabel==="function"?sourceMap.resolveLabel(e[0]):null;
+      var span=document.createElement(source?"a":"span");span.className="article-chip";
+      if(source){span.href=source.primaryUrl;span.target="_blank";span.rel="noopener noreferrer";span.title="เปิดตัวบทมาตรา "+e[0]+" ใน PDF จากหน่วยงานรัฐ หน้า "+source.page;}
       var isKnown=/^(\d+)/.exec(e[0]);var article= isKnown?isKnown[1]:e[0];
       span.innerHTML='<b>ม. '+escapeHTML(e[0])+'</b><span>'+e[1]+' ข้อ</span>';
-      span.title="พบการอ้างอิงในชุดข้อสอบจำนวน "+e[1]+" ข้อ — ตรวจตัวบทฉบับใช้บังคับจากสำนักงานคณะกรรมการกฤษฎีกา";
+      if(!source)span.title="พบการอ้างอิงในชุดข้อสอบจำนวน "+e[1]+" ข้อ";
       cells.appendChild(span);
     });
   }
