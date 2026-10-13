@@ -113,6 +113,7 @@ function activateLegalTree(body,id){
  if(!data)return;
  var ticket=++modelToken;
  if(!window.WebGLRenderingContext){
+  section.classList.add("niti-3d-unavailable");
   fallback.textContent="อุปกรณ์นี้ไม่รองรับ WebGL — ใช้ปุ่มประเด็นด้านล่างอ่านได้ครบทุกกิ่ง";
   return;
  }
@@ -121,11 +122,13 @@ function activateLegalTree(body,id){
   try{modelInstance=mod.mount(section,data);}
   catch(error){
    renderTextTree(section,data);
+   section.classList.add("niti-3d-unavailable");
    fallback.textContent="ไม่สามารถแสดง 3D ได้ในอุปกรณ์นี้ แต่ยังเลือกอ่านทุกประเด็นผ่านปุ่มได้";
    if(window.console)console.warn("NITI Three.js unavailable",error);
   }
  }).catch(function(error){
   if(ticket!==modelToken||!dialog||!dialog.open)return;
+  section.classList.add("niti-3d-unavailable");
   fallback.textContent="โหลด 3D ไม่สำเร็จ (อาจไม่มีอินเทอร์เน็ตหรือ CDN ถูกบล็อก) — ใช้ปุ่มอ่านองค์ประกอบด้านล่างแทน";
   if(window.console)console.warn("NITI Three.js import unavailable",error);
  });
