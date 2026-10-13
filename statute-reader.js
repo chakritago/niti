@@ -8,7 +8,7 @@ var sourceMap=window.NITI_STATUTE_SOURCES||{};
 var notes=Array.isArray(window.NITI_STATUTE_NOTES)?window.NITI_STATUTE_NOTES:[];
 var noteById={};
 notes.forEach(function(note){noteById[note.id]=note;});
-var dialog=null,viewer=null,previousFocus=null,sceneInstance=null,sceneTicket=0;
+var dialog=null,viewer=null,previousFocus=null;
 function normalize(value){
  if(typeof sourceMap.normalizeId==="function")return sourceMap.normalizeId(value);
  var match=String(value||"").trim().match(/^(\d+(?:\/\d+)?)/);
@@ -42,81 +42,36 @@ function setup(){
  dialog.setAttribute("aria-describedby","niti-statute-dialog-description");
  dialog.addEventListener("click",function(event){if(event.target===dialog)dialog.close();});
  dialog.addEventListener("close",function(){
-  sceneTicket++;
-  if(sceneInstance){sceneInstance.dispose();sceneInstance=null;}
   if(viewer)viewer.src="about:blank";
   if(previousFocus&&typeof previousFocus.focus==="function")previousFocus.focus();
  });
  document.body.appendChild(dialog);
 }
 
-/* Reader always offers a fully functional text exploration if 3D is blocked. */
-function buildDiorama(model){
- var outer=element("section","niti-diorama");
- outer.setAttribute("aria-label","แบบจำลองเหตุการณ์กฎหมายสามมิติมาตรา "+model.id);
- outer.appendChild(element("h3","","🎓 ฉากกฎหมาย 3D · "+model.kindLabel));
- outer.appendChild(element("p","niti-diorama-description","สังเกตวัตถุในฉาก: คลิกเพื่อเรียนรู้ประเด็นตามมาตรานี้ ไม่ใช่แผนผังต้นไม้หรือคำวินิจฉัยคดีจริง"));
- outer.appendChild(element("div","niti-diorama-case","เหตุการณ์ใกล้ตัว: "+model.case));
- var layout=element("div","niti-diorama-layout");
- var visual=element("div","niti-diorama-view");
- var viewport=element("div","niti-scene-viewport");
- viewport.setAttribute("aria-hidden","true");
- visual.appendChild(viewport);
- visual.appendChild(element("p","niti-scene-status","กำลังเตรียมฉาก 3D · ระหว่างนี้ใช้ปุ่มอ่านข้อความด้านล่างได้"));
- layout.appendChild(visual);
- var details=element("div","niti-scene-detail");
- details.setAttribute("aria-live","polite");
- layout.appendChild(details);outer.appendChild(layout);
- var buttons=element("div","niti-scene-buttons");
- buttons.setAttribute("role","group");
- buttons.setAttribute("aria-label","เลือกองค์ประกอบกฎหมายมาตรา "+model.id);
- outer.appendChild(buttons);
- outer.appendChild(element("p","niti-diorama-caution","คำอธิบายครอบคลุมประเด็นที่สรุปไว้สำหรับฝึกเรียน แต่ต้องตรวจทุกวรรคและข้อยกเว้นจากตัวบทจริง · "+model.note));
- function select(i){
-  var part=model.parts[i];
-  if(!part)return;
-  details.replaceChildren();
-  details.appendChild(element("span","niti-scene-number","ประเด็น "+(i+1)+" / "+model.parts.length));
-  details.appendChild(element("h4","",part.label));
-  details.appendChild(element("p","",part.explanation));
-  details.appendChild(element("strong","","ลองคิดจากสถานการณ์นี้"));
-  details.appendChild(element("p","",part.ask));
-  details.appendChild(element("p","niti-scene-alert","ข้อควรระวัง: "+model.exception));
-  details.appendChild(element("small","niti-scene-caption",part.caution));
-  Array.prototype.forEach.call(buttons.children,function(b,j){b.setAttribute("aria-pressed",String(i===j));});
- }
- model.parts.forEach(function(part,i){
-  var button=element("button","niti-scene-button",(i+1)+". "+part.label);
-  button.type="button";
-  button.setAttribute("aria-pressed","false");
-  button.addEventListener("click",function(){select(i);});
-  buttons.appendChild(button);
- });
- select(0);
+
+/* Accessible two-dimensional interactive illustration. */
+function buildIllustration(model){
+ var outer=element("section","niti-illustration");
+ outer.setAttribute("aria-label","ภาพประกอบกฎหมายมาตรา "+model.id);
+ outer.appendChild(element("h3","niti-ill-heading","🖼️ ภาพโต้ตอบ · "+model.kindLabel+" (มาตรา "+model.id+")"));
+ outer.appendChild(element("p","niti-ill-intro","คลิกหมายเลขบนภาพเพื่ออ่านประเด็นตามกฎหมาย แล้วลองตรวจข้อเท็จจริงด้วยตัวเอง"));
+ outer.appendChild(element("div","niti-ill-case","โจทย์ใกล้ตัว: "+model.case));
+ var layout=element("div","niti-ill-layout");
+ var picture=element("div","niti-ill-picture");
+ picture.appendChild(element("div","niti-ill-image"));
+ picture.appendChild(element("p","niti-ill-caption","เลือกหมายเลขบนภาพ หรือใช้ปุ่มข้อความด้านล่าง"));
+ layout.appendChild(picture);
+ var details=element("div","niti-ill-details");
+ details.setAttribute("aria-live","polite");layout.appendChild(details);
+ outer.appendChild(layout);
+ var list=element("div","niti-ill-list");list.setAttribute("role","group");list.setAttribute("aria-label","เลือกองค์ประกอบกฎหมายมาตรา "+model.id);
+ outer.appendChild(list);
+ outer.appendChild(element("div","niti-ill-progress",""));
+ outer.appendChild(element("p","niti-ill-caution","ภาพเป็นเหตุการณ์สมมติเพื่อการศึกษา ไม่ใช่คำพิพากษา ข้อเท็จจริงบางข้อเป็นทางเลือกหรือข้อยกเว้น ต้องดูทุกวรรคจากตัวบทกฎหมายทางการประกอบ"));
+ var app=window.NITI_STATUTE_ILLUSTRATION;
+ if(app&&typeof app.mount==="function")app.mount(outer,model);
+ else details.appendChild(element("p","","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
  return outer;
-}
-function startDiorama(model){
- var outer=dialog&&dialog.querySelector(".niti-diorama");
- if(!outer)return;
- var status=outer.querySelector(".niti-scene-status");
- var id=++sceneTicket;
- function fallback(message){
-  outer.classList.add("no-webgl");
-  if(status)status.textContent=message+" · ใช้ปุ่มข้อความด้านล่างเลือกอ่านประเด็นได้ครบ";
- }
- if(!window.WebGLRenderingContext){fallback("เบราว์เซอร์นี้ไม่รองรับ WebGL");return;}
- import("./statute-diorama-3d.js").then(function(module){
-  if(id!==sceneTicket||!dialog.open)return;
-  try{sceneInstance=module.mount(outer,model);}
-  catch(error){
-   fallback("ไม่สามารถสร้างภาพ 3D ได้");
-   if(window.console)console.warn("NITI diorama WebGL fallback",error);
-  }
- }).catch(function(error){
-  if(id!==sceneTicket||!dialog.open)return;
-  fallback("ไม่สามารถโหลด Three.js จาก CDN");
-  if(window.console)console.warn("NITI diorama import fallback",error);
- });
 }
 
 function openStatute(value,opener){
@@ -124,8 +79,6 @@ function openStatute(value,opener){
  if(!id||!ref)return false;
  setup();
  if(typeof dialog.showModal!=="function")return false;
- sceneTicket++;
- if(sceneInstance){sceneInstance.dispose();sceneInstance=null;}
  previousFocus=opener||document.activeElement;
  dialog.replaceChildren();
  var head=element("div","niti-reader-header");
@@ -141,11 +94,11 @@ function openStatute(value,opener){
  var body=element("div","niti-reader-body");
  var title=(noteById[id]||{}).title||(sourceMap.titles||{})[id]||"บทบัญญัติกฎหมายแพ่งและพาณิชย์";
  body.appendChild(element("p","niti-reader-subtitle",title));
- var description=element("p","niti-reader-disclaimer","คำอธิบายด้านล่างเป็นสรุปเพื่อการศึกษา ไม่ใช่ถ้อยคำตัวบทฉบับทางการ เลื่อนลงไปอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐ");
+ var description=element("p","niti-reader-disclaimer","กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ");
  description.id="niti-statute-dialog-description";
  body.appendChild(description);
  var model=window.NITI_DIORAMA_DATA&&window.NITI_DIORAMA_DATA.get(id);
- if(model)body.appendChild(buildDiorama(model));
+ if(model)body.appendChild(buildIllustration(model));
  var note=noteById[id];
  if(note){
   var summary=element("div","niti-reader-summary");
@@ -180,7 +133,6 @@ function openStatute(value,opener){
  }
  dialog.appendChild(body);
  dialog.showModal();
- if(model)startDiorama(model);
  close.focus();
  return true;
 }
