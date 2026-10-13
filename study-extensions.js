@@ -59,11 +59,8 @@ function makeStatuteCard(note,small,reference){
  var title=newNode("h3","","");
  var textTitle="มาตรา "+(reference||note.id)+" — "+note.title;
  if(direct){
-  var titleLink=makeLink("./study.html#statute-"+String(note.id).replace(/\//g,"-"),textTitle+" · 🌳");
+  var titleLink=makeLink(direct.primaryUrl,textTitle);
   titleLink.className="statute-heading-link";
-  titleLink.target="_self";
-  titleLink.setAttribute("data-statute",note.id);
-  titleLink.title="เปิดต้นไม้ตีความกฎหมาย 3D ของมาตรา "+note.id;
   title.appendChild(titleLink);
  }else{
   title.textContent=textTitle;
@@ -85,13 +82,8 @@ function makeStatuteCard(note,small,reference){
  var links=newNode("div","statute-sources");
  links.appendChild(newNode("strong","statute-sources-title","แหล่งตัวบทกฎหมาย"));
  if(direct){
-  var explore=makeLink("./study.html#statute-"+String(note.id).replace(/\//g,"-"),"🌳 สำรวจองค์ประกอบ 3D ของมาตรา "+note.id+" ↗");
-  explore.target="_self";
-  explore.setAttribute("data-statute",note.id);
-  explore.className="statute-source-link statute-source-primary";
-  links.appendChild(explore);
   var main=makeLink(direct.primaryUrl,"เปิดตัวบทมาตรา "+note.id+" โดยตรง — PDF หน้า "+direct.page+" ↗");
-  main.className="statute-source-link statute-source-secondary";
+  main.className="statute-source-link statute-source-primary";
   links.appendChild(main);
   (direct.officialUrls||[]).forEach(function(ref){
    if(!ref.url||ref.url===direct.primaryUrl)return;

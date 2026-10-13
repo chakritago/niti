@@ -93,11 +93,6 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=Sarabun:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./theme.css">
-<script type="importmap">
-{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.180.0/examples/jsm/"}}
-</script>
-<link rel="stylesheet" href="./statute-reader.css">
-<link rel="stylesheet" href="./statute-3d.css">
 </head>
 <body class="tutor-page">
 <header><nav class="wrap nav" aria-label="เมนูหลัก"><a class="brand" href="./index.html"><span class="monogram" aria-hidden="true">น</span>NITI <small style="font:12px Arial,sans-serif;letter-spacing:.04em;color:#cbd7e1">LAW LAB</small></a><div class="nav-right"><a href="./index.html">← หน้าหลัก</a><a href="./study.html">แผนอ่านสอบ + ทริคจำ ↗</a><a href="./study.html#statute-notes">สรุปมาตรา + ตัวบทเต็ม ↗</a><a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">ต้นทาง LAW2001 ↗</a><a href="https://mjsheetramfree.com/category/law2005/" target="_blank" rel="noopener noreferrer">ต้นทาง LAW2005 ↗</a><a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button>
@@ -142,7 +137,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
     <h3 id="exam-statute-title">มาตราที่ใช้ตอบข้อนี้ — สรุปสำหรับเขียนข้อสอบ</h3>
     <p>อ่านหลักกฎหมายแบบย่อ (เฉพาะมาตราที่มีสรุปตรวจทาน) และตรวจเอกสารทางการตามลิงก์ของแต่ละมาตรา</p>
     <div id="exam-statute-list"></div>
-    <p class="law-source-disclaimer">กดเลขมาตราเพื่อเปิดต้นไม้ 3D ภายในเว็บไซต์ คลิกกิ่งเพื่ออ่านองค์ประกอบและตัวอย่าง แล้วเลือกเปิด PDF ทางการได้ มาตรา 681, 714/1, 728 และ 729 ใช้ฉบับแก้ไข พ.ศ. 2557; บางโปรแกรมอ่าน PDF บนมือถืออาจไม่เลื่อนไปหน้าเป้าหมาย จึงแสดงเลขหน้ากำกับไว้ด้วย</p>
+    <p class="law-source-disclaimer">กดที่ชื่อมาตราหรือปุ่มเปิดตัวบทเพื่ออ่าน PDF หน้าที่มีมาตรานั้นจากหน่วยงานรัฐ มาตรา 681, 714/1, 728 และ 729 ใช้ฉบับแก้ไข พ.ศ. 2557; บางโปรแกรมอ่าน PDF บนมือถืออาจไม่เลื่อนไปหน้าเป้าหมาย จึงแสดงเลขหน้ากำกับไว้ด้วย</p>
   </section>
   <section id="exam-ranking" class="exam-ranking" aria-label="อันดับความสำคัญเพื่อจัดเวลาอ่าน">
     <strong id="exam-ranking-value"></strong>
@@ -280,11 +275,12 @@ q.sections.forEach(function(label){
  var ref=sourceMap&&typeof sourceMap.resolveLabel==="function"?sourceMap.resolveLabel(label):null;
  var chip=document.createElement(ref?"a":"span");
  chip.className="topic-tag statute-direct-chip";
- chip.textContent="ป.พ.พ. ม. "+label+(ref?" · 🌳 ดู 3D ↗":"");
+ chip.textContent="ป.พ.พ. ม. "+label+(ref?" · เปิดตัวบท ↗":"");
  if(ref){
-  chip.href="./study.html#statute-"+ref.id.replace(/\//g,"-");
-  chip.setAttribute("data-statute",ref.id);
-  chip.title="อ่านองค์ประกอบมาตรา "+label+" ในต้นไม้ 3D ภายในเว็บไซต์";
+  chip.href=ref.primaryUrl;
+  chip.target="_blank";
+  chip.rel="noopener noreferrer";
+  chip.title="เปิด PDF ทางการ หน้า "+ref.page+" ซึ่งมีมาตรา "+label;
  }
  statutesArea.appendChild(chip);
 });
@@ -322,8 +318,6 @@ refreshList();if(target)load(target.id);
 </script>
 <script src="./statute-notes.js"></script>
 <script src="./statute-notes-extra.js"></script>
-<script src="./statute-3d-data.js"></script>
-<script src="./statute-reader.js"></script>
 <script src="./study-guide.js"></script>
 <script src="./tutor-answers.js"></script>
 <script src="./contract-answers.js"></script>
