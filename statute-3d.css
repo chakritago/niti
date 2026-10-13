@@ -26,3 +26,8 @@
 @media(max-width:800px){.niti-3d-section{padding:12px;margin:12px 0}.niti-3d-layout{grid-template-columns:1fr}.niti-3d-canvas{height:330px}.niti-3d-detail{min-height:0}}
 @media(max-width:470px){.niti-3d-canvas{height:270px}.niti-3d-pick{font-size:.85rem}.niti-3d-section{margin-inline:-6px}}
 @media(prefers-reduced-motion:reduce){.niti-3d-pick{transition:none}}
+
+/* If WebGL or the CDN fails, the accessible buttons and explanations remain. */
+.niti-3d-unavailable .niti-3d-canvas{display:none}
+.niti-3d-unavailable .niti-3d-layout{grid-template-columns:1fr}
+.niti-3d-unavailable .niti-3d-visual{min-height:0}
