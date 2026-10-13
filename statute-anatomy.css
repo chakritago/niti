@@ -1,0 +1,25 @@
+.statute-visual{margin:1rem 0;border:1px solid var(--md-border,var(--line));border-radius:16px;overflow:hidden;background:var(--md-surface,var(--surface))}
+.statute-visual>summary,.anatomy-answer>summary{cursor:pointer;padding:1rem;font-weight:700;color:var(--md-primary,var(--ink));min-height:48px}
+.statute-anatomy{margin:0 1rem 1rem;border:1px solid var(--md-border,var(--line));border-radius:14px;overflow:hidden;background:var(--anatomy-card);color:var(--anatomy-strong)}
+.anatomy-heading{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1rem;border-bottom:1px solid var(--md-border,var(--line))}
+.anatomy-heading span{font-size:.8em;color:var(--md-text-secondary,var(--muted))}
+.anatomy-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,1fr);align-items:center}
+.anatomy-visual{min-width:0;padding:.5rem}
+.anatomy-visual svg{width:100%;height:auto;display:block}
+.anatomy-controls{display:grid;gap:.5rem;padding:1rem;min-width:0}
+.anatomy-step{font:inherit;text-align:left;padding:.65rem .8rem;min-height:48px;border:1px solid var(--md-border,var(--line));border-radius:10px;background:var(--md-surface,var(--surface));color:var(--md-text,var(--ink));cursor:pointer;overflow-wrap:anywhere}
+.anatomy-step[aria-pressed="true"]{background:var(--md-primary-container,#e8f0fe);color:var(--md-on-primary-container,#174ea6);border-color:var(--md-primary,#1967d2)}
+.anatomy-step:focus-visible,.statute-visual summary:focus-visible{outline:3px solid var(--md-primary,#1967d2);outline-offset:-3px}
+.anatomy-drawer{transition:transform 420ms cubic-bezier(.2,.7,.2,1)}
+.anatomy-drawer[data-active="true"] .iso-edge{stroke:var(--anatomy-lit);stroke-width:1}
+.anatomy-readout{margin:0;padding:1rem;border-top:1px solid var(--md-border,var(--line));font-weight:700}
+.statute-anatomy figcaption{padding:0 1rem 1rem;font-size:.85em;line-height:1.8;color:var(--md-text-secondary,var(--muted))}
+.anatomy-case{padding:0 1rem 1rem}
+.anatomy-explanation h4{font-size:1em;margin:1rem 0 .3rem}
+.anatomy-explanation p{margin:.3rem 0;line-height:1.9;overflow-wrap:anywhere}
+.anatomy-answer{border-left:3px solid var(--md-primary,#1967d2);padding:0 .8rem;background:var(--md-bg,var(--paper));margin:1rem 0}
+.anatomy-answer>summary{padding:.6rem 0}
+.anatomy-source-note{font-size:.85em;color:var(--md-text-secondary,var(--muted))}
+.statute-small .anatomy-layout{grid-template-columns:1fr}
+@media(max-width:700px){.anatomy-layout{grid-template-columns:1fr}.statute-anatomy{margin:0 .5rem .5rem}.anatomy-heading{gap:.4rem}.anatomy-visual{max-width:440px;width:100%;margin:auto}}
+@media(prefers-reduced-motion:reduce){.anatomy-drawer{transition:none}}

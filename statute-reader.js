@@ -78,6 +78,7 @@ function openStatute(value,opener){
   section(summary,"องค์ประกอบที่ต้องพิจารณา",note.conditions);
   section(summary,"ข้อควรระวัง",note.trap);
   body.appendChild(summary);
+  if(window.NITI_STATUTE_ANATOMY)body.appendChild(window.NITI_STATUTE_ANATOMY.create(note));
  }else{
   body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
  }
