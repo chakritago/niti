@@ -1,0 +1,38 @@
+/* NITI internal statute reader: modal, PDF, deep links, and mobile layout. */
+.study-page .statute-topic-links{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+.study-page .statute-topic-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:7px 13px;border:1px solid var(--md-outline);border-radius:10px;color:var(--md-primary);background:var(--md-primary-container);font-weight:800;font-size:1rem;text-decoration:none;transition:background .15s,border-color .15s}
+.study-page .statute-topic-link:hover,.study-page .statute-topic-link:focus-visible{background:var(--md-surface-high);border-color:var(--md-primary);text-decoration:underline}
+.study-page .statute-topic-hint{font-size:.87rem!important;color:var(--md-text-secondary)!important;margin:0!important}
+.study-page .statute-card[id]{scroll-margin-top:95px}
+.study-page .statute-card:target{outline:3px solid var(--md-primary);outline-offset:3px}
+.study-page .article-chip[data-statute]{cursor:pointer}
+.niti-statute-dialog{width:min(980px,calc(100vw - 28px));max-width:980px;max-height:min(92dvh,980px);overflow:hidden;padding:0;border:1px solid var(--md-outline);border-radius:20px;background:var(--md-surface);color:var(--md-text);box-shadow:0 22px 75px rgba(0,0,0,.26)}
+.niti-statute-dialog::backdrop{background:rgba(9,21,38,.7);backdrop-filter:blur(3px)}
+.niti-reader-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;background:var(--md-primary-container);border-bottom:1px solid var(--md-outline)}
+.niti-reader-header h2{font-size:clamp(1.22rem,2.2vw,1.7rem)!important;line-height:1.5;margin:0;color:var(--md-on-primary-container)}
+.niti-reader-close{min-width:74px;min-height:44px;border:1px solid var(--md-outline);border-radius:10px;background:var(--md-surface);color:var(--md-text);font:inherit;font-weight:800;cursor:pointer}
+.niti-reader-body{padding:20px 22px 26px;max-height:calc(min(92dvh,980px) - 77px);overflow:auto;overscroll-behavior:contain}
+.niti-reader-subtitle{font-size:1.18rem!important;font-weight:800!important;color:var(--md-text);margin:0 0 8px}
+.niti-reader-disclaimer,.niti-reader-pdf-note,.niti-reader-missing{font-size:.94rem!important;line-height:1.75!important;color:var(--md-text-secondary);margin:8px 0 14px}
+.niti-reader-summary{padding:12px 17px;background:var(--md-surface-low);border:1px solid var(--md-border);border-radius:13px}
+.niti-reader-summary-part:not(:last-child){border-bottom:1px solid var(--md-border);padding-bottom:12px;margin-bottom:12px}
+.niti-reader-summary-part h3{font-size:1rem!important;margin:0 0 7px;font-weight:800}
+.niti-reader-summary-part p{margin:0;font-size:1rem!important;line-height:1.88!important;white-space:pre-wrap}
+.niti-reader-actions{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:15px 0}
+.niti-reader-actions a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:10px;font-size:.97rem;font-weight:800;text-decoration:none}
+.niti-reader-primary{background:var(--md-primary);color:var(--md-on-primary)}
+.niti-reader-primary:hover{background:var(--md-primary-hover)}
+.niti-reader-inside{border:1px solid var(--md-primary);background:var(--md-surface);color:var(--md-primary)}
+.niti-reader-pdf-title{font-size:1.08rem!important;margin:16px 0 5px}
+.niti-reader-pdf{display:block;width:100%;height:min(50vh,470px);border:1px solid var(--md-outline);border-radius:10px;background:var(--md-surface-low)}
+.niti-reader-updated{display:inline-flex;min-height:44px;align-items:center;color:var(--md-primary);font-size:.94rem;line-height:1.6;font-weight:800;text-decoration:underline}
+.niti-statute-dialog a:focus-visible,.niti-statute-dialog button:focus-visible{outline:3px solid var(--md-primary);outline-offset:3px}
+@media(max-width:640px){
+ .niti-statute-dialog{width:calc(100vw - 12px);max-height:97dvh;border-radius:12px}
+ .niti-reader-header{padding:10px 13px}
+ .niti-reader-body{padding:14px 13px 18px;max-height:calc(97dvh - 67px)}
+ .niti-reader-pdf{height:47vh}
+ .niti-reader-actions a{flex:1 1 100%}
+ .study-page .statute-topic-link{font-size:1rem}
+}
+@media(prefers-reduced-motion:reduce){.study-page .statute-topic-link{transition:none}}
