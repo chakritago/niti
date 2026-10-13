@@ -53,6 +53,7 @@ function renderRanking(){
 
 function makeStatuteCard(note,small,reference){
  var detail=newNode("article",small?"statute-small":"statute-card");
+ if(!small)detail.id="statute-"+String(note.id).replace(/\//g,"-");
  var direct=referenceData&&typeof referenceData.resolve==="function"?referenceData.resolve(note.id):null;
  var head=newNode("div","statute-head");
  var title=newNode("h3","","");
