@@ -79,7 +79,7 @@ function openStatute(value,opener){
   section(summary,"ข้อควรระวัง",note.trap);
   body.appendChild(summary);
  }else{
-  body.appendChild(element("p","niti-reader-missing","มาตรานี้ยังไม่มีสรุปที่ตรวจทานในเว็บไซต์ โปรดอ่านถ้อยคำมาตราจากเอกสารทางการในกรอบด้านล่าง"));
+  body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
  }
  var actions=element("div","niti-reader-actions");
  actions.appendChild(link(ref.primaryUrl,"เปิดตัวบทฉบับทางการ PDF หน้า "+ref.page+" ↗","niti-reader-primary"));
