@@ -88,6 +88,7 @@ function drawObject(g,kind,x,y,s){
  case "bank":rect(p,-57,-24,114,78,"#cde9ea",8,"#6b969c");polygon(p,"-64,-24 0,-57 64,-24","#5f91b0");for(var i=0;i<3;i++)rect(p,-42+i*30,-8,16,57,"#f7f0db",3);break;
  case "clock":case "calendar":drawClock(p,0,7,1);break;
  case "watch":drawClock(p,0,0,.8);rect(p,-17,-62,34,31,"#648d9e",6);rect(p,-17,31,34,31,"#648d9e",6);break;
+ case "pledge":drawObject(p,"watch",-20,2,.55);drawObject(p,"handshake",26,23,.53);break;
  case "fence":for(var i=0;i<5;i++)rect(p,-52+i*27,-34,9,75,"#b98569",3);line(p,-58,12,62,12,"#805c45",9);break;
  case "permission":case "shield":case "lock":rect(p,-42,-34,84,76,"#d6f1e1",16,"#5a9b84");label(p,0,10,"✓","#277957");break;
  case "warning":case "crack":polygon(p,"0,-49 -52,46 52,46","#ffe1a1");label(p,0,29,"!","#b56637");break;
@@ -117,7 +118,7 @@ function backdrop(g,model){
   label(g,230,370,"ที่ดินแปลงที่ 1");label(g,655,370,"ที่ดินแปลงที่ 2");
  }else if(kind==="registry"||kind==="mortgage"||kind==="boundary"){
   drawParcel(g,75,170,315,166,"#b9dfaa",true);
-  if(kind==="boundary"){rect(g,433,171,8,171,"#cc7e68",3);drawParcel(g,485,172,302,165,"#c5e2c1",false);}
+  if(kind==="boundary"){rect(g,433,171,8,171,"#cc7e68",3);drawParcel(g,485,172,302,165,"#c5e2c1",false);drawHouse(g,444,296,1.10,"#ffe0c2");label(g,440,402,"ตัวบ้านรุกล้ำแนวเขต");}
   else{drawObject(g,kind==="mortgage"?"bank":"registry",642,270,1.15);}
   label(g,230,371,"ทรัพย์และเจ้าของ");label(g,650,371,kind==="mortgage"?"เจ้าหนี้ / หลักประกัน":"หลักฐาน / สำนักงานที่ดิน");
  }else if(kind==="pledge"||kind==="trade"||kind==="exchange"||kind==="gift"||kind==="borrow"||kind==="obligation"){
@@ -127,10 +128,13 @@ function backdrop(g,model){
   if(kind==="pledge")drawObject(g,"watch",444,250,.67);
   else if(kind==="exchange")drawObject(g,"goods",444,245,.67);
   else drawObject(g,"handshake",444,236,.80);
- }else if(kind==="guarantee"||kind==="loan"){
+ }else if(kind==="loan"){
+  drawPerson(g,195,255,1.38,"#6792c5");drawPerson(g,687,255,1.38,"#85b5a3");drawObject(g,"coins",442,267,1.10);
+  label(g,195,360,"ผู้กู้");label(g,687,360,"ผู้ให้กู้");
+ }else if(kind==="guarantee"){
   drawPerson(g,162,255,1.30,"#6792c5");drawPerson(g,434,255,1.30,"#85b5a3");
   drawObject(g,"bank",710,259,1.1);
-  label(g,150,360,"ลูกหนี้");label(g,432,360,"ผู้ค้ำ / ผู้เกี่ยวข้อง");label(g,710,360,"เจ้าหนี้");
+  label(g,150,360,"ลูกหนี้");label(g,432,360,"ผู้ค้ำ");label(g,710,360,"เจ้าหนี้");
  }else if(kind==="lease"||kind==="hire"){
   drawHouse(g,225,265,1.48);drawPerson(g,647,280,1.30,"#719bc7");
   drawArrow(g,340,231,528,231);label(g,435,204,"สัญญา / การใช้ทรัพย์");
@@ -171,6 +175,33 @@ function specialized(g,model){
   rect(g,285,78,313,51,"#fffaf0",12,"#82b4ae");
   label(g,440,109,"ใช้ทางเป็นสิทธิ หรือแค่ได้รับอนุญาต?");
  }
+ if(model.id==="144"){
+  rect(g,230,250,395,26,"#ad805b",7);
+  for(var i=0;i<4;i++){rect(g,252+i*109,275,19,60,"#a97853",4);}
+  drawObject(g,"tool",710,265,.75);
+  label(g,435,376,"โต๊ะและขาที่แยกออกแล้วอาจเสียรูป");
+ }
+ if(model.id==="146"){
+  drawObject(g,"tent",450,269,1.35);
+  label(g,443,376,"สิ่งปลูกสร้างชั่วคราวบนที่ดิน");
+ }
+ if(model.id==="1401"){
+  drawObject(g,"clock",293,280,.55);drawObject(g,"permission",589,280,.53);
+ }
+ if(model.id==="1332"){
+  drawObject(g,"goods",447,254,.70);
+  label(g,438,383,"สุจริต · แหล่งซื้อ · ชดใช้ราคาก่อนคืน");
+ }
+ if(model.id==="574"){
+  drawObject(g,"car",440,286,.9);drawObject(g,"calendar",624,264,.55);
+ }
+ if(model.id==="640"||model.id==="641"){
+  drawObject(g,"bike",440,270,1.02);
+ }
+ if(model.id==="193/27"){
+  drawObject(g,"pledge",442,286,.85);
+ }
+
 }
 function pointSlots(model){
  var n=model.parts.length;
@@ -189,6 +220,8 @@ function renderPartMarker(g,part,index,coords,select){
  rect(a,coords.x-91,coords.y-29,182,55,"#ffffff",16,"#a5c8d0");
  circle(a,coords.x-68,coords.y-2,19,"#247d9b");
  label(a,coords.x-68,coords.y+4,String(index+1),"#ffffff");
+ // The tiny illustrated object corresponds to this particular legal issue.
+ drawObject(a,part.shape,coords.x+61,coords.y+61,.32);
  var split=part.label.length>20?part.label.slice(0,19)+"…":part.label;
  svg(a,"text",{x:coords.x-44,y:coords.y+4,fill:"#214457","font-size":14.5,"font-weight":700,"font-family":"Sarabun, Tahoma, sans-serif"},split);
  a.addEventListener("click",function(){select(index,true);});
