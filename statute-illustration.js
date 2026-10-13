@@ -153,13 +153,13 @@ function backdrop(g,model){
 function specialized(g,model){
  // Large, meaningful visual legal distinction in the center of the scene.
  if(model.id==="1299"||model.id==="456"){
-  rect(g,274,78,335,62,"#fffdfa",14,"#80b8bf");
+  rect(g,170,78,540,62,"#fffdfa",14,"#80b8bf");
   label(g,440,103,model.id==="1299"?"ได้โดยนิติกรรม  /  ได้โดยทางอื่น":"ตรวจประเภทสัญญาและทรัพย์");
   label(g,440,129,"หนังสือ · จดทะเบียน · สิทธิบุคคลภายนอก");
  }
  if(model.id==="728"){
   rect(g,96,89,684,72,"#fff8ec",14,"#ca9b59");
-  label(g,438,115,"ผิดนัด → หนังสือบอกกล่าว → ระยะเวลาไม่น้อยกว่า 60 วัน");
+  label(g,438,115,"ผิดนัด → บอกกล่าวเป็นหนังสือ → อย่างน้อย 60 วัน");
   label(g,438,144,"กรณีผู้จำนองเป็นบุคคลภายนอกต้องตรวจการแจ้งเพิ่มเติม");
  }
  if(model.id==="1382"){
@@ -172,7 +172,7 @@ function specialized(g,model){
   label(g,440,117,"ของจำนำต้องส่งมอบจริง");
  }
  if(model.id==="1401"){
-  rect(g,285,78,313,51,"#fffaf0",12,"#82b4ae");
+  rect(g,170,78,540,51,"#fffaf0",12,"#82b4ae");
   label(g,440,109,"ใช้ทางเป็นสิทธิ หรือแค่ได้รับอนุญาต?");
  }
  if(model.id==="144"){
