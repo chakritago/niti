@@ -1,4 +1,4 @@
-/* NITI illustrated legal scenarios: accessible 2D SVG, no Three.js/WebGL/dependency.
+/* NITI illustrated legal scenarios: accessible 2D SVG and no external rendering dependencies.
  * Each section uses its own source-backed learning issues, scenario and props.
  * SVG selection and HTML controls explain facts, not issue an automated legal judgment.
  */
