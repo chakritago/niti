@@ -1,0 +1,614 @@
+/* NITI: statute-specific 3D dioramas. Not a tree diagram.
+ * One distinct everyday case per section, 15 visually appropriate sets,
+ * matching each issue in the existing legal notes to a 3D prop.
+ * Props aid recognition; summary is educational, not verbatim law or a judgment.
+ */
+(function(){
+"use strict";
+var recipes={
+  "144": {
+    "scene": "property",
+    "visuals": [
+      "house",
+      "tool"
+    ],
+    "case": "ซื้อโต๊ะที่มีขาติดเป็นส่วนสำคัญ ถอดขาแล้วโต๊ะใช้งานไม่ได้ ขาโต๊ะเป็นส่วนควบหรือไม่"
+  },
+  "146": {
+    "scene": "property",
+    "visuals": [
+      "tent",
+      "house"
+    ],
+    "case": "ตั้งซุ้มขายของชั่วคราวบนที่ดินเช่า ซุ้มนี้กลายเป็นของเจ้าของที่ดินไหม"
+  },
+  "321": {
+    "scene": "obligation",
+    "visuals": [
+      "document",
+      "handshake",
+      "goods"
+    ],
+    "case": "ติดหนี้ค่าสมุด แต่ร้านยอมรับจักรยานแทนเงิน ต้องตรวจการตกลงและชำระแทน"
+  },
+  "453": {
+    "scene": "trade",
+    "visuals": [
+      "person",
+      "goods",
+      "coins",
+      "handshake"
+    ],
+    "case": "ซื้อจักรยานจากเพื่อน มีผู้ซื้อ ผู้ขาย ทรัพย์และราคา"
+  },
+  "456": {
+    "scene": "registry",
+    "visuals": [
+      "parcel",
+      "document",
+      "registry"
+    ],
+    "case": "ตกลงซื้อขายที่ดินผ่านแชต แต่ยังไม่ทำหนังสือหรือจดทะเบียน"
+  },
+  "458": {
+    "scene": "trade",
+    "visuals": [
+      "document",
+      "goods",
+      "stamp"
+    ],
+    "case": "ซื้อเครื่องเกมที่ระบุตัวเครื่องชัดเจน กรรมสิทธิ์โอนเมื่อใด"
+  },
+  "460": {
+    "scene": "trade",
+    "visuals": [
+      "goods",
+      "selector",
+      "clock"
+    ],
+    "case": "สั่งซื้อข้าวสารจากกองใหญ่ที่ยังไม่ได้ตักแยกออกเป็นของผู้ซื้อ"
+  },
+  "472": {
+    "scene": "trade",
+    "visuals": [
+      "goods",
+      "crack",
+      "shield"
+    ],
+    "case": "ซื้อเครื่องซักผ้าแล้วพบเครื่องเสียภายใน สภาพนั้นทำให้ใช้ตามสัญญาไม่ได้ไหม"
+  },
+  "473": {
+    "scene": "trade",
+    "visuals": [
+      "eye",
+      "crack",
+      "auction"
+    ],
+    "case": "ซื้อโต๊ะที่เห็นรอยแตกชัดก่อนรับของ จะอ้างชำรุดบกพร่องได้หรือไม่"
+  },
+  "483": {
+    "scene": "trade",
+    "visuals": [
+      "document",
+      "shield",
+      "lock"
+    ],
+    "case": "ร้านเขียนว่างดรับผิดสินค้าเสียทุกกรณี ข้อตกลงยกเว้นทำได้แค่ไหน"
+  },
+  "485": {
+    "scene": "trade",
+    "visuals": [
+      "document",
+      "eye",
+      "crack"
+    ],
+    "case": "ผู้ขายรู้ว่ารถเคยน้ำท่วมแต่ปกปิด แม้มีข้อตกลงยกเว้นก็ต้องตรวจข้อจำกัด"
+  },
+  "518": {
+    "scene": "exchange",
+    "visuals": [
+      "goods",
+      "goods",
+      "handshake"
+    ],
+    "case": "สองคนแลกกีตาร์กับจักรยานโดยไม่มีเงินเป็นราคาหลัก"
+  },
+  "519": {
+    "scene": "exchange",
+    "visuals": [
+      "handshake",
+      "document"
+    ],
+    "case": "แลกโทรศัพท์กับแท็บเล็ต หากเกิดปัญหาเรื่องแบบและความรับผิดต้องนำบทซื้อขายมาเทียบ"
+  },
+  "523": {
+    "scene": "gift",
+    "visuals": [
+      "gift",
+      "person",
+      "handover"
+    ],
+    "case": "พี่ตกลงให้หนังสือแก่น้องแต่ยังไม่ได้ส่งหนังสือ ต้องตรวจว่าการให้สมบูรณ์หรือยัง"
+  },
+  "525": {
+    "scene": "registry",
+    "visuals": [
+      "parcel",
+      "document",
+      "registry"
+    ],
+    "case": "ยกที่ดินให้ลูก ต้องทำหนังสือและจดทะเบียนแทนการส่งของธรรมดา"
+  },
+  "526": {
+    "scene": "gift",
+    "visuals": [
+      "document",
+      "handover",
+      "coins"
+    ],
+    "case": "จดทะเบียนยกบ้านให้แล้ว แต่ผู้ให้ยังไม่ส่งมอบ ผู้รับเรียกอะไรได้"
+  },
+  "538": {
+    "scene": "lease",
+    "visuals": [
+      "house",
+      "document",
+      "calendar",
+      "registry"
+    ],
+    "case": "เช่าบ้านห้าปีลงชื่อในสัญญาแต่ยังไม่จดทะเบียน ผลต่างกันอย่างไร"
+  },
+  "552": {
+    "scene": "lease",
+    "visuals": [
+      "document",
+      "house",
+      "warning"
+    ],
+    "case": "เช่าห้องไว้อยู่อาศัย แต่เปลี่ยนเป็นโกดังสินค้าผิดวัตถุประสงค์ไหม"
+  },
+  "554": {
+    "scene": "lease",
+    "visuals": [
+      "warning",
+      "letter",
+      "shield"
+    ],
+    "case": "ผู้เช่าใช้บ้านผิดข้อตกลง ผู้ให้เช่าบอกกล่าวให้แก้ไขแล้วหรือยัง"
+  },
+  "569": {
+    "scene": "lease",
+    "visuals": [
+      "house",
+      "handshake",
+      "person"
+    ],
+    "case": "บ้านที่กำลังให้เช่าถูกขายให้คนใหม่ สัญญาเช่าเดิมยังผูกพันผู้รับโอนหรือไม่"
+  },
+  "572": {
+    "scene": "hire",
+    "visuals": [
+      "car",
+      "document",
+      "calendar",
+      "stamp"
+    ],
+    "case": "ผ่อนรถรายเดือนและจะได้กรรมสิทธิ์เมื่อจ่ายครบ เป็นเช่าซื้อหรือเช่าธรรมดา"
+  },
+  "574": {
+    "scene": "hire",
+    "visuals": [
+      "calendar",
+      "letter",
+      "car"
+    ],
+    "case": "ผู้เช่าซื้อผิดนัดสองงวดติดต่อกัน เจ้าของจะบอกเลิกสัญญาได้เมื่อไร"
+  },
+  "640": {
+    "scene": "borrow",
+    "visuals": [
+      "bike",
+      "handshake"
+    ],
+    "case": "ยืมจักรยานเพื่อนไปใช้โดยไม่จ่ายค่าเช่าและต้องคืนคันเดิม"
+  },
+  "641": {
+    "scene": "borrow",
+    "visuals": [
+      "handshake",
+      "handover"
+    ],
+    "case": "เพื่อนรับปากให้ยืมกล้องแต่ยังไม่ได้ส่งกล้อง สัญญาบริบูรณ์ไหม"
+  },
+  "643": {
+    "scene": "borrow",
+    "visuals": [
+      "warning",
+      "person",
+      "calendar",
+      "crack"
+    ],
+    "case": "ยืมกล้องแล้วส่งให้คนอื่นใช้จนเสียหาย ผู้ยืมต้องรับผิดอย่างไร"
+  },
+  "645": {
+    "scene": "borrow",
+    "visuals": [
+      "warning",
+      "shield"
+    ],
+    "case": "ผู้ยืมใช้เครื่องมือผิดข้อตกลง ผู้ให้ยืมมีสิทธิบอกเลิกหรือไม่"
+  },
+  "649": {
+    "scene": "borrow",
+    "visuals": [
+      "document",
+      "calendar",
+      "clock"
+    ],
+    "case": "หลังคืนของยืมไปหลายเดือน เจ้าของจะฟ้องเรียกค่าทดแทนได้เมื่อใด"
+  },
+  "650": {
+    "scene": "borrow",
+    "visuals": [
+      "goods",
+      "handshake",
+      "handover",
+      "goods"
+    ],
+    "case": "ยืมข้าวสารห้ากิโล ต้องคืนข้าวสารชนิดและปริมาณเดียวกัน ไม่ต้องคืนเมล็ดเดิม"
+  },
+  "653": {
+    "scene": "loan",
+    "visuals": [
+      "coins",
+      "document",
+      "stamp"
+    ],
+    "case": "ยืมเงินเพื่อนห้าพันบาทแต่ไม่มีหลักฐานผู้กู้ลงชื่อ ฟ้องบังคับได้หรือไม่"
+  },
+  "680": {
+    "scene": "guarantee",
+    "visuals": [
+      "bank",
+      "person",
+      "person",
+      "document"
+    ],
+    "case": "มีเพื่อนเป็นผู้ค้ำประกันเงินกู้ ถ้าลูกหนี้ไม่ชำระ ผู้ค้ำรับผิดตามขอบเขตใด"
+  },
+  "681": {
+    "scene": "guarantee",
+    "visuals": [
+      "document",
+      "bank",
+      "coins",
+      "calendar"
+    ],
+    "case": "รับค้ำประกันหนี้ในอนาคต ต้องระบุหนี้ วงเงินและระยะเวลาตามบทแก้ไข"
+  },
+  "689": {
+    "scene": "guarantee",
+    "visuals": [
+      "person",
+      "coins",
+      "bank"
+    ],
+    "case": "ธนาคารเรียกผู้ค้ำทั้งที่ลูกหนี้มีทรัพย์บังคับได้ง่าย ต้องตรวจสิทธิให้บังคับจากลูกหนี้ก่อน"
+  },
+  "697": {
+    "scene": "guarantee",
+    "visuals": [
+      "bank",
+      "lock",
+      "coins"
+    ],
+    "case": "เจ้าหนี้ปล่อยหลักประกันหายไปทำให้ผู้ค้ำรับช่วงสิทธิไม่ได้ หลุดพ้นเพียงใด"
+  },
+  "699": {
+    "scene": "guarantee",
+    "visuals": [
+      "document",
+      "calendar",
+      "letter"
+    ],
+    "case": "ค้ำประกันธุรกิจที่มีธุรกรรมต่อเนื่องไม่กำหนดเวลา จะเลิกสำหรับอนาคตอย่างไร"
+  },
+  "702": {
+    "scene": "mortgage",
+    "visuals": [
+      "coins",
+      "parcel",
+      "bank",
+      "registry"
+    ],
+    "case": "จำนองที่ดินค้ำเงินกู้ แต่เจ้าของยังครอบครองและใช้ที่ดินได้"
+  },
+  "714": {
+    "scene": "mortgage",
+    "visuals": [
+      "document",
+      "registry"
+    ],
+    "case": "นำโฉนดไปฝากเจ้าหนี้โดยไม่จดทะเบียน สิทธิจำนองเกิดหรือไม่"
+  },
+  "718": {
+    "scene": "mortgage",
+    "visuals": [
+      "parcel",
+      "house",
+      "warning"
+    ],
+    "case": "จำนองที่ดินพร้อมทรัพย์ติดพัน ต้องตรวจว่าทรัพย์ไหนอยู่ในขอบเขตจำนอง"
+  },
+  "719": {
+    "scene": "mortgage",
+    "visuals": [
+      "parcel",
+      "house",
+      "document"
+    ],
+    "case": "จำนองที่ดินก่อน ต่อมาจึงสร้างบ้านใหม่ บ้านใหม่อยู่ในหลักประกันหรือไม่"
+  },
+  "728": {
+    "scene": "mortgage",
+    "visuals": [
+      "warning",
+      "letter",
+      "calendar",
+      "person"
+    ],
+    "case": "ผิดนัดหนี้จำนอง ต้องมีหนังสือบอกกล่าวและเวลาไม่น้อยกว่าหกสิบวัน"
+  },
+  "729": {
+    "scene": "mortgage",
+    "visuals": [
+      "coins",
+      "registry",
+      "calendar",
+      "parcel"
+    ],
+    "case": "เจ้าหนี้อยากให้ที่ดินจำนองหลุดเป็นของตน ต้องตรวจสิทธิจดทะเบียนอื่น ห้าปี และราคา"
+  },
+  "733": {
+    "scene": "mortgage",
+    "visuals": [
+      "parcel",
+      "coins",
+      "person"
+    ],
+    "case": "ขายทอดตลาดทรัพย์จำนองได้เงินน้อยกว่าหนี้ ผลเงินส่วนขาดต้องดูบทเฉพาะ"
+  },
+  "747": {
+    "scene": "pledge",
+    "visuals": [
+      "watch",
+      "coins",
+      "handover"
+    ],
+    "case": "นำเครื่องประดับไปส่งมอบโรงรับจำนำเพื่อค้ำเงินกู้ ไม่ใช่จำนอง"
+  },
+  "764": {
+    "scene": "pledge",
+    "visuals": [
+      "clock",
+      "letter",
+      "warning",
+      "auction"
+    ],
+    "case": "ลูกหนี้ไม่ไถ่ของจำนำ เจ้าหนี้ต้องบอกกล่าวและขายทอดตลาดตามขั้นตอน"
+  },
+  "767": {
+    "scene": "pledge",
+    "visuals": [
+      "auction",
+      "coins",
+      "handover"
+    ],
+    "case": "ขายของจำนำได้เงินเกินยอดหนี้ ต้องคืนเงินส่วนเกินแก่ผู้มีสิทธิ"
+  },
+  "769": {
+    "scene": "pledge",
+    "visuals": [
+      "document",
+      "handover"
+    ],
+    "case": "หนี้ที่ค้ำด้วยของจำนำระงับหรือคืนของจำนำแล้ว สิทธิจำนำสิ้นสุดเมื่อใด"
+  },
+  "1299": {
+    "scene": "registry",
+    "visuals": [
+      "document",
+      "coins",
+      "person",
+      "registry"
+    ],
+    "case": "รับมรดกที่ดินยังไม่จดทะเบียน ต่อมาผู้ซื้ออีกคนจ่ายเงิน สุจริตและจดทะเบียน ใครใช้สิทธิต่อใครได้"
+  },
+  "1311": {
+    "scene": "boundary",
+    "visuals": [
+      "house",
+      "warning",
+      "person"
+    ],
+    "case": "สร้างบ้านทั้งหลังบนที่ดินผู้อื่นทั้งที่รู้ว่าไม่ใช่ของตน เจ้าของที่ดินมีทางเลือกใด"
+  },
+  "1312": {
+    "scene": "boundary",
+    "visuals": [
+      "house",
+      "fence",
+      "eye",
+      "warning"
+    ],
+    "case": "ปลูกบ้านรุกล้ำแนวเขตเพื่อนบ้าน ต้องแยกการสร้างโดยสุจริตกับไม่สุจริต"
+  },
+  "1332": {
+    "scene": "trade",
+    "visuals": [
+      "eye",
+      "goods",
+      "coins"
+    ],
+    "case": "ซื้อนาฬิกาจากร้านขายนาฬิกาโดยสุจริต เจ้าของเดิมจะเรียกคืนต้องพิจารณาอะไร"
+  },
+  "1336": {
+    "scene": "property",
+    "visuals": [
+      "person",
+      "goods"
+    ],
+    "case": "เจ้าของจักรยานพบผู้อื่นยึดจักรยานอยู่โดยไม่มีสิทธิ จะใช้สิทธิติดตามคืนอย่างไร"
+  },
+  "1367": {
+    "scene": "possession",
+    "visuals": [
+      "person",
+      "flag"
+    ],
+    "case": "เข้าครอบครองพื้นที่โดยยึดถือจริงและมีเจตนายึดถือเพื่อตน"
+  },
+  "1368": {
+    "scene": "possession",
+    "visuals": [
+      "person",
+      "person",
+      "flag"
+    ],
+    "case": "จ้างคนเฝ้าบ้าน คนเฝ้าถือทรัพย์แทนใครและเจ้าของสิทธิครอบครองเป็นใคร"
+  },
+  "1374": {
+    "scene": "possession",
+    "visuals": [
+      "flag",
+      "warning",
+      "calendar"
+    ],
+    "case": "มีคนเข้ามารบกวนการใช้ที่ดิน ผู้ครอบครองต้องฟ้องคุ้มครองภายในเวลาใด"
+  },
+  "1377": {
+    "scene": "possession",
+    "visuals": [
+      "flag",
+      "person",
+      "clock"
+    ],
+    "case": "ผู้ครอบครองหยุดเข้าใช้ที่ดินเพียงชั่วคราว หมายถึงสละการครอบครองแล้วหรือไม่"
+  },
+  "1378": {
+    "scene": "possession",
+    "visuals": [
+      "handover",
+      "person"
+    ],
+    "case": "ผู้ครอบครองส่งมอบกุญแจให้ผู้อื่นเพื่อโอนการครอบครองแล้วหรือยัง"
+  },
+  "1381": {
+    "scene": "possession",
+    "visuals": [
+      "person",
+      "letter",
+      "clock"
+    ],
+    "case": "คนเช่าบ้านถือแทนเจ้าของมาโดยตลอด ต้องเปลี่ยนเจตนาอย่างไรจึงเริ่มถือเพื่อตน"
+  },
+  "1382": {
+    "scene": "possession",
+    "visuals": [
+      "flag",
+      "eye",
+      "person",
+      "clock"
+    ],
+    "case": "อยู่ในที่ดินคนอื่นนานสิบปีแต่จ่ายค่าเช่าตลอด จะอ้างครอบครองปรปักษ์ได้ไหม"
+  },
+  "1387": {
+    "scene": "servitude",
+    "visuals": [
+      "parcel",
+      "path",
+      "parcel"
+    ],
+    "case": "บ้านหลังในต้องผ่านที่ดินหน้าบ้านเพื่อออกถนน ที่ดินใดเป็นภารยทรัพย์และที่ดินใดได้ประโยชน์"
+  },
+  "1401": {
+    "scene": "servitude",
+    "visuals": [
+      "path",
+      "clock",
+      "permission"
+    ],
+    "case": "บ้านหลังในใช้ทางผ่านแปลงข้างเคียงต่อเนื่องมานาน แต่เคยขออนุญาตหรือใช้เป็นสิทธิเอง"
+  },
+  "193/9": {
+    "scene": "time",
+    "visuals": [
+      "document",
+      "calendar",
+      "clock"
+    ],
+    "case": "เพื่อนให้กู้เงินแล้วปล่อยเวลานาน ควรตรวจวันเริ่มนับและอายุความก่อนฟ้อง"
+  },
+  "193/10": {
+    "scene": "time",
+    "visuals": [
+      "clock",
+      "shield"
+    ],
+    "case": "หนี้ขาดอายุความแล้ว ลูกหนี้สามารถยกสิทธิปฏิเสธการชำระได้อย่างไร"
+  },
+  "193/27": {
+    "scene": "time",
+    "visuals": [
+      "lock",
+      "pledge",
+      "clock"
+    ],
+    "case": "เงินกู้ขาดอายุความแต่มีทรัพย์เป็นหลักประกัน สิทธิในทรัพย์ยังมีผลแค่ไหน"
+  },
+  "193/29": {
+    "scene": "time",
+    "visuals": [
+      "gavel"
+    ],
+    "case": "เจ้าหนี้ฟ้องหนี้เก่า ถ้าลูกหนี้ไม่ได้ยกอายุความขึ้นต่อสู้ ศาลทำอย่างไร"
+  },
+  "714/1": {
+    "scene": "mortgage",
+    "visuals": [
+      "document",
+      "warning"
+    ],
+    "case": "สัญญาจำนองเขียนว่าผู้รับจำนองยึดทรัพย์ทันทีได้ ข้อตกลงขัดมาตราบังคับหรือไม่"
+  }
+};
+var types={
+ property:"กรรมสิทธิ์และส่วนควบ",time:"เวลาและอายุความ",obligation:"การชำระหนี้",
+ trade:"ซื้อขายและความรับผิด",registry:"การจดทะเบียนสิทธิ",exchange:"การแลกทรัพย์",
+ gift:"การให้",lease:"การเช่า",hire:"เช่าซื้อ",borrow:"การยืม",
+ loan:"การกู้ยืมเงิน",guarantee:"การค้ำประกัน",mortgage:"การจำนอง",
+ pledge:"การจำนำ",boundary:"สิ่งปลูกสร้างและแนวเขต",possession:"การครอบครอง",
+ servitude:"ภาระจำยอม"
+};
+function byId(raw){
+ var x=String(raw||"").trim().match(/^(\d+(?:\/\d+)?)/);
+ return x?x[1]:"";
+}
+function get(raw){
+ var id=byId(raw),recipe=recipes[id],data=window.NITI_STATUTE_SOURCES||{};
+ var n=(window.NITI_STATUTE_NOTES||[]).find(function(x){return x.id===id;});
+ if(!recipe||!n||!data.resolve||!data.resolve(id))return null;
+ var conditions=String(n.conditions||"").split(/\s*\/\s*/).map(function(s){return s.trim();}).filter(Boolean);
+ // Each numbered stage corresponds to an actual educational review point;
+ // alternatives inside a stage remain alternatives — don't mark all mandatory.
+ var parts=conditions.map(function(label,i){return {id:"part-"+(i+1),label:label,shape:recipe.visuals[Math.min(i,recipe.visuals.length-1)],
+  explanation:"ตรวจข้อเท็จจริงเกี่ยวกับ “"+label+"” โดยเทียบกับหลักกฎหมายของมาตรานี้: "+n.plain,
+  ask:"สถานการณ์: "+recipe.case+" — ประเด็น “"+label+"” มีข้อมูลยืนยันหรือยัง",
+  caution:"กิ่งประเด็นนี้อาจเป็นข้อยกเว้นหรือทางเลือก ไม่ใช่เงื่อนไขที่ต้องมีครบทุกข้อ"};});
+ // An explicit visual represents the legal outcome separately from the facts.
+ return {id:id,kind:recipe.scene,kindLabel:types[recipe.scene],title:n.title,case:recipe.case,
+  principle:n.plain,rule:n.exam,parts:parts,exception:n.trap,source:data.resolve(id).primaryUrl,
+  note:"ตรวจองค์ประกอบตามข้อเท็จจริงและอ่านข้อความทุกวรรคจาก PDF ทางการก่อนใช้ตอบคำถาม"};
+}
+window.NITI_DIORAMA_DATA={get:get,ids:Object.keys(recipes)};
+})();
