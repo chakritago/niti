@@ -1,0 +1,36 @@
+
+/* NITI legal-case illustrations: SVG + HTML, no canvas/WebGL/CDN */
+.niti-illustration{margin:16px 0 23px;padding:16px;background:var(--md-surface-low,#f3f7fa);border:1px solid var(--md-border,#d7e3e8);border-radius:18px}
+.niti-ill-heading{font:800 clamp(1.07rem,2vw,1.23rem)/1.5 "IBM Plex Sans Thai",Tahoma,sans-serif;margin:0 0 7px}
+.niti-ill-intro{font-size:.93rem;line-height:1.75;color:var(--md-text-secondary,#596a7b);margin:0 0 12px}
+.niti-ill-case{padding:12px 15px;border-radius:11px;background:var(--md-primary-container,#e0f3fa);color:var(--md-on-primary-container,var(--md-text,#172f43));font-size:.98rem;line-height:1.8;margin-bottom:12px}
+.niti-ill-image{border-radius:14px;background:#e9f5fa;border:1px solid #9fc3ca;overflow:hidden;min-width:0}
+.niti-law-svg{display:block;width:100%;height:auto;max-height:450px}
+.niti-ill-hotspot{cursor:pointer;outline:none}
+.niti-ill-hotspot rect{transition:fill .18s,stroke .18s,stroke-width .18s}
+.niti-ill-hotspot:hover rect,.niti-ill-hotspot[aria-pressed=true] rect{fill:#d5f2ed;stroke:#188d88;stroke-width:4}
+.niti-ill-hotspot:focus-visible rect{stroke:#145a93;stroke-width:5}
+.niti-ill-caption{margin:7px 0 12px;font-size:.84rem;color:var(--md-text-secondary,#5f6d7b);line-height:1.65}
+.niti-ill-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(225px,.9fr);gap:14px;align-items:start}
+.niti-ill-details{padding:17px 18px;background:var(--md-surface,#fff);border:1px solid var(--md-border,#d7e2ea);border-radius:13px;min-width:0;overflow-wrap:anywhere}
+.niti-ill-details:focus-visible{outline:3px solid var(--md-primary,#1761a5);outline-offset:3px}
+.niti-ill-step{display:inline-flex;padding:5px 11px;background:var(--md-primary-container,#d8eafa);border-radius:999px;color:var(--md-on-primary-container,#174f85);font-weight:800;font-size:.86rem}
+.niti-ill-details h4{margin:10px 0;font-size:1.08rem;line-height:1.55}
+.niti-ill-details p{font-size:.95rem;line-height:1.82;margin:6px 0 12px}
+.niti-ill-details strong{font-size:.91rem;display:block}
+.niti-ill-warning{border-inline-start:4px solid #e3a64c;border-radius:6px;background:var(--md-surface-low,#f5f7fa);padding:9px 11px}
+.niti-ill-hint{font-size:.85rem!important;color:var(--md-text-secondary,#637183)}
+.niti-ill-list{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 10px}
+.niti-ill-pick,.niti-ill-answer{min-height:44px;padding:9px 13px;border:1px solid var(--md-border,#c5d5df);border-radius:12px;background:var(--md-surface,#fff);color:var(--md-text,#1b364e);font:inherit;font-size:.91rem;font-weight:750;cursor:pointer}
+.niti-ill-pick:hover,.niti-ill-answer:hover{border-color:var(--md-primary,#1761a5)}
+.niti-ill-pick[aria-pressed=true],.niti-ill-answer[aria-pressed=true]{background:var(--md-primary,#1761a5);border-color:var(--md-primary,#1761a5);color:white}
+.niti-ill-pick:focus-visible,.niti-ill-answer:focus-visible{outline:3px solid var(--md-primary,#1761a5);outline-offset:3px}
+.niti-ill-answers{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.niti-ill-answers button{font-size:.83rem;padding:8px 11px}
+.niti-ill-progress{font-size:.86rem;font-weight:750;line-height:1.65;color:var(--md-text-secondary,#52657a);margin-top:8px}
+.niti-ill-caution{font-size:.86rem;line-height:1.8;color:var(--md-text-secondary,#596a7b);border-top:1px solid var(--md-border,#d7e3e8);padding-top:12px;margin:13px 0 0}
+.statute-source-illustration{display:inline-flex;min-height:44px;align-items:center;margin:5px 8px 5px 0;padding:10px 14px;border-radius:12px;background:var(--md-primary-container,#e0f2fb);color:var(--md-primary,#165f9b);font-weight:800;text-decoration:none}
+.statute-source-illustration:hover{text-decoration:underline}
+@media(max-width:780px){.niti-ill-layout{grid-template-columns:1fr}.niti-ill-details{min-height:0}}
+@media(max-width:520px){.niti-illustration{margin-inline:-6px;padding:11px}.niti-ill-details{padding:13px}.niti-ill-pick{font-size:.85rem}.niti-law-svg{min-height:225px}}
+@media(prefers-reduced-motion:reduce){.niti-ill-hotspot rect{transition:none}}
