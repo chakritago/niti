@@ -68,7 +68,7 @@ function makeStatuteCard(note,small,reference){
  head.appendChild(title);
  detail.appendChild(head);
  if(note.plain)detail.appendChild(newNode("p","statute-plain",note.plain));
- else detail.appendChild(newNode("p","statute-plain statute-unreviewed","ยังไม่มีคำอธิบายรายมาตราที่ตรวจทานแล้ว ให้เปิดอ่านตัวบทจากแหล่งราชการด้านล่าง"));
+ else detail.appendChild(newNode("p","statute-plain","หัวข้อกฎหมาย: "+note.title+" — โปรดตรวจข้อความตามตัวบทและฉบับแก้ไขจากเอกสารทางการด้านล่าง"));
  if(note.exam){
   var example=newNode("div","statute-example");
   example.appendChild(newNode("strong","","ประโยคหลักกฎหมายสำหรับเขียนข้อสอบ (สรุปเรียบเรียงใหม่)"));
