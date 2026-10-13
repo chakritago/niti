@@ -141,7 +141,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
     <h3 id="exam-statute-title">มาตราที่ใช้ตอบข้อนี้ — สรุปสำหรับเขียนข้อสอบ</h3>
     <p>อ่านหลักกฎหมายแบบย่อ (เฉพาะมาตราที่มีสรุปตรวจทาน) และตรวจเอกสารทางการตามลิงก์ของแต่ละมาตรา</p>
     <div id="exam-statute-list"></div>
-    <p class="law-source-disclaimer">กดที่ชื่อมาตราหรือปุ่มเปิดตัวบทเพื่ออ่าน PDF หน้าที่มีมาตรานั้นจากหน่วยงานรัฐ มาตรา 681, 714/1, 728 และ 729 ใช้ฉบับแก้ไข พ.ศ. 2557; บางโปรแกรมอ่าน PDF บนมือถืออาจไม่เลื่อนไปหน้าเป้าหมาย จึงแสดงเลขหน้ากำกับไว้ด้วย</p>
+    <p class="law-source-disclaimer">กดเลขมาตราเพื่อสำรวจฉาก 3D ตามกฎหมายโดยไม่ออกจากเว็บไซต์ และกดเปิด PDF ทางการอ่านตัวบทได้ในหน้าต่างเดียวกัน มาตรา 681, 714/1, 728 และ 729 ใช้ฉบับแก้ไข พ.ศ. 2557; บางโปรแกรมอ่าน PDF บนมือถืออาจไม่เลื่อนไปหน้าเป้าหมาย จึงแสดงเลขหน้ากำกับไว้ด้วย</p>
   </section>
   <section id="exam-ranking" class="exam-ranking" aria-label="อันดับความสำคัญเพื่อจัดเวลาอ่าน">
     <strong id="exam-ranking-value"></strong>
@@ -279,12 +279,11 @@ q.sections.forEach(function(label){
  var ref=sourceMap&&typeof sourceMap.resolveLabel==="function"?sourceMap.resolveLabel(label):null;
  var chip=document.createElement(ref?"a":"span");
  chip.className="topic-tag statute-direct-chip";
- chip.textContent="ป.พ.พ. ม. "+label+(ref?" · เปิดตัวบท ↗":"");
+ chip.textContent="ป.พ.พ. ม. "+label+(ref?" · ดูฉาก 3D ↗":"");
  if(ref){
-  chip.href=ref.primaryUrl;
-  chip.target="_blank";
-  chip.rel="noopener noreferrer";
-  chip.title="เปิด PDF ทางการ หน้า "+ref.page+" ซึ่งมีมาตรา "+label;
+  chip.href="./study.html#statute-"+ref.id.replace(/\//g,"-");
+  chip.setAttribute("data-statute",ref.id);
+  chip.title="เปิดแบบจำลองเหตุการณ์ตามมาตรา "+label+" ภายในเว็บไซต์";
  }
  statutesArea.appendChild(chip);
 });
