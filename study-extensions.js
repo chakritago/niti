@@ -79,6 +79,7 @@ function makeStatuteCard(note,small,reference){
   if(note.conditions)detail.appendChild(newNode("p","statute-conditions","องค์ประกอบที่ต้องตรวจ: "+note.conditions));
   if(note.trap)detail.appendChild(newNode("p","statute-warning","จุดระวัง: "+note.trap));
  }
+ if(window.NITI_STATUTE_ANATOMY)detail.appendChild(window.NITI_STATUTE_ANATOMY.create(note));
  var links=newNode("div","statute-sources");
  links.appendChild(newNode("strong","statute-sources-title","แหล่งตัวบทกฎหมาย"));
  if(direct){
