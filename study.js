@@ -30,7 +30,12 @@
       var sourceMap=window.NITI_STATUTE_SOURCES;
       var source=sourceMap&&typeof sourceMap.resolveLabel==="function"?sourceMap.resolveLabel(e[0]):null;
       var span=document.createElement(source?"a":"span");span.className="article-chip";
-      if(source){span.href=source.primaryUrl;span.target="_blank";span.rel="noopener noreferrer";span.title="เปิดตัวบทมาตรา "+e[0]+" ใน PDF จากหน่วยงานรัฐ หน้า "+source.page;}
+      if(source){
+        var id=sourceMap.normalizeId(e[0]);
+        span.href="#statute-"+id.replace(/\//g,"-");
+        span.setAttribute("data-statute",id);
+        span.title="อ่านมาตรา "+e[0]+" ในหน้าต่างภายในเว็บไซต์";
+      }
       var isKnown=/^(\d+)/.exec(e[0]);var article= isKnown?isKnown[1]:e[0];
       span.innerHTML='<b>ม. '+escapeHTML(e[0])+'</b><span>'+e[1]+' ข้อ</span>';
       if(!source)span.title="พบการอ้างอิงในชุดข้อสอบจำนวน "+e[1]+" ข้อ";
@@ -48,7 +53,12 @@
       box.innerHTML='<div class="topic-heading"><h3>'+escapeHTML(topic.name)+'</h3><span class="topic-count">'+matching.length+' ข้อ</span></div>'+
         '<p class="topic-sub">'+escapeHTML(topic.headline)+'</p>'+
         '<dl><div><dt>โจทย์ที่พบในคลัง</dt><dd>'+escapeHTML(topic.pattern)+'</dd></div>'+
-        '<div><dt>มาตราที่ควรอ่าน: '+escapeHTML(topic.sections.join(", "))+'</dt><dd>'+escapeHTML(topic.focus)+'</dd></div></dl>'+
+        '<div><dt>มาตราที่ควรอ่าน:</dt><dd class="statute-topic-links">'+topic.sections.map(function(sec){
+          var mapping=window.NITI_STATUTE_SOURCES;
+          var id=mapping&&typeof mapping.normalizeId==="function"?mapping.normalizeId(sec):String(sec).trim();
+          return '<a class="statute-topic-link" href="#statute-'+escapeHTML(id.replace(/\//g,"-"))+'" data-statute="'+escapeHTML(id)+'" title="กดอ่านมาตรา '+escapeHTML(sec)+' ภายในเว็บไซต์">ม. '+escapeHTML(sec)+' ↗</a>';
+        }).join(" ")+
+        '</dd><p class="statute-topic-hint">แตะเลขมาตราเพื่ออ่านสรุปและตัวบทในหน้าต่างลอย โดยไม่ออกจากเว็บไซต์</p><dd>'+escapeHTML(topic.focus)+'</dd></div></dl>'+
         '<div class="trick-box"><strong>จำสั้น ๆ:</strong> '+escapeHTML(topic.trick)+'</div>'+
         '<p><strong>ข้อควรระวัง:</strong> '+escapeHTML(topic.trap)+'</p>'+
         '<a class="start-link" href="'+examLink(first)+'">เริ่มฝึกข้อแรกของหมวดนี้ ↗</a>';
