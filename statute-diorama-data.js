@@ -526,8 +526,8 @@ var recipes={
     "scene": "servitude",
     "visuals": [
       "parcel",
-      "path",
-      "parcel"
+      "parcel",
+      "path"
     ],
     "case": "บ้านหลังในต้องผ่านที่ดินหน้าบ้านเพื่อออกถนน ที่ดินใดเป็นภารยทรัพย์และที่ดินใดได้ประโยชน์"
   },
