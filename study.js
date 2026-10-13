@@ -34,7 +34,7 @@
         var id=sourceMap.normalizeId(e[0]);
         span.href="#statute-"+id.replace(/\//g,"-");
         span.setAttribute("data-statute",id);
-        span.title="อ่านมาตรา "+e[0]+" ในหน้าต่างภายในเว็บไซต์";
+        span.title="เปิดแบบจำลองเหตุการณ์ 3D มาตรา "+e[0]+" ภายในเว็บไซต์";
       }
       var isKnown=/^(\d+)/.exec(e[0]);var article= isKnown?isKnown[1]:e[0];
       span.innerHTML='<b>ม. '+escapeHTML(e[0])+'</b><span>'+e[1]+' ข้อ</span>';
@@ -56,9 +56,9 @@
         '<div><dt>มาตราที่ควรอ่าน:</dt><dd class="statute-topic-links">'+topic.sections.map(function(sec){
           var mapping=window.NITI_STATUTE_SOURCES;
           var id=mapping&&typeof mapping.normalizeId==="function"?mapping.normalizeId(sec):String(sec).trim();
-          return '<a class="statute-topic-link" href="#statute-'+escapeHTML(id.replace(/\//g,"-"))+'" data-statute="'+escapeHTML(id)+'" title="กดอ่านมาตรา '+escapeHTML(sec)+' ภายในเว็บไซต์">ม. '+escapeHTML(sec)+' ↗</a>';
+          return '<a class="statute-topic-link" href="#statute-'+escapeHTML(id.replace(/\//g,"-"))+'" data-statute="'+escapeHTML(id)+'" title="กดดูฉากจำลองกฎหมาย 3D มาตรา '+escapeHTML(sec)+' ภายในเว็บไซต์">ม. '+escapeHTML(sec)+' ↗</a>';
         }).join(" ")+
-        '</dd><dd class="statute-topic-hint">แตะเลขมาตราเพื่ออ่านสรุปและตัวบทในหน้าต่างลอย โดยไม่ออกจากเว็บไซต์</dd><dd>'+escapeHTML(topic.focus)+'</dd></div></dl>'+
+        '</dd><dd class="statute-topic-hint">แตะเลขมาตราเพื่อดูฉาก 3D ที่ตรงกับบทกฎหมาย คลิกวัตถุเพื่ออ่านแต่ละประเด็น โดยไม่ออกจากเว็บไซต์</dd><dd>'+escapeHTML(topic.focus)+'</dd></div></dl>'+
         '<div class="trick-box"><strong>จำสั้น ๆ:</strong> '+escapeHTML(topic.trick)+'</div>'+
         '<p><strong>ข้อควรระวัง:</strong> '+escapeHTML(topic.trap)+'</p>'+
         '<a class="start-link" href="'+examLink(first)+'">เริ่มฝึกข้อแรกของหมวดนี้ ↗</a>';
