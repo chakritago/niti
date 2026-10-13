@@ -82,6 +82,7 @@ export function mount(root,data){
  const rootGlow=new THREE.Mesh(new THREE.SphereGeometry(.39,20,16),new THREE.MeshStandardMaterial({color:0x2aafa0,emissive:0x176a59,emissiveIntensity:.2,metalness:.16,roughness:.5}));
  rootGlow.position.set(0,1.24,0);scene.add(rootGlow);
 
+ pickList.replaceChildren();
  const selectable=[],modelObjects=[],buttons=[];
  let current=0,hover=-1,disposed=false,frame=null,lastPointer=null,resizeObs=null;
  const raycaster=new THREE.Raycaster(),mouse=new THREE.Vector2();
