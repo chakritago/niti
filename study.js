@@ -58,7 +58,7 @@
           var id=mapping&&typeof mapping.normalizeId==="function"?mapping.normalizeId(sec):String(sec).trim();
           return '<a class="statute-topic-link" href="#statute-'+escapeHTML(id.replace(/\//g,"-"))+'" data-statute="'+escapeHTML(id)+'" title="กดอ่านมาตรา '+escapeHTML(sec)+' ภายในเว็บไซต์">ม. '+escapeHTML(sec)+' ↗</a>';
         }).join(" ")+
-        '</dd><p class="statute-topic-hint">แตะเลขมาตราเพื่ออ่านสรุปและตัวบทในหน้าต่างลอย โดยไม่ออกจากเว็บไซต์</p><dd>'+escapeHTML(topic.focus)+'</dd></div></dl>'+
+        '</dd><dd class="statute-topic-hint">แตะเลขมาตราเพื่ออ่านสรุปและตัวบทในหน้าต่างลอย โดยไม่ออกจากเว็บไซต์</dd><dd>'+escapeHTML(topic.focus)+'</dd></div></dl>'+
         '<div class="trick-box"><strong>จำสั้น ๆ:</strong> '+escapeHTML(topic.trick)+'</div>'+
         '<p><strong>ข้อควรระวัง:</strong> '+escapeHTML(topic.trap)+'</p>'+
         '<a class="start-link" href="'+examLink(first)+'">เริ่มฝึกข้อแรกของหมวดนี้ ↗</a>';
