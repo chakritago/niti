@@ -8,7 +8,7 @@ var sourceMap=window.NITI_STATUTE_SOURCES||{};
 var notes=Array.isArray(window.NITI_STATUTE_NOTES)?window.NITI_STATUTE_NOTES:[];
 var noteById={};
 notes.forEach(function(note){noteById[note.id]=note;});
-var dialog=null,viewer=null,previousFocus=null;
+var dialog=null,viewer=null,previousFocus=null,modelInstance=null,modelToken=0;
 function normalize(value){
  if(typeof sourceMap.normalizeId==="function")return sourceMap.normalizeId(value);
  var match=String(value||"").trim().match(/^(\d+(?:\/\d+)?)/);
@@ -42,16 +42,102 @@ function setup(){
  dialog.setAttribute("aria-describedby","niti-statute-dialog-description");
  dialog.addEventListener("click",function(event){if(event.target===dialog)dialog.close();});
  dialog.addEventListener("close",function(){
+  modelToken++;
+  if(modelInstance){modelInstance.dispose();modelInstance=null;}
   if(viewer)viewer.src="about:blank";
   if(previousFocus&&typeof previousFocus.focus==="function")previousFocus.focus();
  });
  document.body.appendChild(dialog);
 }
+
+/* The DOM list remains usable if WebGL, the module CDN or 3D rendering fails. */
+function addLegalTree(body,id){
+ var source=window.NITI_STATUTE_3D_DATA;
+ var data=source&&source.build?source.build(id):null;
+ if(!data)return;
+ var section=element("section","niti-3d-section");
+ section.setAttribute("aria-label","ต้นไม้องค์ประกอบกฎหมายสามมิติมาตรา "+id);
+ section.appendChild(element("h3","niti-3d-heading","🌳 ต้นไม้ตีความกฎหมาย 3D · มาตรา "+id));
+ section.appendChild(element("p","niti-3d-intro","ลำต้น = หลักกฎหมาย · กิ่ง = ประเด็นที่ต้องตรวจ · ผลสีทอง = ผลทางกฎหมาย ลองคลิกกิ่งเพื่อเข้าใจเหตุผลก่อนท่องจำ"));
+ var layout=element("div","niti-3d-layout");
+ var visual=element("div","niti-3d-visual");
+ var viewport=element("div","niti-3d-canvas");
+ viewport.setAttribute("aria-hidden","true");
+ visual.appendChild(viewport);
+ visual.appendChild(element("p","niti-3d-status","กำลังเตรียมต้นไม้ 3D… คุณสามารถอ่านผ่านปุ่มด้านล่างได้ทันที"));
+ layout.appendChild(visual);
+ var info=element("div","niti-3d-detail");
+ info.setAttribute("aria-live","polite");
+ layout.appendChild(info);
+ section.appendChild(layout);
+ var controls=element("div","niti-3d-picks");
+ controls.setAttribute("role","group");
+ controls.setAttribute("aria-label","เลือกประเด็นกฎหมายเพื่ออ่านคำอธิบาย");
+ section.appendChild(controls);
+ section.appendChild(element("p","niti-3d-caution",data.caution+" · สถานการณ์เป็นเรื่องสมมติเพื่อฝึกคิด ไม่ใช่คำวินิจฉัยคดี"));
+ body.appendChild(section);
+ renderTextTree(section,data);
+}
+function renderTextTree(section,data){
+ var choices=section.querySelector(".niti-3d-picks");
+ var detail=section.querySelector(".niti-3d-detail");
+ if(!choices||!detail)return;
+ choices.replaceChildren();
+ function select(item,index){
+  detail.replaceChildren();
+  detail.appendChild(element("span","niti-3d-kind",item.type==="result"?"ผลทางกฎหมาย":"ประเด็นที่ต้องตรวจ"));
+  detail.appendChild(element("h4","",item.title));
+  detail.appendChild(element("p","",item.explanation));
+  detail.appendChild(element("strong","","สถานการณ์ใกล้ตัว"));
+  detail.appendChild(element("p","",item.example));
+  detail.appendChild(element("strong","","ลองตอบคำถาม"));
+  detail.appendChild(element("p","niti-3d-question",item.question));
+  detail.appendChild(element("p","niti-3d-reminder",item.reminder));
+  Array.prototype.forEach.call(choices.children,function(b,i){b.setAttribute("aria-pressed",String(i===index));});
+ }
+ data.nodes.forEach(function(item,index){
+  var button=element("button","niti-3d-pick",(index+1)+". "+item.label);
+  button.type="button";
+  button.setAttribute("aria-pressed","false");
+  button.addEventListener("click",function(){select(item,index);});
+  choices.appendChild(button);
+ });
+ select(data.nodes[0],0);
+}
+function activateLegalTree(body,id){
+ var section=body.querySelector(".niti-3d-section");
+ if(!section)return;
+ var fallback=section.querySelector(".niti-3d-status");
+ var source=window.NITI_STATUTE_3D_DATA;
+ var data=source&&source.build?source.build(id):null;
+ if(!data)return;
+ var ticket=++modelToken;
+ if(!window.WebGLRenderingContext){
+  fallback.textContent="อุปกรณ์นี้ไม่รองรับ WebGL — ใช้ปุ่มประเด็นด้านล่างอ่านได้ครบทุกกิ่ง";
+  return;
+ }
+ import("./statute-3d.js").then(function(mod){
+  if(ticket!==modelToken||!dialog||!dialog.open)return;
+  try{modelInstance=mod.mount(section,data);}
+  catch(error){
+   renderTextTree(section,data);
+   fallback.textContent="ไม่สามารถแสดง 3D ได้ในอุปกรณ์นี้ แต่ยังเลือกอ่านทุกประเด็นผ่านปุ่มได้";
+   if(window.console)console.warn("NITI Three.js unavailable",error);
+  }
+ }).catch(function(error){
+  if(ticket!==modelToken||!dialog||!dialog.open)return;
+  fallback.textContent="โหลด 3D ไม่สำเร็จ (อาจไม่มีอินเทอร์เน็ตหรือ CDN ถูกบล็อก) — ใช้ปุ่มอ่านองค์ประกอบด้านล่างแทน";
+  if(window.console)console.warn("NITI Three.js import unavailable",error);
+ });
+}
+
 function openStatute(value,opener){
  var id=normalize(value),ref=typeof sourceMap.resolve==="function"?sourceMap.resolve(id):null;
  if(!id||!ref)return false;
  setup();
  if(typeof dialog.showModal!=="function")return false;
+ modelToken++;
+ if(modelInstance){modelInstance.dispose();modelInstance=null;}
  previousFocus=opener||document.activeElement;
  dialog.replaceChildren();
  var head=element("div","niti-reader-header");
@@ -81,6 +167,7 @@ function openStatute(value,opener){
  }else{
   body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
  }
+ addLegalTree(body,id);
  var actions=element("div","niti-reader-actions");
  actions.appendChild(link(ref.primaryUrl,"เปิดตัวบทฉบับทางการ PDF หน้า "+ref.page+" ↗","niti-reader-primary"));
  var inside=link("#"+anchorId(id),"ดูการ์ดมาตรานี้ในหน้าเว็บ ↓","niti-reader-inside");
@@ -104,6 +191,7 @@ function openStatute(value,opener){
  }
  dialog.appendChild(body);
  dialog.showModal();
+ activateLegalTree(body,id);
  close.focus();
  return true;
 }
