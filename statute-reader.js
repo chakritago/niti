@@ -9,6 +9,135 @@ var notes=Array.isArray(window.NITI_STATUTE_NOTES)?window.NITI_STATUTE_NOTES:[];
 var noteById={};
 notes.forEach(function(note){noteById[note.id]=note;});
 var dialog=null,viewer=null,previousFocus=null;
+var fsFallbackTrigger=null;
+/* Post-mount normalization (defense in depth).
+   Fresh illustration.js implements the drawer + fullscreen controls inside
+   mount(), but browsers/CDN can briefly serve a stale illustration.js after a
+   push (new reader.js + old illustration.js). These helpers make the dialog
+   correct even then: they only act when the expected nodes are MISSING, so
+   with fresh files they are no-ops. */
+function isCssFullscreenActive(){
+  try{ return !!(dialog&&dialog.querySelector(".is-niti-fullscreen")); }catch(e){ return false; }
+}
+function syncFallbackFsButtons(card){
+  if(!card) return;
+  var expanded=false;
+  try{ expanded=card.classList.contains("is-niti-fullscreen"); }catch(e){}
+  try{
+    card.querySelectorAll('[data-action="toggle-fullscreen"]').forEach(function(btn){
+      btn.setAttribute("aria-pressed",expanded?"true":"false");
+      btn.setAttribute("aria-label",expanded?"ย่อกลับขนาดปกติ (กดปุ่ม ESC ได้)":"ขยายภาพเต็มหน้าจอ");
+      var labelEl=btn.querySelector(".fs-btn-text");
+      if(labelEl) labelEl.textContent=expanded?"ย่อขนาดปกติ":"ขยายเต็มจอ";
+    });
+  }catch(e){}
+}
+function exitCssFullscreen(){
+  if(!dialog) return;
+  try{
+    dialog.querySelectorAll(".is-niti-fullscreen").forEach(function(el){ el.classList.remove("is-niti-fullscreen"); });
+  }catch(e){}
+  try{ dialog.classList.remove("is-dialog-fullscreen"); }catch(e){}
+  try{
+    var card=dialog.querySelector(".niti-illustration");
+    if(card) syncFallbackFsButtons(card);
+  }catch(e){}
+  if(fsFallbackTrigger&&typeof fsFallbackTrigger.focus==="function"){
+    try{ fsFallbackTrigger.focus(); }catch(e){}
+  }
+  fsFallbackTrigger=null;
+}
+function toggleCssFullscreen(card, triggerBtn){
+  if(!card) return;
+  var expanded=false;
+  try{ expanded=card.classList.contains("is-niti-fullscreen"); }catch(e){}
+  if(expanded){ exitCssFullscreen(); return; }
+  fsFallbackTrigger=triggerBtn||document.activeElement;
+  try{ card.classList.add("is-niti-fullscreen"); }catch(e){}
+  try{ if(dialog) dialog.classList.add("is-dialog-fullscreen"); }catch(e){}
+  syncFallbackFsButtons(card);
+  try{
+    var closeBtn=card.querySelector(".niti-fs-close-btn");
+    if(closeBtn) closeBtn.focus();
+  }catch(e){}
+}
+function injectFallbackFullscreen(outer){
+  if(!outer) return;
+  try{ if(outer.querySelector('[data-action="toggle-fullscreen"]')) return; }catch(e){ return; }
+  try{
+    var topBar=document.createElement("div");
+    topBar.className="niti-fs-sticky-topbar";
+    var topLabel=document.createElement("span");
+    topLabel.textContent="โหมดขยายเต็มหน้าจอ • สื่อการศึกษา";
+    var exitBtn=document.createElement("button");
+    exitBtn.type="button";
+    exitBtn.className="niti-fs-close-btn";
+    exitBtn.setAttribute("data-action","exit-fullscreen");
+    exitBtn.setAttribute("aria-label","ปิดโหมดเต็มหน้าจอ (ESC)");
+    exitBtn.textContent="✕ ย่อกลับขนาดเดิม (ESC)";
+    exitBtn.addEventListener("click",function(){ exitCssFullscreen(); });
+    topBar.appendChild(topLabel);
+    topBar.appendChild(exitBtn);
+    if(outer.firstChild) outer.insertBefore(topBar, outer.firstChild);
+    else outer.appendChild(topBar);
+  }catch(e){}
+  try{
+    var svgWrap=outer.querySelector(".niti-ill-image");
+    if(svgWrap){
+      var cornerBtn=document.createElement("button");
+      cornerBtn.type="button";
+      cornerBtn.className="niti-btn-fs-corner";
+      cornerBtn.setAttribute("data-action","toggle-fullscreen");
+      cornerBtn.setAttribute("aria-pressed","false");
+      cornerBtn.setAttribute("aria-label","ขยายภาพเต็มหน้าจอ");
+      cornerBtn.innerHTML='<span aria-hidden="true">⛶</span> <span class="fs-btn-text">ขยายเต็มจอ</span>';
+      cornerBtn.addEventListener("click",function(){ toggleCssFullscreen(outer, cornerBtn); });
+      svgWrap.appendChild(cornerBtn);
+    }
+  }catch(e){}
+  try{
+    var shareBar=outer.querySelector(".niti-share-bar, .niti-ill-sharebar");
+    if(shareBar){
+      var barBtn=document.createElement("button");
+      barBtn.type="button";
+      barBtn.className="niti-btn-fs-bar";
+      barBtn.setAttribute("data-action","toggle-fullscreen");
+      barBtn.setAttribute("aria-pressed","false");
+      barBtn.setAttribute("aria-label","ขยายภาพเต็มหน้าจอ");
+      barBtn.innerHTML='<span aria-hidden="true">⛶</span> <span class="fs-btn-text">ขยายเต็มจอ</span>';
+      barBtn.addEventListener("click",function(){ toggleCssFullscreen(outer, barBtn); });
+      if(shareBar.firstChild) shareBar.insertBefore(barBtn, shareBar.firstChild);
+      else shareBar.appendChild(barBtn);
+    }
+  }catch(e){}
+}
+function collapseStaleMeaning(outer){
+  if(!outer) return;
+  try{
+    if(outer.querySelector(".niti-ill-context-drawer")) return;
+    var meaning=outer.querySelector(".niti-ill-meaning");
+    if(!meaning) return;
+    var layout=outer.querySelector(".niti-ill-layout");
+    var drawer=document.createElement("details");
+    drawer.className="niti-ill-context-drawer";
+    var drawerSummary=document.createElement("summary");
+    drawerSummary.className="niti-ill-context-summary";
+    drawerSummary.textContent="ข้อมูลประกอบแผนภาพ... คลิกเพื่อดูเพิ่มเติม";
+    drawer.appendChild(drawerSummary);
+    drawer.appendChild(meaning);
+    if(layout&&layout.nextSibling) outer.insertBefore(drawer, layout.nextSibling);
+    else outer.appendChild(drawer);
+  }catch(e){}
+}
+function normalizeIllustrationAfterMount(outer, opts){
+  if(!outer) return;
+  try{
+    if(opts&&opts.collapseIntroText) collapseStaleMeaning(outer);
+  }catch(e){}
+  try{
+    if(!outer.querySelector('[data-action="toggle-fullscreen"]')) injectFallbackFullscreen(outer);
+  }catch(e){}
+}
 function normalize(value){
  if(typeof sourceMap.normalizeId==="function")return sourceMap.normalizeId(value);
  var match=String(value||"").trim().match(/^(\d+(?:\/\d+)?)/);
@@ -46,6 +175,13 @@ function setup(){
     if(window.NitiFullscreen&&typeof window.NitiFullscreen.isActive==="function"&&window.NitiFullscreen.isActive()){
       event.preventDefault();
       window.NitiFullscreen.exit();
+      return;
+    }
+  }catch(e){}
+  try{
+    if(isCssFullscreenActive()){
+      event.preventDefault();
+      exitCssFullscreen();
     }
   }catch(e){}
  });
@@ -54,6 +190,7 @@ function setup(){
   try{
     if(window.NitiFullscreen&&typeof window.NitiFullscreen.isActive==="function"&&window.NitiFullscreen.isActive()) window.NitiFullscreen.exit();
   }catch(e){}
+  try{ if(isCssFullscreenActive()) exitCssFullscreen(); }catch(e){}
   if(previousFocus&&typeof previousFocus.focus==="function")previousFocus.focus();
  });
  document.body.appendChild(dialog);
@@ -83,7 +220,7 @@ function buildIllustration(model, opts){
  try{ outer.dataset.hasTopSummary=(opts&&opts.collapseIntroText)?"true":"false"; }catch(e){}
  var app=window.NITI_STATUTE_ILLUSTRATION;
  if(app&&typeof app.mount==="function"){
-  try{ app.mount(outer,model,opts||{}); }
+  try{ app.mount(outer,model,opts||{}); normalizeIllustrationAfterMount(outer, opts||{}); }
   catch(err){
    try{ console.warn("[NITI] illustration mount failed:", err); }catch(e){}
    details.appendChild(element("p","","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
@@ -226,5 +363,5 @@ document.addEventListener("click",function(event){
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261015d"};
 })();
