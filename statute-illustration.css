@@ -170,3 +170,116 @@ dialog.niti-statute-dialog.is-dialog-fullscreen{width:100dvw!important;max-width
 .niti-ill-quiz-empty{font-size:.98rem;line-height:1.8;color:#52657a;margin:12px 0}
 .niti-ill-quiz-save-note{font-size:.9rem;color:#B45309;margin:10px 0 0}
 .niti-ill-quiz-btn:disabled{cursor:default;opacity:1}
+
+
+/* 2026-10-16 dark contrast repairs. Shared theme otherwise changes text to
+   pale colors while earlier illustration cards retain hard-coded white surfaces.
+   Keep the SVG drawing white on purpose (its own artwork is authored for white). */
+html[data-theme="dark"] .niti-ill-readbar,
+html[data-theme="dark"] .niti-ill-details,
+html[data-theme="dark"] .niti-ill-elements,
+html[data-theme="dark"] .niti-ill-sharebar,
+html[data-theme="dark"] .niti-ill-quiz,
+html[data-theme="dark"] .niti-summary-top-priority,
+html[data-theme="dark"] .niti-ill-context-drawer{
+  background:var(--md-surface)!important;
+  color:var(--md-text)!important;
+  border-color:var(--md-border)!important;
+}
+html[data-theme="dark"] .niti-ill-meaning{
+  background:var(--md-primary-container)!important;
+  color:var(--md-on-primary-container)!important;
+  border-color:var(--md-border)!important;
+}
+html[data-theme="dark"] .niti-conditions-grid{
+  background:var(--md-surface-low)!important;
+  color:var(--md-text)!important;
+  border-color:var(--md-border)!important;
+}
+html[data-theme="dark"] .niti-ill-read-btn,
+html[data-theme="dark"] .niti-ill-share-btn,
+html[data-theme="dark"] .niti-ill-element-btn,
+html[data-theme="dark"] .niti-condition-card,
+html[data-theme="dark"] .niti-ill-quiz-btn,
+html[data-theme="dark"] .niti-ill-quiz-retry,
+html[data-theme="dark"] .niti-ill-quiz-reason,
+html[data-theme="dark"] .niti-btn-fs-bar{
+  background:var(--md-surface-low)!important;
+  color:var(--md-text)!important;
+  border-color:var(--md-border)!important;
+}
+html[data-theme="dark"] .niti-ill-element-btn[aria-pressed="true"],
+html[data-theme="dark"] .niti-ill-element-item.is-active .niti-ill-element-btn,
+html[data-theme="dark"] .niti-condition-card[aria-pressed="true"],
+html[data-theme="dark"] .niti-condition-card.is-active{
+  background:var(--md-primary-container)!important;
+  color:var(--md-on-primary-container)!important;
+  border-color:var(--md-primary)!important;
+}
+html[data-theme="dark"] .niti-ill-pick[aria-pressed="true"],
+html[data-theme="dark"] .niti-ill-answer[aria-pressed="true"]{
+  color:var(--md-on-primary)!important;
+}
+html[data-theme="dark"] .niti-ill-read-btn[aria-pressed="true"]{
+  background:#1761a5!important;
+  color:#fff!important;
+  border-color:#6db7fb!important;
+}
+html[data-theme="dark"] .niti-ill-quiz-retry:hover{
+  background:var(--md-primary-container)!important;
+  color:var(--md-on-primary-container)!important;
+}
+html[data-theme="dark"] .niti-ill-quiz-btn.is-correct,
+html[data-theme="dark"] .niti-ill-quiz-btn.is-picked.is-correct,
+html[data-theme="dark"] .niti-ill-quiz-reason.is-correct{
+  background:#1b4739!important;
+  color:#d0ffe9!important;
+  border-color:#76e1aa!important;
+}
+html[data-theme="dark"] .niti-ill-quiz-btn.is-wrong-picked,
+html[data-theme="dark"] .niti-ill-quiz-reason.is-wrong{
+  background:#522b32!important;
+  color:#ffe4e7!important;
+  border-color:#ff9fa8!important;
+}
+html[data-theme="dark"] .niti-ill-meaning-title,
+html[data-theme="dark"] .niti-ill-elements-title,
+html[data-theme="dark"] .niti-ill-context-summary,
+html[data-theme="dark"] .niti-ill-context-heading,
+html[data-theme="dark"] .niti-summary-top-priority h3,
+html[data-theme="dark"] .niti-ill-quiz-title{
+  color:var(--md-primary)!important;
+}
+html[data-theme="dark"] .niti-ill-meaning-case-label,
+html[data-theme="dark"] .niti-ill-meaning-rule-label,
+html[data-theme="dark"] .niti-ill-condition-heading,
+html[data-theme="dark"] .niti-conditions-title,
+html[data-theme="dark"] .niti-condition-verb,
+html[data-theme="dark"] .niti-ill-share-title,
+html[data-theme="dark"] .niti-ill-quiz-score{
+  color:var(--md-text)!important;
+}
+html[data-theme="dark"] .niti-condition-label,
+html[data-theme="dark"] .niti-ill-element-expl,
+html[data-theme="dark"] .niti-ill-elements-progress,
+html[data-theme="dark"] .niti-ill-read-overall,
+html[data-theme="dark"] .niti-ill-share-status,
+html[data-theme="dark"] .niti-ill-quiz-instr,
+html[data-theme="dark"] .niti-ill-quiz-empty,
+html[data-theme="dark"] .niti-ill-quiz-disc,
+html[data-theme="dark"] .niti-ill-disclaimer{
+  color:var(--md-text-secondary)!important;
+}
+html[data-theme="dark"] .niti-ill-context-exception{
+  color:var(--md-text)!important;
+  background:var(--md-surface-low)!important;
+}
+html[data-theme="dark"] .niti-ill-quiz-save-note{
+  color:#ffd39b!important;
+}
+html[data-theme="dark"] .niti-module-card:fullscreen,
+html[data-theme="dark"] .niti-module-card:-webkit-full-screen,
+html[data-theme="dark"] .niti-module-card.is-niti-fullscreen{
+  background:var(--md-bg)!important;
+  color:var(--md-text)!important;
+}
