@@ -152,3 +152,21 @@
 dialog.niti-statute-dialog.is-dialog-fullscreen{width:100dvw!important;max-width:100dvw!important;height:100dvh!important;max-height:100dvh!important;margin:0!important;border-radius:0!important}
 @media(max-width:640px){.niti-module-card.is-niti-fullscreen{padding:0 .75rem 1.5rem!important}}
 @media(prefers-reduced-motion:reduce){.niti-module-card,.niti-btn-fs-corner,.niti-btn-fs-bar{transition:none!important}}
+
+/* Quiz v2: multi-question, per-question feedback */
+.niti-ill-quiz-score{font-weight:800;font-size:1.02rem;margin:0 0 8px;color:#0F172A}
+.niti-ill-quiz-item{border-top:1px dashed #CBD5E1;padding-top:14px;margin-top:14px}
+.niti-ill-quiz-item:first-of-type{border-top:none;padding-top:0;margin-top:0}
+.niti-ill-quiz-item-q{font-weight:700;font-size:1.02rem;line-height:1.8;margin:0 0 10px;overflow-wrap:anywhere}
+.niti-ill-quiz-item-opts{display:grid;gap:10px;margin:0 0 10px}
+.niti-ill-quiz-item-feedback{margin-top:10px}
+.niti-ill-quiz-reason-list{list-style:none;margin:8px 0;padding:0;display:grid;gap:6px}
+.niti-ill-quiz-reason{padding:8px 10px;border-radius:8px;background:#F8FAFD;border:1px solid #D7E2EA;font-size:.95rem;line-height:1.7;overflow-wrap:anywhere}
+.niti-ill-quiz-reason.is-correct{border-color:#047857;background:#ECFDF5}
+.niti-ill-quiz-reason.is-wrong{border-color:#E5E7EB;background:#F8FAFD}
+.niti-ill-quiz-retry{margin-top:12px;padding:10px 18px;border-radius:10px;border:1.5px solid #0F172A;background:#fff;color:#0F172A;font:inherit;font-weight:700;cursor:pointer}
+.niti-ill-quiz-retry:hover{background:#0F172A;color:#fff}
+.niti-ill-quiz-retry:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
+.niti-ill-quiz-empty{font-size:.98rem;line-height:1.8;color:#52657a;margin:12px 0}
+.niti-ill-quiz-save-note{font-size:.9rem;color:#B45309;margin:10px 0 0}
+.niti-ill-quiz-btn:disabled{cursor:default;opacity:1}
