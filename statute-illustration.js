@@ -1228,5 +1228,5 @@ function computePointSlots(model){
   return out;
 }
 function pointSlots(model){return computePointSlots(model);}
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,QUIZ_KEY:QUIZ_KEY};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,QUIZ_KEY:QUIZ_KEY,__build:"20261015d"};
 })();
