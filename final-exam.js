@@ -114,7 +114,7 @@ function render(){
    cbLabel.appendChild(cb);cbLabel.appendChild(document.createTextNode(" อ่านแล้ว"));top.appendChild(cbLabel);card.appendChild(top);
    card.appendChild(el("h3","",note.title));card.appendChild(el("p","final-summary",note.plain||"โปรดตรวจตัวบทมาตรานี้"));
    var line=el("div","final-links");
-   line.appendChild(anchor("./study.html#statute-"+id,"สรุป + ภาพ/ตัวบทในเว็บไซต์ ↗","final-link"));
+   line.appendChild(anchor("./study.html#statute-"+id,"สรุปมาตรา + ตัวบทในเว็บไซต์ ↗","final-link"));
    var direct=sources.direct&&sources.direct[id];
    line.appendChild(anchor(direct?direct.primaryUrl:"https://www.ocs.go.th/searchlaw","PDF ตัวบทจากหน่วยงานรัฐ ↗","final-link secondary",true));
    card.appendChild(line);
