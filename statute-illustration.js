@@ -958,7 +958,42 @@ function quizQuoteSourceLabel(model, quote){
   if(model&&model.exception&&quizContains(model.exception, quote)) return "ข้อควรระวัง";
   return "ข้อมูลของมาตรานี้";
 }
-/* Reviewed 3-question spec for มาตรา 144 — verbatim quotes from the model. */
+/* Explanations in question specs use SPEC-ORDER letters: "ข้อ ก" means
+   q.options[0], "ข้อ ข" means q.options[1], etc. The UI shuffles options
+   deterministically, so the displayed letters differ. Remap every
+   "ข้อ <letter>" in the explanation's summary tail to the letter that
+   option actually displays as. Only the text AFTER the last " — "
+   separator is remapped, so verbatim quotes (which sit before it) are
+   never touched. The negative lookahead guards words like "ข้อควรระวัง"
+   ("ข้อค...") from being mistaken for a letter reference. */
+function quizRemapExplanationLetters(explanation, q, buttons){
+  var text=String(explanation==null?"":explanation);
+  if(!q||!Array.isArray(q.options)||!Array.isArray(buttons)||!buttons.length) return text;
+  var displayById={};
+  buttons.forEach(function(b){ if(b&&b.opt&&b.opt.id) displayById[b.opt.id]=b.letter; });
+  var map={};
+  for(var i=0;i<q.options.length&&i<QUIZ_LETTERS.length;i++){
+    var specLetter=QUIZ_LETTERS[i];
+    var disp=displayById[q.options[i].id];
+    if(disp) map[specLetter]=disp;
+  }
+  var changed=false;
+  for(var k in map){ if(map[k]!==k) changed=true; }
+  if(!changed) return text;
+  var sep=" — ";
+  var idx=text.lastIndexOf(sep);
+  var head=text, tail="";
+  if(idx>=0){ head=text.slice(0, idx+sep.length); tail=text.slice(idx+sep.length); }
+  else { tail=text; head=""; }
+  tail=tail.replace(/\u0e02\u0e49\u0e2d\s*([\u0e01\u0e02\u0e04\u0e07])(?![\u0E00-\u0E7F])/g, function(m, letter){
+    return "\u0e02\u0e49\u0e2d "+(map[letter]||letter);
+  });
+  return head+tail;
+}
+/* Reviewed 3-question spec for มาตรา 144 — verbatim quotes from the model.
+   NOTE: explanations below use SPEC-ORDER letters (options array order).
+   renderQuizItemFeedback remaps them via quizRemapExplanationLetters to
+   the shuffled displayed letters. Do NOT "fix" these letters by hand. */
 function buildReviewed144Questions(model){
   var rule=quizNorm(model&&model.rule);
   var trap=quizNorm(model&&model.exception);
@@ -1540,7 +1575,7 @@ function mount(host,model,options){
         list.appendChild(li);
       });
       entry.fb.appendChild(list);
-      entry.fb.appendChild(node("p","niti-ill-quiz-expl", entry.q.explanation));
+      entry.fb.appendChild(node("p","niti-ill-quiz-expl", quizRemapExplanationLetters(entry.q.explanation, entry.q, entry.buttons)));
       entry.fb.appendChild(node("p","niti-ill-quiz-disc",FOOTER_DISCLAIMER));
       entry.buttons.forEach(function(b){
         b.btn.classList.toggle("is-correct", !!b.opt.isCorrect);
@@ -1612,5 +1647,5 @@ function computePointSlots(model){
   return out;
 }
 function pointSlots(model){return computePointSlots(model);}
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,getQuizAnswers:getQuizAnswers,setQuizAnswer:setQuizAnswer,clearQuizAnswers:clearQuizAnswers,buildQuizQuestions:buildQuizQuestions,QUIZ_KEY:QUIZ_KEY,QUIZ_SCHEMA_VERSION:QUIZ_SCHEMA_VERSION,__build:"20261015e"};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,getQuizAnswers:getQuizAnswers,setQuizAnswer:setQuizAnswer,clearQuizAnswers:clearQuizAnswers,buildQuizQuestions:buildQuizQuestions,QUIZ_KEY:QUIZ_KEY,QUIZ_SCHEMA_VERSION:QUIZ_SCHEMA_VERSION,__build:"20261015f"};
 })();
