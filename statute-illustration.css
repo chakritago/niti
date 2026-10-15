@@ -118,3 +118,37 @@
 /* Universal SVG cards: ensure text never bleeds, decorative art never blocks clicks */
 .niti-law-svg .niti-ill-hotspot{pointer-events:auto}
 .niti-law-svg .niti-visual-decor{pointer-events:none}
+
+/* ---- Feature B: summary on top (reader) ---- */
+.niti-summary-top-priority{background:#fff;border:1px solid #d7e2ea;border-inline-start:6px solid #1761a5;border-radius:14px;box-shadow:0 2px 12px rgba(23,47,67,.07);padding:18px 20px;margin:0 0 16px}
+.niti-summary-top-priority .reader-summary-part{margin:0 0 12px}
+.niti-summary-top-priority .reader-summary-part:last-child{margin-bottom:0}
+.niti-summary-top-priority h3{margin:0 0 6px;font:800 1.05rem/1.5 "IBM Plex Sans Thai",Tahoma,sans-serif;color:#1E40AF}
+.niti-summary-top-priority p{margin:0;font-size:1rem;line-height:1.9;overflow-wrap:anywhere}
+
+/* ---- Feature B: context drawer below image (collapsed when summary on top) ---- */
+.niti-ill-context-drawer{border:1px solid #d7e2ea;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(23,47,67,.06);margin:14px 0;padding:0;overflow-wrap:anywhere}
+.niti-ill-context-summary{cursor:pointer;padding:13px 16px;font-weight:800;font-size:.98rem;color:#1E40AF;list-style:none}
+.niti-ill-context-summary::-webkit-details-marker{display:none}
+.niti-ill-context-summary::before{content:"▸ ";color:#1761a5}
+.niti-ill-context-drawer[open] .niti-ill-context-summary::before{content:"▾ "}
+.niti-ill-context-summary:focus-visible{outline:3px solid #F59E0B;outline-offset:2px;border-radius:10px}
+.niti-ill-context-body{padding:0 16px 14px}
+.niti-ill-context-heading{margin:8px 0;font:800 1.05rem/1.5 "IBM Plex Sans Thai",Tahoma,sans-serif;color:#1E40AF}
+.niti-ill-context-exception{font-size:.96rem;line-height:1.85;color:#334155;border-inline-start:4px solid #e3a64c;background:#f5f7fa;border-radius:6px;padding:9px 11px}
+
+/* ---- Feature A: Fullscreen / Expand ---- */
+.niti-svg-wrapper{position:relative}
+.niti-btn-fs-corner{position:absolute;top:8px;right:10px;z-index:10;display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .7rem;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:rgba(15,23,42,.82);color:#fff;font-family:Sarabun,Tahoma,sans-serif;font-size:.85rem;font-weight:700;cursor:pointer}
+.niti-btn-fs-corner:hover{background:#1E40AF}
+.niti-btn-fs-bar{padding:.55rem 1rem;border-radius:10px;font-family:Sarabun,Tahoma,sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;border:1.5px solid #0F172A;background:#fff;color:#0F172A;display:inline-flex;align-items:center;gap:.4rem}
+.niti-btn-fs-bar[aria-pressed="true"]{background:#0F172A;color:#fff}
+.niti-btn-fs-corner:focus-visible,.niti-btn-fs-bar:focus-visible,.niti-fs-close-btn:focus-visible{outline:3px solid #F59E0B;outline-offset:2px}
+.niti-fs-sticky-topbar{display:none}
+.niti-module-card:fullscreen,.niti-module-card:-webkit-full-screen,.niti-module-card.is-niti-fullscreen{position:fixed!important;inset:0!important;width:100dvw!important;height:100dvh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0 1.25rem 2rem!important;background:#F1F5F9!important;z-index:999999!important;overflow-y:auto!important;overscroll-behavior:contain;box-sizing:border-box}
+.niti-module-card:fullscreen .niti-fs-sticky-topbar,.niti-module-card:-webkit-full-screen .niti-fs-sticky-topbar,.niti-module-card.is-niti-fullscreen .niti-fs-sticky-topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;position:sticky;top:0;z-index:50;background:rgba(15,23,42,.95);color:#fff;padding:.75rem 1.25rem;margin:0 -1.25rem 1rem!important;box-shadow:0 4px 12px rgba(0,0,0,.15);font-family:Sarabun,Tahoma,sans-serif}
+.niti-fs-close-btn{padding:.45rem 1rem;border-radius:8px;border:1.5px solid #F87171;background:#DC2626;color:#fff;font-family:Sarabun,Tahoma,sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;flex:none}
+.niti-module-card:fullscreen .niti-law-svg,.niti-module-card:-webkit-full-screen .niti-law-svg,.niti-module-card.is-niti-fullscreen .niti-law-svg{width:100%!important;max-width:1400px!important;height:auto!important;max-height:68dvh!important;margin:0 auto;display:block}
+dialog.niti-statute-dialog.is-dialog-fullscreen{width:100dvw!important;max-width:100dvw!important;height:100dvh!important;max-height:100dvh!important;margin:0!important;border-radius:0!important}
+@media(max-width:640px){.niti-module-card.is-niti-fullscreen{padding:0 .75rem 1.5rem!important}}
+@media(prefers-reduced-motion:reduce){.niti-module-card,.niti-btn-fs-corner,.niti-btn-fs-bar{transition:none!important}}
