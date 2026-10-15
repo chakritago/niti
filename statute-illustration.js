@@ -4,6 +4,79 @@
  */
 (function(){
 "use strict";
+
+var FOOTER_DISCLAIMER="สื่อการศึกษาเพื่อความเข้าใจโครงสร้างตัวบท ไม่ใช่คำวินิจฉัยคดี";
+var TYPE_STYLES={
+  mandatory:{label:"ต้องทำ",color:"#047857",bg:"#ECFDF5"},
+  time:{label:"เงื่อนไขเวลา",color:"#B45309",bg:"#FFFBEB"},
+  exception:{label:"ข้อยกเว้น",color:"#B91C1C",bg:"#FEF2F2",dashed:true},
+  alternative:{label:"ทางเลือก",color:"#0369A1",bg:"#EFF6FF"}
+};
+var ROLE_STYLES=[
+  {label:"เจ้าหนี้ / ผู้มีสิทธิ",color:"#1E40AF",bg:"#DBEAFE"},
+  {label:"ลูกหนี้ / ผู้มีหน้าที่",color:"#C2410C",bg:"#FFEDD5"},
+  {label:"บุคคลภายนอก / ทะเบียน",color:"#6D28D9",bg:"#EDE9FE"}
+];
+function inferPartType(part){
+  var s=(part&&part.label)||"";
+  if(/ข้อยกเว้น|ยกเว้น|เว้นแต่|ไม่ต้อง|ไม่จำเป็น/.test(s))return "exception";
+  if(/เวลา|วัน|เดือน|ปี|อายุความ|กำหนด|ภายใน|ระยะ|60 วัน|10 ปี|5 ปี/.test(s))return "time";
+  if(/หรือ|ทางเลือก|อย่างใด|เลือก/.test(s))return "alternative";
+  return "mandatory";
+}
+function truncateForWidth(text,maxChars){
+  var t=String(text||"");
+  if(t.length<=maxChars)return t;
+  return t.slice(0,Math.max(1,maxChars-1))+"…";
+}
+function stripLayout(n){
+  var cols=n<=1?1:n===2?2:n===3?3:n===4?4:3;
+  var rows=Math.max(1,Math.ceil(n/cols));
+  var pillW=(880-32-(cols-1)*10)/cols;
+  var pillH=40;
+  var stripTop=542;
+  var titleH=28;
+  var stripH=titleH+rows*pillH+(rows-1)*8+14;
+  var footerY=stripTop+stripH+10;
+  var totalH=footerY+22;
+  return {cols:cols,rows:rows,pillW:pillW,pillH:pillH,stripTop:stripTop,titleH:titleH,stripH:stripH,footerY:footerY,totalH:totalH};
+}
+function drawHeader(g,model){
+  rect(g,0,0,880,96,"#FFFFFF",0,"#CBD5E1");
+  // Section badge
+  rect(g,16,16,112,34,"#1E40AF",17);
+  svg(g,"text",{x:72,y:38,fill:"#FFFFFF","font-size":15,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},"มาตรา "+String(model.id||""));
+  // Title + kind
+  var title=String(model.title||("มาตรา "+String(model.id||"")));
+  title=truncateForWidth(title,48);
+  svg(g,"text",{x:140,y:33,fill:"#111827","font-size":20,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},title);
+  svg(g,"text",{x:140,y:56,fill:"#4B5563","font-size":13.5,"font-weight":600,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},"หมวด: "+String(model.kindLabel||model.kind||""));
+  // Legend row: types + roles (visual only)
+  var lx=16, ly=80;
+  var items=[];
+  Object.keys(TYPE_STYLES).forEach(function(k){items.push({label:TYPE_STYLES[k].label,color:TYPE_STYLES[k].color,bg:TYPE_STYLES[k].bg,shape:"circle"});});
+  ROLE_STYLES.forEach(function(r){items.push({label:r.label,color:r.color,bg:r.bg,shape:"square"});});
+  items.forEach(function(it){
+    if(it.shape==="circle"){circle(g,lx+6,ly,5.5,it.color);}
+    else{rect(g,lx,ly-5.5,12,11,it.bg,2,it.color);}
+    svg(g,"text",{x:lx+16,y:ly+4,fill:"#374151","font-size":11,"font-weight":600,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},it.label);
+    lx+=16+it.label.length*7.2+16;
+  });
+}
+function drawStageCues(g,model){
+  // Archetype-aware, visual-only cues. No new legal facts.
+  if(model.id==="1387"||model.id==="1401"){
+    rect(g,240,8,400,30,"#EDE9FE",15,"#6D28D9");
+    svg(g,"text",{x:440,y:28,fill:"#4C1D95","font-size":13.5,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},"สามยทรัพย์ ↔ ภารยทรัพย์ — เปรียบเทียบสองฝั่ง");
+  } else if(model.kind==="mortgage"||model.kind==="time"){
+    rect(g,290,8,300,30,"#FFFBEB",15,"#B45309");
+    svg(g,"text",{x:440,y:28,fill:"#92400E","font-size":13.5,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},"ลำดับเวลา / ขั้นตอน — ดูรายละเอียดในแต่ละประเด็น");
+  }
+}
+function drawFooter(g,footerY){
+  svg(g,"text",{x:440,y:footerY+14,fill:"#6B7280","font-size":12.5,"font-weight":600,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},FOOTER_DISCLAIMER);
+}
+
 var NS="http://www.w3.org/2000/svg";
 function node(tag,cls,txt){
  var e=document.createElement(tag);if(cls)e.className=cls;
@@ -203,89 +276,113 @@ function specialized(g,model){
  }
 
 }
-function pointSlots(model){
- var n=model.parts.length;
- // Stage cards are around the physical fact illustration, not conceptual tree branches.
- var x=[100,300,500,700],positions=[];
- if(n===1)return [{x:440,y:177}];
- if(n===2)return [{x:285,y:163},{x:590,y:163}];
- if(n===3)return [{x:166,y:153},{x:444,y:153},{x:712,y:153}];
- if(n===4)return x.map(function(v,i){return {x:v,y:153};});
- for(var i=0;i<n;i++)positions.push({x:95+(i%4)*225,y:i<4?149:378});
- return positions;
+function computePointSlots(model){
+  var n=model.parts.length;
+  var L=stripLayout(n);
+  var positions=[];
+  for(var i=0;i<n;i++){
+    var row=Math.floor(i/L.cols);
+    var startOfRow=row*L.cols;
+    var itemsInRow=Math.min(L.cols,n-startOfRow);
+    var colInRow=i-startOfRow;
+    var rowW=itemsInRow*L.pillW+(itemsInRow-1)*10;
+    var rowX=(880-rowW)/2;
+    var cx=rowX+colInRow*(L.pillW+10)+L.pillW/2;
+    var cy=L.stripTop+L.titleH+6+row*(L.pillH+8)+L.pillH/2;
+    positions.push({x:cx,y:cy,w:L.pillW,h:L.pillH});
+  }
+  return positions;
 }
+function pointSlots(model){return computePointSlots(model);}
 function renderPartMarker(g,part,index,coords,select){
- var a=svg(g,"g",{"class":"niti-ill-hotspot",role:"button",tabindex:"0","aria-label":"ประเด็น "+(index+1)+" "+part.label,"aria-pressed":"false"});
- // No text is injected as HTML; all content is set through DOM textContent.
- rect(a,coords.x-91,coords.y-29,182,55,"#ffffff",16,"#a5c8d0");
- circle(a,coords.x-68,coords.y-2,19,"#247d9b");
- label(a,coords.x-68,coords.y+4,String(index+1),"#ffffff");
- // The tiny illustrated object corresponds to this particular legal issue.
- drawObject(a,part.shape,coords.x+61,coords.y+61,.32);
- var split=part.label.length>20?part.label.slice(0,19)+"…":part.label;
- svg(a,"text",{x:coords.x-44,y:coords.y+4,fill:"#214457","font-size":14.5,"font-weight":700,"font-family":"Sarabun, Tahoma, sans-serif"},split);
- a.addEventListener("click",function(){select(index,true);});
- a.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(index,true);}});
- return a;
+  var type=inferPartType(part);
+  var st=TYPE_STYLES[type]||TYPE_STYLES.mandatory;
+  var w=coords.w||220, h=coords.h||40;
+  var x=coords.x-w/2, y=coords.y-h/2;
+  var a=svg(g,"g",{"class":"niti-ill-hotspot",role:"button",tabindex:"0","aria-label":"ประเด็น "+(index+1)+" "+part.label+" — "+st.label,"aria-pressed":"false","data-type":type});
+  var r=rect(a,x,y,w,h,st.bg,h/2,st.color);
+  if(st.dashed){r.setAttribute("stroke-dasharray","7 4");}
+  r.setAttribute("stroke-width","2.5");
+  circle(a,x+22,coords.y,13.5,st.color);
+  svg(a,"text",{x:x+22,y:coords.y+5,fill:"#FFFFFF","font-size":14,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},String(index+1));
+  var maxChars=Math.min(20,Math.max(8,Math.floor((w-78)/8)));
+  var keyword=truncateForWidth(part.label,maxChars);
+  svg(a,"text",{x:x+44,y:coords.y-1,fill:"#1F2937","font-size":13.5,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},keyword);
+  svg(a,"text",{x:x+44,y:coords.y+15,fill:st.color,"font-size":11,"font-weight":700,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},st.label);
+  drawObject(a,part.shape,x+w-24,coords.y+2,.22);
+  a.addEventListener("click",function(){select(index,true);});
+  a.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(index,true);}});
+  return a;
 }
 function mount(host,model){
- var image=host.querySelector(".niti-ill-image");
- var details=host.querySelector(".niti-ill-details");
- var list=host.querySelector(".niti-ill-list");
- var counter=host.querySelector(".niti-ill-progress");
- if(!image||!details||!list||!model.parts?.length)return {dispose:function(){}};
- image.replaceChildren();list.replaceChildren();
- var illustration=svg(image,"svg",{viewBox:"0 0 880 430",role:"group","aria-label":"ภาพเหตุการณ์ "+model.kindLabel+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
- var defs=svg(illustration,"defs",{});
- var marker=svg(defs,"marker",{id:"niti-svg-arrow",markerWidth:8,markerHeight:8,refX:6,refY:3,orient:"auto"});polygon(marker,"0,0 6,3 0,6","#278b93");
- backdrop(illustration,model);specialized(illustration,model);
- var places=pointSlots(model);
- var mark=[],buttons=[],states=model.parts.map(function(){return "unknown";}),current=0;
- var layout=svg(illustration,"g",{class:"niti-law-stages"});
- model.parts.forEach(function(part,i){
-  var coord=places[i]||{x:440,y:153};
-  var item=renderPartMarker(layout,part,i,coord,select);
-  mark.push(item);
-  var button=node("button","niti-ill-pick",(i+1)+". "+part.label);
-  button.type="button";button.setAttribute("aria-pressed","false");
-  button.addEventListener("click",function(){select(i,true);});
-  list.appendChild(button);buttons.push(button);
- });
- function updateCounter(){
-  var found=states.filter(function(s){return s==="yes";}).length;
-  var missing=states.filter(function(s){return s==="no";}).length;
-  var unsure=states.filter(function(s){return s==="unknown";}).length;
-  if(counter)counter.textContent="บันทึกข้อเท็จจริง: พบ "+found+" · ไม่พบ "+missing+" · ยังไม่แน่ใจ "+unsure+" (ไม่ได้ตัดสินผลคดีอัตโนมัติ)";
- }
- function choose(i,status){
-  states[i]=status;
-  select(i,false);
- }
- function select(i,focus){
-  var p=model.parts[i];if(!p)return;current=i;
-  mark.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
-  buttons.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
-  details.replaceChildren();
-  details.appendChild(node("span","niti-ill-step","ประเด็น "+(i+1)+" จาก "+model.parts.length));
-  details.appendChild(node("h4","",p.label));
-  details.appendChild(node("p","",p.explanation));
-  details.appendChild(node("strong","","ลองวิเคราะห์จากสถานการณ์"));
-  details.appendChild(node("p","",p.ask));
-  details.appendChild(node("p","niti-ill-warning","ข้อควรระวัง: "+model.exception));
-  details.appendChild(node("p","niti-ill-hint","บางประเด็นเป็นทางเลือกหรือข้อยกเว้น จึงไม่จำเป็นต้องมีครบพร้อมกัน"));
-  var controls=node("div","niti-ill-answers");
-  [["yes","พบข้อเท็จจริงนี้"],["no","ไม่พบ"],["unknown","ยังไม่แน่ใจ"]].forEach(function(choice){
-   var b=node("button","niti-ill-answer",choice[1]);
-   b.type="button";b.setAttribute("aria-pressed",String(states[i]===choice[0]));
-   b.addEventListener("click",function(){choose(i,choice[0]);});
-   controls.appendChild(b);
+  var image=host.querySelector(".niti-ill-image");
+  var details=host.querySelector(".niti-ill-details");
+  var list=host.querySelector(".niti-ill-list");
+  var counter=host.querySelector(".niti-ill-progress");
+  if(!image||!details||!list||!model.parts?.length)return {dispose:function(){}};
+  image.replaceChildren();list.replaceChildren();
+  var L=stripLayout(model.parts.length);
+  var illustration=svg(image,"svg",{viewBox:"0 0 880 "+L.totalH,role:"group","aria-label":"ภาพเหตุการณ์ "+model.kindLabel+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
+  var defs=svg(illustration,"defs",{});
+  var marker=svg(defs,"marker",{id:"niti-svg-arrow",markerWidth:8,markerHeight:8,refX:6,refY:3,orient:"auto"});polygon(marker,"0,0 6,3 0,6","#278b93");
+  drawHeader(illustration,model);
+  var stage=svg(illustration,"g",{transform:"translate(0,104)"});
+  backdrop(stage,model);specialized(stage,model);drawStageCues(stage,model);
+  // Condition Strip
+  rect(illustration,8,L.stripTop,864,L.stripH,"#FFFFFF",16,"#CBD5E1");
+  svg(illustration,"text",{x:24,y:L.stripTop+20,fill:"#111827","font-size":13.5,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},"เงื่อนไข / ประเด็นที่ต้องตรวจ — คลิกเพื่ออ่านรายละเอียด");
+  var places=computePointSlots(model);
+  var mark=[],buttons=[],states=model.parts.map(function(){return "unknown";}),current=0;
+  var layout=svg(illustration,"g",{class:"niti-law-stages"});
+  model.parts.forEach(function(part,i){
+    var coord=places[i]||{x:440,y:L.stripTop+40,w:220,h:40};
+    var item=renderPartMarker(layout,part,i,coord,select);
+    mark.push(item);
+    var button=node("button","niti-ill-pick",(i+1)+". "+part.label);
+    button.type="button";button.setAttribute("aria-pressed","false");
+    button.addEventListener("click",function(){select(i,true);});
+    list.appendChild(button);buttons.push(button);
   });
-  details.appendChild(controls);
-  updateCounter();
-  if(focus){details.tabIndex=-1;details.focus({preventScroll:true});}
- }
- select(0,false);
- return {dispose:function(){image.replaceChildren();}};
+  drawFooter(illustration,L.footerY);
+  function updateCounter(){
+    var found=states.filter(function(s){return s==="yes";}).length;
+    var missing=states.filter(function(s){return s==="no";}).length;
+    var unsure=states.filter(function(s){return s==="unknown";}).length;
+    if(counter)counter.textContent="บันทึกข้อเท็จจริง: พบ "+found+" · ไม่พบ "+missing+" · ยังไม่แน่ใจ "+unsure+" (ไม่ได้ตัดสินผลคดีอัตโนมัติ)";
+  }
+  function choose(i,status){
+    states[i]=status;
+    select(i,false);
+  }
+  function select(i,focus){
+    var p=model.parts[i];if(!p)return;current=i;
+    mark.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
+    buttons.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
+    details.replaceChildren();
+    details.appendChild(node("span","niti-ill-step","ประเด็น "+(i+1)+" จาก "+model.parts.length));
+    var tb=node("span","niti-ill-type-badge",TYPE_STYLES[inferPartType(p)].label);
+    tb.setAttribute("data-type",inferPartType(p));
+    details.appendChild(tb);
+    details.appendChild(node("h4","",p.label));
+    details.appendChild(node("p","",p.explanation));
+    details.appendChild(node("strong","","ลองวิเคราะห์จากสถานการณ์"));
+    details.appendChild(node("p","",p.ask));
+    details.appendChild(node("p","niti-ill-warning","ข้อควรระวัง: "+model.exception));
+    details.appendChild(node("p","niti-ill-hint","บางประเด็นเป็นทางเลือกหรือข้อยกเว้น จึงไม่จำเป็นต้องมีครบพร้อมกัน"));
+    details.appendChild(node("p","niti-ill-disclaimer",FOOTER_DISCLAIMER));
+    var controls=node("div","niti-ill-answers");
+    [["yes","พบข้อเท็จจริงนี้"],["no","ไม่พบ"],["unknown","ยังไม่แน่ใจ"]].forEach(function(choice){
+      var b=node("button","niti-ill-answer",choice[1]);
+      b.type="button";b.setAttribute("aria-pressed",String(states[i]===choice[0]));
+      b.addEventListener("click",function(){choose(i,choice[0]);});
+      controls.appendChild(b);
+    });
+    details.appendChild(controls);
+    updateCounter();
+    if(focus){details.tabIndex=-1;details.focus({preventScroll:true});}
+  }
+  select(0,false);
+  return {dispose:function(){image.replaceChildren();}};
 }
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,inferPartType:inferPartType};
 })();
