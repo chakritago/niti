@@ -17,6 +17,70 @@ var ROLE_STYLES=[
   {label:"ลูกหนี้ / ผู้มีหน้าที่",color:"#C2410C",bg:"#FFEDD5"},
   {label:"บุคคลภายนอก / ทะเบียน",color:"#6D28D9",bg:"#EDE9FE"}
 ];
+
+var READ_KEY="niti-statute-read-v1";
+var readMem={};
+function loadReadMap(){
+  try{
+    if(typeof localStorage==="undefined") return {};
+    var raw=localStorage.getItem(READ_KEY);
+    if(!raw) return {};
+    var parsed=JSON.parse(raw);
+    if(!parsed||typeof parsed!=="object"||Array.isArray(parsed)) return {};
+    return parsed;
+  }catch(e){ return {}; }
+}
+function saveReadMap(map){
+  try{
+    if(typeof localStorage==="undefined") return false;
+    localStorage.setItem(READ_KEY, JSON.stringify(map));
+    return true;
+  }catch(e){ return false; }
+}
+function getReadStatus(id){
+  var key=String(id==null?"":id);
+  var map=loadReadMap();
+  var entry=map[key];
+  if(entry&&typeof entry==="object") return {read:entry.read===true, updatedAt:typeof entry.updatedAt==="string"?entry.updatedAt:null};
+  if(entry===true) return {read:true, updatedAt:null};
+  if(entry===false) return {read:false, updatedAt:null};
+  return {read:false, updatedAt:null};
+}
+function isRead(id){ return getReadStatus(id).read; }
+function countReadFromMap(map){
+  var n=0; Object.keys(map||{}).forEach(function(k){ var e=map[k]; if(e&&typeof e==="object"?e.read===true:e===true) n++; });
+  return n;
+}
+function setReadStatus(id, read){
+  var key=String(id==null?"":id);
+  var want=read===true;
+  var updatedAt=new Date().toISOString();
+  var map=loadReadMap();
+  map[key]={read:want, updatedAt:updatedAt};
+  // keep in-memory mirror so private-mode still reflects UI in this session
+  readMem[key]=map[key];
+  saveReadMap(map);
+  try{
+    if(typeof window!=="undefined"&&typeof window.CustomEvent==="function"&&typeof window.dispatchEvent==="function"){
+      window.dispatchEvent(new window.CustomEvent("niti:statute-read-change",{detail:{id:key,read:want,updatedAt:updatedAt}}));
+    }
+  }catch(e){}
+  return {read:want, updatedAt:updatedAt};
+}
+function overallReadText(){
+  var map=loadReadMap();
+  // merge in-memory (private-mode) entries
+  Object.keys(readMem).forEach(function(k){ if(!map[k]) map[k]=readMem[k]; });
+  var ids=null;
+  try{ if(typeof window!=="undefined"&&window.NITI_DIORAMA_DATA&&Array.isArray(window.NITI_DIORAMA_DATA.ids)) ids=window.NITI_DIORAMA_DATA.ids; }catch(e){}
+  if(ids&&ids.length){
+    var c=0; ids.forEach(function(id){ var e=map[String(id)]; if(e&&typeof e==="object"?e.read===true:e===true) c++; });
+    return "อ่านแล้ว "+c+" จาก "+ids.length+" มาตรา";
+  }
+  var keys=Object.keys(map);
+  if(!keys.length) return "";
+  return "อ่านแล้ว "+countReadFromMap(map)+" จาก "+keys.length+" มาตราที่เคยเปิด";
+}
 function inferPartType(part){
   var s=(part&&part.label)||"";
   if(/ข้อยกเว้น|ยกเว้น|เว้นแต่|ไม่ต้อง|ไม่จำเป็น/.test(s))return "exception";
@@ -320,19 +384,81 @@ function mount(host,model){
   var list=host.querySelector(".niti-ill-list");
   var counter=host.querySelector(".niti-ill-progress");
   if(!image||!details||!list||!model.parts?.length)return {dispose:function(){}};
+  // Remove previous round's injected blocks on re-mount
+  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements").forEach(function(el){el.remove();});
   image.replaceChildren();list.replaceChildren();
+  // ---------- Read / unread (localStorage, explicit click only) ----------
+  var readBar=node("div","niti-ill-readbar");
+  var readBadge=node("span","niti-ill-read-badge","");
+  readBadge.setAttribute("aria-live","polite");
+  var readOverall=node("span","niti-ill-read-overall","");
+  var btnRead=node("button","niti-ill-read-btn","ทำเครื่องหมายว่าอ่านแล้ว");
+  btnRead.type="button";
+  var btnUnread=node("button","niti-ill-read-btn","ทำเครื่องหมายว่ายังไม่ได้อ่าน");
+  btnUnread.type="button";
+  var readControls=node("div","niti-ill-read-controls");
+  readControls.appendChild(btnRead);readControls.appendChild(btnUnread);
+  readBar.appendChild(readBadge);readBar.appendChild(readOverall);readBar.appendChild(readControls);
+  host.insertBefore(readBar,host.firstChild);
+  function refreshRead(){
+    var st=getReadStatus(model.id);
+    readBadge.textContent=st.read?"อ่านแล้ว ✓":"ยังไม่ได้อ่าน";
+    readBadge.setAttribute("data-read",String(st.read));
+    btnRead.setAttribute("aria-pressed",String(st.read===true));
+    btnUnread.setAttribute("aria-pressed",String(st.read===false));
+    readOverall.textContent=overallReadText();
+  }
+  btnRead.addEventListener("click",function(){setReadStatus(model.id,true);refreshRead();});
+  btnUnread.addEventListener("click",function(){setReadStatus(model.id,false);refreshRead();});
+  function onReadChange(ev){
+    try{ if(ev&&ev.detail&&String(ev.detail.id)===String(model.id)) refreshRead(); }catch(e){}
+  }
+  try{ if(typeof window!=="undefined"&&window.addEventListener) window.addEventListener("niti:statute-read-change",onReadChange); }catch(e){}
+  refreshRead();
+  // ---------- Meaning (verbatim principle + case) ----------
+  var meaning=node("div","niti-ill-meaning");
+  meaning.appendChild(node("h3","niti-ill-meaning-title","ความหมายของมาตรา"));
+  if(model.principle) meaning.appendChild(node("p","niti-ill-meaning-text",String(model.principle)));
+  if(model.case){
+    meaning.appendChild(node("strong","niti-ill-meaning-case-label","สถานการณ์ตัวอย่าง"));
+    meaning.appendChild(node("p","niti-ill-meaning-case",String(model.case)));
+  }
+  if(model.rule){
+    meaning.appendChild(node("strong","niti-ill-meaning-rule-label","หลักสำหรับเขียนตอบ"));
+    meaning.appendChild(node("p","niti-ill-meaning-rule",String(model.rule)));
+  }
+  host.insertBefore(meaning,image);
+  // ---------- Elements list (verbatim label + explanation) ----------
+  var elements=node("div","niti-ill-elements");
+  elements.appendChild(node("h3","niti-ill-elements-title","องค์ประกอบที่ต้องตรวจ"));
+  var elemProgress=node("p","niti-ill-elements-progress","");
+  elements.appendChild(elemProgress);
+  var elemList=node("ol","niti-ill-elements-list");
+  elements.appendChild(elemList);
+  if(image.nextSibling) host.insertBefore(elements,image.nextSibling); else host.appendChild(elements);
+  // ---------- SVG ----------
   var L=stripLayout(model.parts.length);
   var illustration=svg(image,"svg",{viewBox:"0 0 880 "+L.totalH,role:"group","aria-label":"ภาพเหตุการณ์ "+model.kindLabel+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
   var defs=svg(illustration,"defs",{});
   var marker=svg(defs,"marker",{id:"niti-svg-arrow",markerWidth:8,markerHeight:8,refX:6,refY:3,orient:"auto"});polygon(marker,"0,0 6,3 0,6","#278b93");
+  // Soft gradients + shadow for polished cards (visual only)
+  var grad=svg(defs,"linearGradient",{id:"niti-header-grad",x1:"0",y1:"0",x2:"0",y2:"1"});
+  svg(grad,"stop",{offset:"0%","stop-color":"#FFFFFF"});
+  svg(grad,"stop",{offset:"100%","stop-color":"#EFF6FF"});
+  var grad2=svg(defs,"linearGradient",{id:"niti-strip-grad",x1:"0",y1:"0",x2:"0",y2:"1"});
+  svg(grad2,"stop",{offset:"0%","stop-color":"#FFFFFF"});
+  svg(grad2,"stop",{offset:"100%","stop-color":"#F8FAFD"});
+  var filt=svg(defs,"filter",{id:"niti-soft-shadow",x:"-20%",y:"-20%",width:"140%",height:"140%"});
+  svg(filt,"feDropShadow",{dx:"0",dy:"3",stdDeviation:"6","flood-color":"#0F172A","flood-opacity":"0.10"});
   drawHeader(illustration,model);
   var stage=svg(illustration,"g",{transform:"translate(0,104)"});
   backdrop(stage,model);specialized(stage,model);drawStageCues(stage,model);
   // Condition Strip
-  rect(illustration,8,L.stripTop,864,L.stripH,"#FFFFFF",16,"#CBD5E1");
+  var stripRect=rect(illustration,8,L.stripTop,864,L.stripH,"url(#niti-strip-grad)",16,"#CBD5E1");
+  stripRect.setAttribute("filter","url(#niti-soft-shadow)");
   svg(illustration,"text",{x:24,y:L.stripTop+20,fill:"#111827","font-size":13.5,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},"เงื่อนไข / ประเด็นที่ต้องตรวจ — คลิกเพื่ออ่านรายละเอียด");
   var places=computePointSlots(model);
-  var mark=[],buttons=[],states=model.parts.map(function(){return "unknown";}),current=0;
+  var mark=[],buttons=[],elemButtons=[],states=model.parts.map(function(){return "unknown";}),current=0;
   var layout=svg(illustration,"g",{class:"niti-law-stages"});
   model.parts.forEach(function(part,i){
     var coord=places[i]||{x:440,y:L.stripTop+40,w:220,h:40};
@@ -342,6 +468,26 @@ function mount(host,model){
     button.type="button";button.setAttribute("aria-pressed","false");
     button.addEventListener("click",function(){select(i,true);});
     list.appendChild(button);buttons.push(button);
+    // Elements list item (verbatim)
+    var li=document.createElement("li");
+    li.className="niti-ill-element-item";
+    var eb=document.createElement("button");
+    eb.type="button";
+    eb.className="niti-ill-element-btn";
+    eb.setAttribute("aria-pressed","false");
+    eb.setAttribute("title",String(part.label));
+    var ebHead=node("span","niti-ill-element-head");
+    ebHead.appendChild(node("span","niti-ill-element-num",String(i+1)));
+    ebHead.appendChild(node("span","niti-ill-element-label",String(part.label)));
+    var tb2=node("span","niti-ill-type-badge",TYPE_STYLES[inferPartType(part)].label);
+    tb2.setAttribute("data-type",inferPartType(part));
+    ebHead.appendChild(tb2);
+    eb.appendChild(ebHead);
+    eb.appendChild(node("span","niti-ill-element-expl",String(part.explanation||"")));
+    eb.addEventListener("click",function(){select(i,true);});
+    li.appendChild(eb);
+    elemList.appendChild(li);
+    elemButtons.push(eb);
   });
   drawFooter(illustration,L.footerY);
   function updateCounter(){
@@ -349,6 +495,8 @@ function mount(host,model){
     var missing=states.filter(function(s){return s==="no";}).length;
     var unsure=states.filter(function(s){return s==="unknown";}).length;
     if(counter)counter.textContent="บันทึกข้อเท็จจริง: พบ "+found+" · ไม่พบ "+missing+" · ยังไม่แน่ใจ "+unsure+" (ไม่ได้ตัดสินผลคดีอัตโนมัติ)";
+    var checked=found+missing;
+    elemProgress.textContent="ตรวจแล้ว "+checked+" / "+states.length+" ประเด็น";
   }
   function choose(i,status){
     states[i]=status;
@@ -358,6 +506,11 @@ function mount(host,model){
     var p=model.parts[i];if(!p)return;current=i;
     mark.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
     buttons.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
+    elemButtons.forEach(function(e,j){
+      e.setAttribute("aria-pressed",String(j===i));
+      e.classList.toggle("is-active",j===i);
+      var li=e.parentElement; if(li) li.classList.toggle("is-active",j===i);
+    });
     details.replaceChildren();
     details.appendChild(node("span","niti-ill-step","ประเด็น "+(i+1)+" จาก "+model.parts.length));
     var tb=node("span","niti-ill-type-badge",TYPE_STYLES[inferPartType(p)].label);
@@ -381,8 +534,19 @@ function mount(host,model){
     updateCounter();
     if(focus){details.tabIndex=-1;details.focus({preventScroll:true});}
   }
+  function onKeys(ev){
+    if(!ev||!ev.key) return;
+    if(ev.key==="ArrowRight"||ev.key==="ArrowDown"){ ev.preventDefault(); select((current+1)%model.parts.length,true); }
+    else if(ev.key==="ArrowLeft"||ev.key==="ArrowUp"){ ev.preventDefault(); select((current-1+model.parts.length)%model.parts.length,true); }
+  }
+  host.addEventListener("keydown",onKeys);
   select(0,false);
-  return {dispose:function(){image.replaceChildren();}};
+  return {dispose:function(){
+    try{ if(typeof window!=="undefined"&&window.removeEventListener) window.removeEventListener("niti:statute-read-change",onReadChange); }catch(e){}
+    try{ host.removeEventListener("keydown",onKeys); }catch(e){}
+    image.replaceChildren();
+    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements").forEach(function(el){el.remove();});
+  }};
 }
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,inferPartType:inferPartType};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,inferPartType:inferPartType,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY};
 })();
