@@ -675,12 +675,23 @@ function renderUniversalCards(g, model, select, current){
   return marks;
 }
 
+
+/* Safe insert: falls back to appendChild when ref is null or not a child of parent.
+   Prevents NotFoundError (the popup-killing bug: image is NOT a direct child of host). */
+function safeInsertBefore(parent, node, ref){
+  try{
+    if(ref && ref.parentNode===parent) { parent.insertBefore(node, ref); return; }
+  }catch(e){}
+  try{ parent.appendChild(node); }catch(e2){}
+}
+
 /* ---------- mount ---------- */
 function mount(host,model){
   var image=host.querySelector(".niti-ill-image");
   var details=host.querySelector(".niti-ill-details");
   var list=host.querySelector(".niti-ill-list");
   var counter=host.querySelector(".niti-ill-progress");
+  var layoutEl=host.querySelector(".niti-ill-layout");
   if(!image||!details||!list||!model.parts||!model.parts.length)return {dispose:function(){}};
   host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz").forEach(function(el){el.remove();});
   image.replaceChildren();list.replaceChildren();
@@ -724,7 +735,7 @@ function mount(host,model){
     meaning.appendChild(node("strong","niti-ill-meaning-rule-label","หลักสำหรับเขียนตอบ"));
     meaning.appendChild(node("p","niti-ill-meaning-rule",String(model.rule)));
   }
-  host.insertBefore(meaning,image);
+  if(layoutEl) safeInsertBefore(host, meaning, layoutEl); else safeInsertBefore(host, meaning, host.firstChild);
   // Elements (verbatim)
   var elements=node("div","niti-ill-elements");
   elements.appendChild(node("h3","niti-ill-elements-title","องค์ประกอบที่ต้องตรวจ"));
@@ -732,7 +743,7 @@ function mount(host,model){
   elements.appendChild(elemProgress);
   var elemList=node("ol","niti-ill-elements-list");
   elements.appendChild(elemList);
-  if(image.nextSibling) host.insertBefore(elements,image.nextSibling); else host.appendChild(elements);
+  if(layoutEl && layoutEl.nextSibling) safeInsertBefore(host, elements, layoutEl.nextSibling); else host.appendChild(elements);
   // Strict Y-zoning SVG: viewBox 0 0 880 380 — Header 0-48 / Visual Strip 58-145 / Auto-Slot Cards 155-340 / Footer 340-380
   var illustration=svg(image,"svg",{viewBox:"0 0 880 380",role:"group","aria-label":"ภาพเหตุการณ์ "+(model.kindLabel||"")+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
   var defs=svg(illustration,"defs",{});
@@ -849,7 +860,7 @@ function mount(host,model){
   shareStatus.setAttribute("aria-live","polite");
   shareBar.appendChild(shareTitle); shareBar.appendChild(btnShare); shareBar.appendChild(btnCopyLink); shareBar.appendChild(shareStatus);
   // Insert shareBar after image (SVG container)
-  if(image.nextSibling) host.insertBefore(shareBar, image.nextSibling); else host.appendChild(shareBar);
+  if(elements.nextSibling) safeInsertBefore(host, shareBar, elements.nextSibling); else host.appendChild(shareBar);
   function sectionLink(){
     try{
       var origin=window.location.origin||"";
@@ -925,7 +936,7 @@ function mount(host,model){
   quizFeedback.setAttribute("aria-live","polite");
   quizWrap.appendChild(quizFeedback);
   // Insert quiz after shareBar
-  if(shareBar.nextSibling) host.insertBefore(quizWrap, shareBar.nextSibling); else host.appendChild(quizWrap);
+  if(shareBar.nextSibling) safeInsertBefore(host, quizWrap, shareBar.nextSibling); else host.appendChild(quizWrap);
   var correctText=String(model.rule||model.principle||"").trim();
   var distractorText="ไม่ต้องพิจารณาเงื่อนไขอื่นเลย";
   var numericPart=parseInt(String(model.id||""),10);
