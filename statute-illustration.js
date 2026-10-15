@@ -1,5 +1,6 @@
 /* NITI illustrated legal scenarios: accessible 2D SVG and no external rendering dependencies.
- * Each section uses its own source-backed learning issues, scenario and props.
+ * Zero-collision build: SVG holds ONLY short role/verb/number badges (wrapped, measured).
+ * Long Thai explanations live in HTML panels (meaning / elements / conditions grid) where text can flow.
  * SVG selection and HTML controls explain facts, not issue an automated legal judgment.
  */
 (function(){
@@ -18,6 +19,7 @@ var ROLE_STYLES=[
   {label:"บุคคลภายนอก / ทะเบียน",color:"#6D28D9",bg:"#EDE9FE"}
 ];
 
+/* ---------- localStorage read/unread (unchanged behaviour) ---------- */
 var READ_KEY="niti-statute-read-v1";
 var readMem={};
 function loadReadMap(){
@@ -57,7 +59,6 @@ function setReadStatus(id, read){
   var updatedAt=new Date().toISOString();
   var map=loadReadMap();
   map[key]={read:want, updatedAt:updatedAt};
-  // keep in-memory mirror so private-mode still reflects UI in this session
   readMem[key]=map[key];
   saveReadMap(map);
   try{
@@ -69,7 +70,6 @@ function setReadStatus(id, read){
 }
 function overallReadText(){
   var map=loadReadMap();
-  // merge in-memory (private-mode) entries
   Object.keys(readMem).forEach(function(k){ if(!map[k]) map[k]=readMem[k]; });
   var ids=null;
   try{ if(typeof window!=="undefined"&&window.NITI_DIORAMA_DATA&&Array.isArray(window.NITI_DIORAMA_DATA.ids)) ids=window.NITI_DIORAMA_DATA.ids; }catch(e){}
@@ -88,59 +88,93 @@ function inferPartType(part){
   if(/หรือ|ทางเลือก|อย่างใด|เลือก/.test(s))return "alternative";
   return "mandatory";
 }
-function truncateForWidth(text,maxChars){
-  var t=String(text||"");
-  if(t.length<=maxChars)return t;
-  return t.slice(0,Math.max(1,maxChars-1))+"…";
+
+/* ---------- Thai text measurement + wrapping (zero-collision) ---------- */
+var _measureCtx=null;
+function measureThaiTextWidth(text, fontSize, fontWeight){
+  var s=String(text||"");
+  try{
+    if(typeof document!=="undefined"&&document.createElement){
+      if(!_measureCtx){ var cv=document.createElement("canvas"); _measureCtx=cv.getContext("2d"); }
+      if(_measureCtx){
+        _measureCtx.font=(fontWeight||"700")+" "+fontSize+"px Sarabun, Tahoma, sans-serif";
+        return _measureCtx.measureText(s).width;
+      }
+    }
+  }catch(e){}
+  return s.length*fontSize*0.62;
 }
-function stripLayout(n){
-  var cols=n<=1?1:n===2?2:n===3?3:n===4?4:3;
-  var rows=Math.max(1,Math.ceil(n/cols));
-  var pillW=(880-32-(cols-1)*10)/cols;
-  var pillH=40;
-  var stripTop=542;
-  var titleH=28;
-  var stripH=titleH+rows*pillH+(rows-1)*8+14;
-  var footerY=stripTop+stripH+10;
-  var totalH=footerY+22;
-  return {cols:cols,rows:rows,pillW:pillW,pillH:pillH,stripTop:stripTop,titleH:titleH,stripH:stripH,footerY:footerY,totalH:totalH};
+function segmentThai(text){
+  var s=String(text||"");
+  try{
+    if(typeof Intl!=="undefined"&&typeof Intl.Segmenter==="function"){
+      var seg=new Intl.Segmenter("th",{granularity:"word"});
+      var out=[]; var it=seg.segment(s);
+      for(var segItem of it){ out.push(segItem.segment); }
+      if(out.length) return out;
+    }
+  }catch(e){}
+  // Fallback: split keeping spaces, then split long tokens by chars
+  var parts=s.split(/(\s+)/).filter(function(x){return x.length;});
+  var res=[];
+  parts.forEach(function(p){ if(p.length<=12) res.push(p); else { for(var i=0;i<p.length;i+=12) res.push(p.slice(i,i+12)); } });
+  return res;
 }
-function drawHeader(g,model){
-  rect(g,0,0,880,96,"#FFFFFF",0,"#CBD5E1");
-  // Section badge
-  rect(g,16,16,112,34,"#1E40AF",17);
-  svg(g,"text",{x:72,y:38,fill:"#FFFFFF","font-size":15,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},"มาตรา "+String(model.id||""));
-  // Title + kind
-  var title=String(model.title||("มาตรา "+String(model.id||"")));
-  title=truncateForWidth(title,48);
-  svg(g,"text",{x:140,y:33,fill:"#111827","font-size":20,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},title);
-  svg(g,"text",{x:140,y:56,fill:"#4B5563","font-size":13.5,"font-weight":600,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},"หมวด: "+String(model.kindLabel||model.kind||""));
-  // Legend row: types + roles (visual only)
-  var lx=16, ly=80;
-  var items=[];
-  Object.keys(TYPE_STYLES).forEach(function(k){items.push({label:TYPE_STYLES[k].label,color:TYPE_STYLES[k].color,bg:TYPE_STYLES[k].bg,shape:"circle"});});
-  ROLE_STYLES.forEach(function(r){items.push({label:r.label,color:r.color,bg:r.bg,shape:"square"});});
-  items.forEach(function(it){
-    if(it.shape==="circle"){circle(g,lx+6,ly,5.5,it.color);}
-    else{rect(g,lx,ly-5.5,12,11,it.bg,2,it.color);}
-    svg(g,"text",{x:lx+16,y:ly+4,fill:"#374151","font-size":11,"font-weight":600,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},it.label);
-    lx+=16+it.label.length*7.2+16;
-  });
-}
-function drawStageCues(g,model){
-  // Archetype-aware, visual-only cues. No new legal facts.
-  if(model.id==="1387"||model.id==="1401"){
-    rect(g,240,8,400,30,"#EDE9FE",15,"#6D28D9");
-    svg(g,"text",{x:440,y:28,fill:"#4C1D95","font-size":13.5,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},"สามยทรัพย์ ↔ ภารยทรัพย์ — เปรียบเทียบสองฝั่ง");
-  } else if(model.kind==="mortgage"||model.kind==="time"){
-    rect(g,290,8,300,30,"#FFFBEB",15,"#B45309");
-    svg(g,"text",{x:440,y:28,fill:"#92400E","font-size":13.5,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},"ลำดับเวลา / ขั้นตอน — ดูรายละเอียดในแต่ละประเด็น");
+function wrapThaiSvgLines(text, maxWidth, fontSize, maxLines){
+  var s=String(text||"").replace(/\s+/g," ").trim();
+  if(!s) return [""];
+  var words=segmentThai(s);
+  var lines=[]; var cur="";
+  function fits(t){ return measureThaiTextWidth(t, fontSize, "700")<=maxWidth; }
+  for(var i=0;i<words.length;i++){
+    var w=words[i];
+    if(!cur){ 
+      if(fits(w)){ cur=w; } else {
+        // hard-break a single overlong word by chars
+        var chunk="";
+        for(var c=0;c<w.length;c++){
+          var trial=chunk+w[c];
+          if(fits(trial)) chunk=trial; else { lines.push(chunk); chunk=w[c]; }
+        }
+        cur=chunk;
+      }
+    } else {
+      var trial2=cur+w;
+      if(fits(trial2)) cur=trial2;
+      else { lines.push(cur); cur=w; }
+    }
+    if(lines.length>= (maxLines||2)){
+      // overflow: ellipsis on last visible line
+      var last=lines[lines.length-1]||"";
+      while(last.length>1 && !fits(last+"…")) last=last.slice(0,-1);
+      lines[lines.length-1]=last+"…";
+      return lines.slice(0,maxLines||2);
+    }
   }
+  if(cur) lines.push(cur);
+  if(lines.length>(maxLines||2)){
+    var truncated=lines.slice(0,maxLines||2);
+    var l=truncated[truncated.length-1];
+    while(l.length>1 && !fits(l+"…")) l=l.slice(0,-1);
+    truncated[truncated.length-1]=l+"…";
+    return truncated;
+  }
+  return lines;
 }
-function drawFooter(g,footerY){
-  svg(g,"text",{x:440,y:footerY+14,fill:"#6B7280","font-size":12.5,"font-weight":600,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},FOOTER_DISCLAIMER);
+function shortBadge(text, maxChars){
+  var s=String(text||"").trim();
+  if(s.length<= (maxChars||16)) return s;
+  return s.slice(0, Math.max(1,(maxChars||16)-1))+"…";
+}
+/* Short verb badges for SVG only — truncated display of existing part labels, never new legal text */
+function svgVerbForPart(part, index){
+  var label=String((part&&part.label)||"");
+  // Keep SVG to ~2 short tokens: prefer first clause before / or ,
+  var first=label.split(/[\/,·;]/)[0].trim();
+  return shortBadge(first, 16);
 }
 
+/* ---------- SVG primitives ---------- */
 var NS="http://www.w3.org/2000/svg";
 function node(tag,cls,txt){
  var e=document.createElement(tag);if(cls)e.className=cls;
@@ -154,9 +188,6 @@ function svg(parent,tag,attrs,txt){
  parent.appendChild(e);return e;
 }
 function shape(g,tag,attrs){return svg(g,tag,attrs);}
-function label(g,x,y,text,style){
- return svg(g,"text",{x:x,y:y,fill:style||"#20415b","font-size":17,"font-weight":750,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},text);
-}
 function rect(g,x,y,w,h,fill,rx,stroke){
  return shape(g,"rect",{x:x,y:y,width:w,height:h,rx:rx||0,fill:fill,stroke:stroke||"none","stroke-width":2});
 }
@@ -168,6 +199,31 @@ function line(g,x1,y1,x2,y2,stroke,width,dash){
 }
 function polygon(g,points,fill){
  return shape(g,"polygon",{points:points,fill:fill,stroke:"#496477","stroke-width":2,"stroke-linejoin":"round"});
+}
+/* Wrapped multi-line SVG text: lineHeight 20 avoids tone-mark collision */
+function svgMultiline(g, x, y, text, opts){
+  var o=opts||{};
+  var fontSize=o.fontSize||14;
+  var maxWidth=o.maxWidth||160;
+  var maxLines=o.maxLines||2;
+  var fill=o.fill||"#1F2937";
+  var weight=o.weight||"700";
+  var anchor=o.anchor||"middle";
+  var lines=wrapThaiSvgLines(text, maxWidth, fontSize, maxLines);
+  var el=svg(g,"text",{x:x,y:y,fill:fill,"font-size":fontSize,"font-weight":weight,"text-anchor":anchor,"font-family":"Sarabun, Tahoma, sans-serif","text-size-adjust":"none"});
+  lines.forEach(function(ln, idx){
+    var tsp=svg(el,"tspan",{x:x, dy: idx===0?0:20}, ln);
+    void tsp;
+  });
+  return el;
+}
+function svgBadge(g, cx, cy, w, h, text, style){
+  var st=style||{color:"#047857",bg:"#ECFDF5"};
+  var r=rect(g, cx-w/2, cy-h/2, w, h, st.bg, h/2, st.color);
+  r.setAttribute("stroke-width","2");
+  if(st.dashed) r.setAttribute("stroke-dasharray","6 4");
+  svgMultiline(g, cx, cy+5, text, {fontSize:12.5, maxWidth:w-14, maxLines:1, fill:st.color, weight:"800"});
+  return r;
 }
 function drawHouse(g,x,y,s,color){
  var h=svg(g,"g",{transform:"translate("+x+","+y+") scale("+s+")"});
@@ -192,7 +248,8 @@ function drawPaper(g,x,y,s){
 function drawCoins(g,x,y,s){
  var p=svg(g,"g",{transform:"translate("+x+","+y+") scale("+s+")"});
  for(var i=0;i<3;i++){rect(p,-40+i*25,20-i*12,38,13,"#e9bc57",6,"#a27a2c");}
- circle(p,12,-12,20,"#ffd66e","#ae822e");label(p,12,-6,"฿","#684917");
+ circle(p,12,-12,20,"#ffd66e","#ae822e");
+ svgMultiline(p,12,-6,"฿",{fontSize:16,maxWidth:20,maxLines:1,fill:"#684917",weight:"800"});
  return p;
 }
 function drawPerson(g,x,y,s,color){
@@ -209,8 +266,21 @@ function drawClock(g,x,y,s){
  circle(p,0,0,5,"#33516c");return p;
 }
 function drawArrow(g,x1,y1,x2,y2,color){
- var p=shape(g,"path",{d:"M"+x1+" "+y1+" L"+x2+" "+y2,fill:"none",stroke:color||"#278b93","stroke-width":6,"stroke-linecap":"round","marker-end":"url(#niti-svg-arrow)"});
- return p;
+ return shape(g,"path",{d:"M"+x1+" "+y1+" L"+x2+" "+y2,fill:"none",stroke:color||"#278b93","stroke-width":5,"stroke-linecap":"round","marker-end":"url(#niti-svg-arrow)"});
+}
+function drawEnvelope(g,x,y,s){
+  var p=svg(g,"g",{transform:"translate("+x+","+y+") scale("+s+")"});
+  rect(p,-44,-28,88,56,"#FFFFFF",6,"#367DA0");
+  shape(p,"path",{d:"M-44 -28 L0 8 L44 -28",fill:"none",stroke:"#367DA0","stroke-width":3});
+  svgMultiline(p,0,26,"หนังสือ",{fontSize:11,maxWidth:70,maxLines:1,fill:"#1E40AF",weight:"800"});
+  return p;
+}
+function drawGavel(g,x,y,s){
+  var p=svg(g,"g",{transform:"translate("+x+","+y+") scale("+s+")"});
+  line(p,-30,30,18,-12,"#946448",11);
+  rect(p,-2,-38,52,20,"#AC7959",5);
+  rect(p,-38,38,76,8,"#8B5E3C",3);
+  return p;
 }
 function drawObject(g,kind,x,y,s){
  var p=svg(g,"g",{transform:"translate("+x+","+y+") scale("+s+")"});
@@ -218,7 +288,7 @@ function drawObject(g,kind,x,y,s){
  case "parcel":drawParcel(p,-53,-33,106,72,"#b9e3ac",true);break;
  case "house":drawHouse(p,0,18,1);break;
  case "path":rect(p,-62,-14,124,30,"#98b1c0",10);line(p,-47,1,48,1,"#fff7e8",4,"14 12");break;
- case "registry":rect(p,-53,-13,106,68,"#c1eaf4",10,"#698999");rect(p,-60,-35,120,28,"#367da0",6);label(p,0,-15,"ทะเบียน","#ffffff");rect(p,-20,12,40,45,"#fbf3de",4);break;
+ case "registry":rect(p,-53,-13,106,68,"#c1eaf4",10,"#698999");rect(p,-60,-35,120,28,"#367da0",6);svgMultiline(p,0,-15,"ทะเบียน",{fontSize:12,maxWidth:80,maxLines:1,fill:"#ffffff",weight:"800"});rect(p,-20,12,40,45,"#fbf3de",4);break;
  case "document":case "letter":case "stamp":drawPaper(p,0,0,1);break;
  case "coins":drawCoins(p,0,0,1);break;
  case "person":drawPerson(p,0,18,1);break;
@@ -227,167 +297,175 @@ function drawObject(g,kind,x,y,s){
  case "watch":drawClock(p,0,0,.8);rect(p,-17,-62,34,31,"#648d9e",6);rect(p,-17,31,34,31,"#648d9e",6);break;
  case "pledge":drawObject(p,"watch",-20,2,.55);drawObject(p,"handshake",26,23,.53);break;
  case "fence":for(var i=0;i<5;i++)rect(p,-52+i*27,-34,9,75,"#b98569",3);line(p,-58,12,62,12,"#805c45",9);break;
- case "permission":case "shield":case "lock":rect(p,-42,-34,84,76,"#d6f1e1",16,"#5a9b84");label(p,0,10,"✓","#277957");break;
- case "warning":case "crack":polygon(p,"0,-49 -52,46 52,46","#ffe1a1");label(p,0,29,"!","#b56637");break;
+ case "permission":case "shield":case "lock":rect(p,-42,-34,84,76,"#d6f1e1",16,"#5a9b84");svgMultiline(p,0,10,"✓",{fontSize:20,maxWidth:30,maxLines:1,fill:"#277957",weight:"800"});break;
+ case "warning":case "crack":polygon(p,"0,-49 -52,46 52,46","#ffe1a1");svgMultiline(p,0,29,"!",{fontSize:20,maxWidth:30,maxLines:1,fill:"#b56637",weight:"800"});break;
  case "goods":case "selector":case "gift":rect(p,-48,-27,96,74,"#eac48a",9,"#ab7c52");rect(p,-5,-27,12,74,"#fff1c7",2);break;
  case "car":rect(p,-62,-15,126,46,"#79b4dc",12);rect(p,-25,-42,62,30,"#cde9ff",8);circle(p,-39,32,14,"#415267");circle(p,39,32,14,"#415267");break;
  case "bike":circle(p,-46,18,23,"none","#4c6679");circle(p,46,18,23,"none","#4c6679");polygon(p,"-46,18 -11,-15 12,18 -46,18","#91c7ea");break;
  case "handshake":drawPerson(p,-29,8,.62,"#6592b8");drawPerson(p,29,8,.62,"#75ab8b");line(p,-10,23,12,23,"#ad7a5d",12);break;
  case "flag":line(p,-22,-47,-22,48,"#5f8294",6);polygon(p,"-18,-45 49,-32 -18,-8","#ec9478");break;
  case "eye":circle(p,0,1,26,"#e6f3fa","#4f8cad");circle(p,0,1,12,"#4c6687");break;
- case "auction":case "gavel":line(p,-38,39,24,-16,"#946448",12);rect(p,-3,-48,60,23,"#ac7959",5);break;
+ case "auction":case "gavel":drawGavel(p,0,0,1);break;
  case "tent":polygon(p,"-61,43 0,-48 61,43","#edbf84");line(p,0,-48,0,43,"#d47a60",4);break;
  case "tool":line(p,-35,42,31,-40,"#956b4f",13);rect(p,3,-47,58,15,"#8ba8af",3);break;
  default:drawPaper(p,0,0,.86);
  }
  return p;
 }
-function backdrop(g,model){
- rect(g,0,0,880,430,"#e9f5fa",20);
- circle(g,758,71,36,"#ffe2a4");
- shape(g,"path",{d:"M0 304 Q160 241 312 293 T620 275 T880 296 L880 430 L0 430 Z",fill:"#cde9cf"});
- var kind=model.kind;
- if(kind==="servitude"){
-  drawParcel(g,70,172,320,175,"#a8deaa",true);
-  drawParcel(g,490,172,320,175,"#adddbf",true);
-  rect(g,395,168,78,183,"#b5bec2",6);
-  line(g,433,195,433,332,"#fefaf0",4,"12 12");
-  label(g,230,370,"ที่ดินแปลงที่ 1");label(g,655,370,"ที่ดินแปลงที่ 2");
- }else if(kind==="registry"||kind==="mortgage"||kind==="boundary"){
-  drawParcel(g,75,170,315,166,"#b9dfaa",true);
-  if(kind==="boundary"){rect(g,433,171,8,171,"#cc7e68",3);drawParcel(g,485,172,302,165,"#c5e2c1",false);drawHouse(g,444,296,1.10,"#ffe0c2");label(g,440,402,"ตัวบ้านรุกล้ำแนวเขต");}
-  else{drawObject(g,kind==="mortgage"?"bank":"registry",642,270,1.15);}
-  label(g,230,371,"ทรัพย์และเจ้าของ");label(g,650,371,kind==="mortgage"?"เจ้าหนี้ / หลักประกัน":"หลักฐาน / สำนักงานที่ดิน");
- }else if(kind==="pledge"||kind==="trade"||kind==="exchange"||kind==="gift"||kind==="borrow"||kind==="obligation"){
-  drawPerson(g,133,253,1.38,"#4c84aa");drawPerson(g,749,253,1.38,"#6ea68a");
-  rect(g,250,301,388,38,"#bd9576",8);
-  label(g,136,351,"ผู้ให้ / ผู้ขาย");label(g,748,351,"ผู้รับ / ผู้ซื้อ");
-  if(kind==="pledge")drawObject(g,"watch",444,250,.67);
-  else if(kind==="exchange")drawObject(g,"goods",444,245,.67);
-  else drawObject(g,"handshake",444,236,.80);
- }else if(kind==="loan"){
-  drawPerson(g,195,255,1.38,"#6792c5");drawPerson(g,687,255,1.38,"#85b5a3");drawObject(g,"coins",442,267,1.10);
-  label(g,195,360,"ผู้กู้");label(g,687,360,"ผู้ให้กู้");
- }else if(kind==="guarantee"){
-  drawPerson(g,162,255,1.30,"#6792c5");drawPerson(g,434,255,1.30,"#85b5a3");
-  drawObject(g,"bank",710,259,1.1);
-  label(g,150,360,"ลูกหนี้");label(g,432,360,"ผู้ค้ำ");label(g,710,360,"เจ้าหนี้");
- }else if(kind==="lease"||kind==="hire"){
-  drawHouse(g,225,265,1.48);drawPerson(g,647,280,1.30,"#719bc7");
-  drawArrow(g,340,231,528,231);label(g,435,204,"สัญญา / การใช้ทรัพย์");
- }else if(kind==="possession"||kind==="property"){
-  drawParcel(g,77,184,720,169,"#b5dba8",true);
-  drawPerson(g,685,267,1.10,"#739ac0");
-  label(g,453,373,kind==="possession"?"ใครยึดถือ · ถือแทนใคร · นานเท่าไร":"ใครเป็นเจ้าของ · ทรัพย์นั้นมีสถานะใด");
- }else if(kind==="time"){
-  drawClock(g,248,266,1.55);drawPaper(g,625,269,.96);
-  drawArrow(g,370,263,501,263);label(g,442,224,"นับเวลาและใช้สิทธิ");
- }else{
-  drawPaper(g,268,273,1.0);drawPerson(g,644,269,1.15);
-  drawArrow(g,377,261,511,261);
- }
-}
-function specialized(g,model){
- // Large, meaningful visual legal distinction in the center of the scene.
- if(model.id==="1299"||model.id==="456"){
-  rect(g,170,78,540,62,"#fffdfa",14,"#80b8bf");
-  label(g,440,103,model.id==="1299"?"ได้โดยนิติกรรม  /  ได้โดยทางอื่น":"ตรวจประเภทสัญญาและทรัพย์");
-  label(g,440,129,"หนังสือ · จดทะเบียน · สิทธิบุคคลภายนอก");
- }
- if(model.id==="728"){
-  rect(g,96,89,684,72,"#fff8ec",14,"#ca9b59");
-  label(g,438,115,"ผิดนัด → บอกกล่าวเป็นหนังสือ → อย่างน้อย 60 วัน");
-  label(g,438,144,"กรณีผู้จำนองเป็นบุคคลภายนอกต้องตรวจการแจ้งเพิ่มเติม");
- }
- if(model.id==="1382"){
-  rect(g,164,75,550,68,"#fffdf4",12,"#88a5ac");
-  label(g,440,103,"สงบ · เปิดเผย · เจตนาเป็นเจ้าของ · ต่อเนื่อง");
-  label(g,440,131,"อสังหาริมทรัพย์ 10 ปี  /  สังหาริมทรัพย์ 5 ปี");
- }
- if(model.id==="747"){
-  rect(g,286,86,309,49,"#fffaf0",12,"#82b4ae");
-  label(g,440,117,"ของจำนำต้องส่งมอบจริง");
- }
- if(model.id==="1401"){
-  rect(g,170,78,540,51,"#fffaf0",12,"#82b4ae");
-  label(g,440,109,"ใช้ทางเป็นสิทธิ หรือแค่ได้รับอนุญาต?");
- }
- if(model.id==="144"){
-  rect(g,230,250,395,26,"#ad805b",7);
-  for(var i=0;i<4;i++){rect(g,252+i*109,275,19,60,"#a97853",4);}
-  drawObject(g,"tool",710,265,.75);
-  label(g,435,376,"โต๊ะและขาที่แยกออกแล้วอาจเสียรูป");
- }
- if(model.id==="146"){
-  drawObject(g,"tent",450,269,1.35);
-  label(g,443,376,"สิ่งปลูกสร้างชั่วคราวบนที่ดิน");
- }
- if(model.id==="1401"){
-  drawObject(g,"clock",293,280,.55);drawObject(g,"permission",589,280,.53);
- }
- if(model.id==="1332"){
-  drawObject(g,"goods",447,254,.70);
-  label(g,438,383,"สุจริต · แหล่งซื้อ · ชดใช้ราคาก่อนคืน");
- }
- if(model.id==="574"){
-  drawObject(g,"car",440,286,.9);drawObject(g,"calendar",624,264,.55);
- }
- if(model.id==="640"||model.id==="641"){
-  drawObject(g,"bike",440,270,1.02);
- }
- if(model.id==="193/27"){
-  drawObject(g,"pledge",442,286,.85);
- }
 
+/* ---------- Compact header (measured, no overlap) ---------- */
+function drawHeader(g,model){
+  rect(g,0,0,880,64,"#FFFFFF",0,"#CBD5E1");
+  rect(g,16,16,104,32,"#1E40AF",16);
+  svgMultiline(g,68,37,"มาตรา "+String(model.id||""),{fontSize:14,maxWidth:96,maxLines:1,fill:"#FFFFFF",weight:"800"});
+  var title=String(model.title||("มาตรา "+String(model.id||"")));
+  svgMultiline(g,132,30,title,{fontSize:18,maxWidth:560,maxLines:1,fill:"#111827",weight:"800",anchor:"start"});
+  svgMultiline(g,132,52,"หมวด: "+String(model.kindLabel||model.kind||""),{fontSize:12.5,maxWidth:560,maxLines:1,fill:"#4B5563",weight:"600",anchor:"start"});
+  // Legend: 3 role pills, measured spacing, right-aligned, never overlapping title
+  var lx=880-16;
+  var pills=ROLE_STYLES.slice().reverse();
+  pills.forEach(function(r){
+    var w=Math.ceil(measureThaiTextWidth(r.label,11,"700"))+28;
+    lx-=w;
+    var rr=rect(g,lx,20,w,24,r.bg,12,r.color); rr.setAttribute("stroke-width","1.5");
+    svgMultiline(g,lx+w/2,36,r.label,{fontSize:11,maxWidth:w-12,maxLines:1,fill:r.color,weight:"700"});
+    lx-=8;
+  });
 }
-function computePointSlots(model){
+function drawFooter(g){
+  svgMultiline(g,440,386,FOOTER_DISCLAIMER,{fontSize:12,maxWidth:800,maxLines:1,fill:"#6B7280",weight:"600"});
+}
+
+/* ---------- Action-based stages: WHO does WHAT to WHOM + consequence ---------- */
+function actionBox(g, cx, cy, w, h, fill, stroke, titleText, subText){
+  var r=rect(g,cx-w/2,cy-h/2,w,h,fill,14,stroke); r.setAttribute("stroke-width","2.5");
+  svgMultiline(g,cx,cy-8,titleText,{fontSize:14,maxWidth:w-16,maxLines:1,fill:"#111827",weight:"800"});
+  if(subText) svgMultiline(g,cx,cy+14,subText,{fontSize:12,maxWidth:w-16,maxLines:1,fill:"#475569",weight:"600"});
+  return r;
+}
+function drawStage728(g){
+  // Timeline: house+chain -> letter -> calendar >=60 -> court. Dashed branch for third-party mortgagor.
+  rect(g,0,0,880,296,"#F8FAFD",0);
+  // Node 1: house with chain
+  actionBox(g,120,150,190,110,"#FFEDD5","#C2410C","บ้านจำนอง","หนี้ถึงกำหนด");
+  drawHouse(g,120,205,0.55,"#fff4d8");
+  svgBadge(g,120,240,120,26,"ไม่ชำระ",{color:"#C2410C",bg:"#FFEDD5"});
+  drawArrow(g,220,150,275,150,"#047857");
+  // Node 2: envelope
+  actionBox(g,375,150,200,110,"#DBEAFE","#1E40AF","บอกกล่าว","เป็นหนังสือ");
+  drawEnvelope(g,375,205,0.6);
+  drawArrow(g,480,150,535,150,"#047857");
+  // Node 3: calendar >=60
+  actionBox(g,640,150,200,110,"#FEF3C7","#B45309","≥ 60 วัน","นับแต่ได้รับหนังสือ");
+  drawClock(g,640,205,0.55);
+  drawArrow(g,740,150,790,150,"#047857");
+  // Node 4: enforcement (compact, right edge) — use badge + gavel icon below to avoid overlap
+  actionBox(g,820,110,110,64,"#D1FAE5","#047857","บังคับจำนอง","ฟ้องศาล");
+  drawGavel(g,820,205,0.7);
+  // Dashed branch: third-party mortgagor — generic wording only, NO invented deadline
+  var br=rect(g,240,268,400,28,"#FEF2F2",14,"#B91C1C"); br.setAttribute("stroke-dasharray","6 4"); br.setAttribute("stroke-width","2");
+  svgMultiline(g,440,286,"กรณีผู้จำนองบุคคลภายนอก — ตรวจการแจ้งเพิ่มเติม",{fontSize:12,maxWidth:384,maxLines:1,fill:"#B91C1C",weight:"700"});
+}
+function drawStage1387(g){
+  rect(g,0,0,880,296,"#F8FAFD",0);
+  // Plot B (left) = สามยทรัพย์, Plot A (right) = ภารยทรัพย์, public road bottom
+  rect(g,40,90,340,150,"#DBEAFE",14,"#1E40AF");
+  svgMultiline(g,210,118,"สามยทรัพย์",{fontSize:15,maxWidth:200,maxLines:1,fill:"#1E40AF",weight:"800"});
+  svgMultiline(g,210,140,"ที่ดินได้ประโยชน์",{fontSize:12,maxWidth:280,maxLines:1,fill:"#1E3A8A",weight:"600"});
+  drawHouse(g,210,195,0.7,"#EFF6FF");
+  rect(g,500,90,340,150,"#FFEDD5",14,"#C2410C");
+  svgMultiline(g,670,118,"ภารยทรัพย์",{fontSize:15,maxWidth:200,maxLines:1,fill:"#C2410C",weight:"800"});
+  svgMultiline(g,670,140,"ที่ดินรับภาระ",{fontSize:12,maxWidth:280,maxLines:1,fill:"#7C2D12",weight:"600"});
+  drawHouse(g,670,195,0.7,"#FFF7ED");
+  // Passage arrow through A to public road
+  rect(g,380,150,120,28,"#D1FAE5",14,"#047857");
+  svgMultiline(g,440,168,"ทางผ่าน",{fontSize:12,maxWidth:100,maxLines:1,fill:"#047857",weight:"800"});
+  drawArrow(g,380,190,500,190,"#047857");
+  rect(g,40,256,800,28,"#E2E8F0",8,"#64748B");
+  svgMultiline(g,440,274,"ถนนสาธารณะ",{fontSize:12,maxWidth:200,maxLines:1,fill:"#334155",weight:"700"});
+  svgBadge(g,210,292,220,26,"ยอมรับกรรม",{color:"#047857",bg:"#D1FAE5"});
+  svgBadge(g,670,292,220,26,"งดเว้นใช้สิทธิ",{color:"#B91C1C",bg:"#FEE2E2"});
+}
+function drawStage1382(g){
+  rect(g,0,0,880,296,"#F8FAFD",0);
+  actionBox(g,190,130,300,96,"#F1F5F9","#64748B","เจ้าของเดิม","มีโฉนด แต่ไม่ใช้ที่ดิน");
+  drawPerson(g,190,215,0.8,"#94A3B8");
+  svgMultiline(g,190,262,"ไม่ดูแล",{fontSize:12,maxWidth:120,maxLines:1,fill:"#475569",weight:"700"});
+  drawArrow(g,350,130,420,130,"#047857");
+  actionBox(g,600,130,320,96,"#D1FAE5","#047857","ผู้ครอบครอง","สงบ · เปิดเผย · เจตนาเป็นเจ้าของ");
+  // Fence + tree icons for possession
+  drawObject(g,"fence",520,215,0.6);
+  drawObject(g,"flag",690,215,0.6);
+  // Time bar
+  rect(g,120,272,640,28,"#FEF3C7",14,"#B45309");
+  svgMultiline(g,440,290,"ที่ดิน 10 ปี / สังหาริมทรัพย์ 5 ปี → ได้กรรมสิทธิ์",{fontSize:12.5,maxWidth:600,maxLines:1,fill:"#92400E",weight:"800"});
+}
+function drawStageGeneric(g, model){
+  // Generic action template: Actor A -> verb -> Actor B + consequence, using kind only
+  rect(g,0,0,880,296,"#F8FAFD",0);
+  var kind=String(model.kind||"");
+  var left="ฝ่ายหนึ่ง", right="อีกฝ่ายหนึ่ง", verb="ทำนิติกรรม", conseq="ตรวจผลตามมาตรา";
+  if(kind==="guarantee"){ left="เจ้าหนี้"; right="ผู้ค้ำ + ลูกหนี้"; verb="ค้ำประกัน"; conseq="รับผิดตามหนี้หลัก"; }
+  else if(kind==="lease"||kind==="hire"){ left="ผู้ให้เช่า"; right="ผู้เช่า"; verb="ให้ใช้ทรัพย์"; conseq="ใช้ตามสัญญา"; }
+  else if(kind==="pledge"){ left="ผู้จำนำ"; right="ผู้รับจำนำ"; verb="ส่งมอบทรัพย์"; conseq="เป็นหลักประกัน"; }
+  else if(kind==="mortgage"){ left="ผู้จำนอง"; right="ผู้รับจำนอง"; verb="ตราจำนอง"; conseq="ไม่ต้องส่งมอบ"; }
+  else if(kind==="loan"){ left="ผู้ให้กู้"; right="ผู้กู้"; verb="ให้กู้เงิน"; conseq="คืนเงิน + ดอกเบี้ย"; }
+  else if(kind==="registry"){ left="คู่กรณี"; right="พนักงานเจ้าหน้าที่"; verb="จดทะเบียน"; conseq="สมบูรณ์ตามแบบ"; }
+  else if(kind==="time"){ left="เจ้าหนี้"; right="ลูกหนี้"; verb="นับเวลา"; conseq="อายุความ"; }
+  else if(kind==="possession"||kind==="property"){ left="ผู้ยึดถือ"; right="เจ้าของ"; verb="ครอบครอง"; conseq="ตรวจเจตนา + เวลา"; }
+  else if(kind==="trade"||kind==="exchange"||kind==="gift"||kind==="borrow"){ left="ผู้ให้ / ผู้ขาย"; right="ผู้รับ / ผู้ซื้อ"; verb="ส่งมอบ"; conseq="ตรวจกรรมสิทธิ์"; }
+  actionBox(g,190,150,260,110, "#DBEAFE","#1E40AF", left, "ผู้ทรงสิทธิ / ผู้ให้");
+  drawPerson(g,190,230,0.9,"#4C84AA");
+  drawArrow(g,330,150,450,150,"#047857");
+  svgBadge(g,390,120,140,28,verb,{color:"#047857",bg:"#D1FAE5"});
+  actionBox(g,640,150,260,110, "#FFEDD5","#C2410C", right, "ผู้มีหน้าที่ / ผู้รับ");
+  drawPerson(g,640,230,0.9,"#6EA68A");
+  svgBadge(g,440,270,260,28,conseq,{color:"#1E40AF",bg:"#DBEAFE"});
+}
+function drawActionStage(g, model){
+  if(String(model.id)==="728") drawStage728(g);
+  else if(String(model.id)==="1387") drawStage1387(g);
+  else if(String(model.id)==="1382") drawStage1382(g);
+  else drawStageGeneric(g, model);
+}
+
+/* Legacy: keep backdrop for API compat (not used in new mount) */
+function backdrop(g,model){ drawActionStage(g, model); }
+function specialized(g,model){ /* kept as no-op: action stage already encodes meaning */ }
+
+/* ---------- SVG markers: small numbered dots only (no long text in SVG) ---------- */
+function renderSvgMarkers(g, model, select){
   var n=model.parts.length;
-  var L=stripLayout(n);
-  var positions=[];
+  var y=330;
+  var gap=16;
+  var dotR=14;
+  var totalW=n*(dotR*2)+ (n-1)*gap;
+  var startX=(880-totalW)/2 + dotR;
+  var marks=[];
   for(var i=0;i<n;i++){
-    var row=Math.floor(i/L.cols);
-    var startOfRow=row*L.cols;
-    var itemsInRow=Math.min(L.cols,n-startOfRow);
-    var colInRow=i-startOfRow;
-    var rowW=itemsInRow*L.pillW+(itemsInRow-1)*10;
-    var rowX=(880-rowW)/2;
-    var cx=rowX+colInRow*(L.pillW+10)+L.pillW/2;
-    var cy=L.stripTop+L.titleH+6+row*(L.pillH+8)+L.pillH/2;
-    positions.push({x:cx,y:cy,w:L.pillW,h:L.pillH});
+    var cx=startX + i*(dotR*2+gap);
+    var type=inferPartType(model.parts[i]);
+    var st=TYPE_STYLES[type]||TYPE_STYLES.mandatory;
+    var grp=svg(g,"g",{"class":"niti-ill-hotspot",role:"button",tabindex:"0","aria-label":"ประเด็น "+(i+1)+" "+model.parts[i].label+" — "+st.label,"aria-pressed":"false","data-type":type});
+    var c=circle(grp,cx,y,dotR,st.color);
+    c.setAttribute("stroke","#FFFFFF"); c.setAttribute("stroke-width","2");
+    svgMultiline(grp,cx,y+5,String(i+1),{fontSize:13,maxWidth:24,maxLines:1,fill:"#FFFFFF",weight:"800"});
+    (function(idx,el){ el.addEventListener("click",function(){select(idx,true);}); el.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(idx,true);}}); })(i,grp);
+    marks.push(grp);
   }
-  return positions;
+  return marks;
 }
-function pointSlots(model){return computePointSlots(model);}
-function renderPartMarker(g,part,index,coords,select){
-  var type=inferPartType(part);
-  var st=TYPE_STYLES[type]||TYPE_STYLES.mandatory;
-  var w=coords.w||220, h=coords.h||40;
-  var x=coords.x-w/2, y=coords.y-h/2;
-  var a=svg(g,"g",{"class":"niti-ill-hotspot",role:"button",tabindex:"0","aria-label":"ประเด็น "+(index+1)+" "+part.label+" — "+st.label,"aria-pressed":"false","data-type":type});
-  var r=rect(a,x,y,w,h,st.bg,h/2,st.color);
-  if(st.dashed){r.setAttribute("stroke-dasharray","7 4");}
-  r.setAttribute("stroke-width","2.5");
-  circle(a,x+22,coords.y,13.5,st.color);
-  svg(a,"text",{x:x+22,y:coords.y+5,fill:"#FFFFFF","font-size":14,"font-weight":800,"text-anchor":"middle","font-family":"Sarabun, Tahoma, sans-serif"},String(index+1));
-  var maxChars=Math.min(20,Math.max(8,Math.floor((w-78)/8)));
-  var keyword=truncateForWidth(part.label,maxChars);
-  svg(a,"text",{x:x+44,y:coords.y-1,fill:"#1F2937","font-size":13.5,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},keyword);
-  svg(a,"text",{x:x+44,y:coords.y+15,fill:st.color,"font-size":11,"font-weight":700,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},st.label);
-  drawObject(a,part.shape,x+w-24,coords.y+2,.22);
-  a.addEventListener("click",function(){select(index,true);});
-  a.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(index,true);}});
-  return a;
-}
+
+/* ---------- mount ---------- */
 function mount(host,model){
   var image=host.querySelector(".niti-ill-image");
   var details=host.querySelector(".niti-ill-details");
   var list=host.querySelector(".niti-ill-list");
   var counter=host.querySelector(".niti-ill-progress");
-  if(!image||!details||!list||!model.parts?.length)return {dispose:function(){}};
-  // Remove previous round's injected blocks on re-mount
-  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements").forEach(function(el){el.remove();});
+  if(!image||!details||!list||!model.parts||!model.parts.length)return {dispose:function(){}};
+  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid").forEach(function(el){el.remove();});
   image.replaceChildren();list.replaceChildren();
-  // ---------- Read / unread (localStorage, explicit click only) ----------
+  // Read/unread
   var readBar=node("div","niti-ill-readbar");
   var readBadge=node("span","niti-ill-read-badge","");
   readBadge.setAttribute("aria-live","polite");
@@ -415,7 +493,7 @@ function mount(host,model){
   }
   try{ if(typeof window!=="undefined"&&window.addEventListener) window.addEventListener("niti:statute-read-change",onReadChange); }catch(e){}
   refreshRead();
-  // ---------- Meaning (verbatim principle + case) ----------
+  // Meaning (verbatim)
   var meaning=node("div","niti-ill-meaning");
   meaning.appendChild(node("h3","niti-ill-meaning-title","ความหมายของมาตรา"));
   if(model.principle) meaning.appendChild(node("p","niti-ill-meaning-text",String(model.principle)));
@@ -428,7 +506,7 @@ function mount(host,model){
     meaning.appendChild(node("p","niti-ill-meaning-rule",String(model.rule)));
   }
   host.insertBefore(meaning,image);
-  // ---------- Elements list (verbatim label + explanation) ----------
+  // Elements (verbatim)
   var elements=node("div","niti-ill-elements");
   elements.appendChild(node("h3","niti-ill-elements-title","องค์ประกอบที่ต้องตรวจ"));
   var elemProgress=node("p","niti-ill-elements-progress","");
@@ -436,72 +514,27 @@ function mount(host,model){
   var elemList=node("ol","niti-ill-elements-list");
   elements.appendChild(elemList);
   if(image.nextSibling) host.insertBefore(elements,image.nextSibling); else host.appendChild(elements);
-  // ---------- SVG ----------
-  var L=stripLayout(model.parts.length);
-  var illustration=svg(image,"svg",{viewBox:"0 0 880 "+L.totalH,role:"group","aria-label":"ภาพเหตุการณ์ "+model.kindLabel+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
+  // Compact SVG: viewBox 0 0 880 400 — visual only
+  var illustration=svg(image,"svg",{viewBox:"0 0 880 400",role:"group","aria-label":"ภาพเหตุการณ์ "+(model.kindLabel||"")+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
   var defs=svg(illustration,"defs",{});
   var marker=svg(defs,"marker",{id:"niti-svg-arrow",markerWidth:8,markerHeight:8,refX:6,refY:3,orient:"auto"});polygon(marker,"0,0 6,3 0,6","#278b93");
-  // Soft gradients + shadow for polished cards (visual only)
-  var grad=svg(defs,"linearGradient",{id:"niti-header-grad",x1:"0",y1:"0",x2:"0",y2:"1"});
-  svg(grad,"stop",{offset:"0%","stop-color":"#FFFFFF"});
-  svg(grad,"stop",{offset:"100%","stop-color":"#EFF6FF"});
-  var grad2=svg(defs,"linearGradient",{id:"niti-strip-grad",x1:"0",y1:"0",x2:"0",y2:"1"});
-  svg(grad2,"stop",{offset:"0%","stop-color":"#FFFFFF"});
-  svg(grad2,"stop",{offset:"100%","stop-color":"#F8FAFD"});
-  var filt=svg(defs,"filter",{id:"niti-soft-shadow",x:"-20%",y:"-20%",width:"140%",height:"140%"});
-  svg(filt,"feDropShadow",{dx:"0",dy:"3",stdDeviation:"6","flood-color":"#0F172A","flood-opacity":"0.10"});
   drawHeader(illustration,model);
-  var stage=svg(illustration,"g",{transform:"translate(0,104)"});
-  backdrop(stage,model);specialized(stage,model);drawStageCues(stage,model);
-  // Condition Strip
-  var stripRect=rect(illustration,8,L.stripTop,864,L.stripH,"url(#niti-strip-grad)",16,"#CBD5E1");
-  stripRect.setAttribute("filter","url(#niti-soft-shadow)");
-  svg(illustration,"text",{x:24,y:L.stripTop+20,fill:"#111827","font-size":13.5,"font-weight":800,"text-anchor":"start","font-family":"Sarabun, Tahoma, sans-serif"},"เงื่อนไข / ประเด็นที่ต้องตรวจ — คลิกเพื่ออ่านรายละเอียด");
-  var places=computePointSlots(model);
-  var mark=[],buttons=[],elemButtons=[],states=model.parts.map(function(){return "unknown";}),current=0;
-  var layout=svg(illustration,"g",{class:"niti-law-stages"});
-  model.parts.forEach(function(part,i){
-    var coord=places[i]||{x:440,y:L.stripTop+40,w:220,h:40};
-    var item=renderPartMarker(layout,part,i,coord,select);
-    mark.push(item);
-    var button=node("button","niti-ill-pick",(i+1)+". "+part.label);
-    button.type="button";button.setAttribute("aria-pressed","false");
-    button.addEventListener("click",function(){select(i,true);});
-    list.appendChild(button);buttons.push(button);
-    // Elements list item (verbatim)
-    var li=document.createElement("li");
-    li.className="niti-ill-element-item";
-    var eb=document.createElement("button");
-    eb.type="button";
-    eb.className="niti-ill-element-btn";
-    eb.setAttribute("aria-pressed","false");
-    eb.setAttribute("title",String(part.label));
-    var ebHead=node("span","niti-ill-element-head");
-    ebHead.appendChild(node("span","niti-ill-element-num",String(i+1)));
-    ebHead.appendChild(node("span","niti-ill-element-label",String(part.label)));
-    var tb2=node("span","niti-ill-type-badge",TYPE_STYLES[inferPartType(part)].label);
-    tb2.setAttribute("data-type",inferPartType(part));
-    ebHead.appendChild(tb2);
-    eb.appendChild(ebHead);
-    eb.appendChild(node("span","niti-ill-element-expl",String(part.explanation||"")));
-    eb.addEventListener("click",function(){select(i,true);});
-    li.appendChild(eb);
-    elemList.appendChild(li);
-    elemButtons.push(eb);
-  });
-  drawFooter(illustration,L.footerY);
-  function updateCounter(){
-    var found=states.filter(function(s){return s==="yes";}).length;
-    var missing=states.filter(function(s){return s==="no";}).length;
-    var unsure=states.filter(function(s){return s==="unknown";}).length;
-    if(counter)counter.textContent="บันทึกข้อเท็จจริง: พบ "+found+" · ไม่พบ "+missing+" · ยังไม่แน่ใจ "+unsure+" (ไม่ได้ตัดสินผลคดีอัตโนมัติ)";
-    var checked=found+missing;
-    elemProgress.textContent="ตรวจแล้ว "+checked+" / "+states.length+" ประเด็น";
-  }
-  function choose(i,status){
-    states[i]=status;
-    select(i,false);
-  }
+  var stage=svg(illustration,"g",{transform:"translate(0,64)"});
+  drawActionStage(stage,model);
+  // Footer inside SVG (short, wrapped)
+  svgMultiline(illustration,440,386,FOOTER_DISCLAIMER,{fontSize:12,maxWidth:800,maxLines:1,fill:"#6B7280",weight:"600"});
+  // SVG dots — markers only, bound later via select
+  var mark=[]; var buttons=[]; var elemButtons=[]; var condCards=[];
+  var states=model.parts.map(function(){return "unknown";});
+  var current=0;
+  // HTML Conditions Grid BELOW SVG (zero-collision: Thai flows in HTML)
+  var grid=node("div","niti-conditions-grid");
+  grid.setAttribute("role","list");
+  grid.appendChild(node("h3","niti-conditions-title","เงื่อนไข / ประเด็นที่ต้องตรวจ — คลิกเพื่ออ่านรายละเอียด"));
+  var gridList=node("div","niti-conditions-list");
+  grid.appendChild(gridList);
+  image.appendChild(grid);
+  // Wire markers after grid exists (select defined below, markers need select)
   function select(i,focus){
     var p=model.parts[i];if(!p)return;current=i;
     mark.forEach(function(e,j){e.setAttribute("aria-pressed",String(j===i));});
@@ -510,6 +543,10 @@ function mount(host,model){
       e.setAttribute("aria-pressed",String(j===i));
       e.classList.toggle("is-active",j===i);
       var li=e.parentElement; if(li) li.classList.toggle("is-active",j===i);
+    });
+    condCards.forEach(function(e,j){
+      e.setAttribute("aria-pressed",String(j===i));
+      e.classList.toggle("is-active",j===i);
     });
     details.replaceChildren();
     details.appendChild(node("span","niti-ill-step","ประเด็น "+(i+1)+" จาก "+model.parts.length));
@@ -534,6 +571,52 @@ function mount(host,model){
     updateCounter();
     if(focus){details.tabIndex=-1;details.focus({preventScroll:true});}
   }
+  function choose(i,status){ states[i]=status; select(i,false); }
+  function updateCounter(){
+    var found=states.filter(function(s){return s==="yes";}).length;
+    var missing=states.filter(function(s){return s==="no";}).length;
+    var unsure=states.filter(function(s){return s==="unknown";}).length;
+    if(counter)counter.textContent="บันทึกข้อเท็จจริง: พบ "+found+" · ไม่พบ "+missing+" · ยังไม่แน่ใจ "+unsure+" (ไม่ได้ตัดสินผลคดีอัตโนมัติ)";
+    var checked=found+missing;
+    elemProgress.textContent="ตรวจแล้ว "+checked+" / "+states.length+" ประเด็น";
+  }
+  // Build SVG dot markers now that select exists
+  var markerGroup=svg(illustration,"g",{class:"niti-law-markers"});
+  mark=renderSvgMarkers(markerGroup,model,select);
+  // Build HTML lists + conditions grid
+  model.parts.forEach(function(part,i){
+    var button=node("button","niti-ill-pick",(i+1)+". "+part.label);
+    button.type="button";button.setAttribute("aria-pressed","false");
+    button.addEventListener("click",function(){select(i,true);});
+    list.appendChild(button);buttons.push(button);
+    var li=document.createElement("li");
+    li.className="niti-ill-element-item";
+    var eb=document.createElement("button");
+    eb.type="button"; eb.className="niti-ill-element-btn"; eb.setAttribute("aria-pressed","false"); eb.setAttribute("title",String(part.label));
+    var ebHead=node("span","niti-ill-element-head");
+    ebHead.appendChild(node("span","niti-ill-element-num",String(i+1)));
+    ebHead.appendChild(node("span","niti-ill-element-label",String(part.label)));
+    var tb2=node("span","niti-ill-type-badge",TYPE_STYLES[inferPartType(part)].label);
+    tb2.setAttribute("data-type",inferPartType(part));
+    ebHead.appendChild(tb2);
+    eb.appendChild(ebHead);
+    eb.appendChild(node("span","niti-ill-element-expl",String(part.explanation||"")));
+    eb.addEventListener("click",function(){select(i,true);});
+    li.appendChild(eb); elemList.appendChild(li); elemButtons.push(eb);
+    // Conditions grid card (HTML, full label flows, no SVG overlap)
+    var card=document.createElement("button");
+    card.type="button"; card.className="niti-condition-card"; card.setAttribute("role","listitem"); card.setAttribute("aria-pressed","false");
+    var cardHead=node("span","niti-condition-head");
+    cardHead.appendChild(node("span","niti-condition-num",String(i+1)));
+    cardHead.appendChild(node("span","niti-condition-verb",svgVerbForPart(part,i)));
+    var tb3=node("span","niti-ill-type-badge",TYPE_STYLES[inferPartType(part)].label);
+    tb3.setAttribute("data-type",inferPartType(part));
+    cardHead.appendChild(tb3);
+    card.appendChild(cardHead);
+    card.appendChild(node("span","niti-condition-label",String(part.label)));
+    card.addEventListener("click",function(){select(i,true);});
+    gridList.appendChild(card); condCards.push(card);
+  });
   function onKeys(ev){
     if(!ev||!ev.key) return;
     if(ev.key==="ArrowRight"||ev.key==="ArrowDown"){ ev.preventDefault(); select((current+1)%model.parts.length,true); }
@@ -545,8 +628,16 @@ function mount(host,model){
     try{ if(typeof window!=="undefined"&&window.removeEventListener) window.removeEventListener("niti:statute-read-change",onReadChange); }catch(e){}
     try{ host.removeEventListener("keydown",onKeys); }catch(e){}
     image.replaceChildren();
-    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements").forEach(function(el){el.remove();});
+    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid").forEach(function(el){el.remove();});
   }};
 }
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,inferPartType:inferPartType,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY};
+function computePointSlots(model){
+  // Back-compat: now returns HTML-grid-like slots (not used for SVG strip, kept for API)
+  var n=model.parts?model.parts.length:0;
+  var out=[];
+  for(var i=0;i<n;i++) out.push({x:440,y:330,w:200,h:40});
+  return out;
+}
+function pointSlots(model){return computePointSlots(model);}
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY};
 })();
