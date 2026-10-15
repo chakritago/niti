@@ -390,7 +390,7 @@ function openStatute(value,opener){
   var body=element("div","niti-reader-body");
   var title=(noteById[id]||{}).title||(sourceMap.titles||{})[id]||"บทบัญญัติกฎหมายแพ่งและพาณิชย์";
   body.appendChild(element("p","niti-reader-subtitle",title));
-  var description=element("p","niti-reader-disclaimer","กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ");
+  var description=element("p","niti-reader-disclaimer",model?"กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ":"มาตรานี้มีสรุปและตัวบทกฎหมายให้อ่าน แต่ยังไม่มีภาพประกอบโต้ตอบ โปรดตรวจต้นฉบับ PDF ของหน่วยงานรัฐประกอบ");
   description.id="niti-statute-dialog-description";
   body.appendChild(description);
   var hasSummaryContent=!!(note&&(note.plain||note.exam||note.conditions||note.trap));
