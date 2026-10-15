@@ -685,15 +685,193 @@ function safeInsertBefore(parent, node, ref){
   try{ parent.appendChild(node); }catch(e2){}
 }
 
+/* ---------- NITI Universal Fullscreen Controller (Native API + CSS fallback) ---------- */
+/* Hybrid: Native Fullscreen when outside <dialog>; CSS fallback (.is-niti-fullscreen) inside dialog / iOS Safari. */
+var _fsActiveCard=null;
+var _fsLastTrigger=null;
+var _fsListenersBound=false;
+function _fsIsNativeFullscreen(el){
+  try{
+    var fsEl=document.fullscreenElement||document.webkitFullscreenElement;
+    return !!(fsEl&&(fsEl===el||(el&&el.contains&&el.contains(fsEl))));
+  }catch(e){ return false; }
+}
+function _fsIsCardFullscreen(cardEl){
+  if(!cardEl) return false;
+  try{ if(cardEl.classList.contains("is-niti-fullscreen")) return true; }catch(e){}
+  return _fsIsNativeFullscreen(cardEl);
+}
+function _fsIsActive(){
+  return !!(_fsActiveCard&&_fsIsCardFullscreen(_fsActiveCard));
+}
+function _fsSyncButtons(cardEl){
+  if(!cardEl) return;
+  var expanded=_fsIsCardFullscreen(cardEl);
+  try{
+    cardEl.querySelectorAll('[data-action="toggle-fullscreen"]').forEach(function(btn){
+      btn.setAttribute("aria-pressed",expanded?"true":"false");
+      btn.setAttribute("aria-label",expanded?"ย่อกลับขนาดปกติ (กดปุ่ม ESC ได้)":"ขยายภาพเต็มหน้าจอ");
+      var labelEl=btn.querySelector(".fs-btn-text");
+      if(labelEl) labelEl.textContent=expanded?"ย่อขนาดปกติ":"ขยายเต็มจอ";
+    });
+  }catch(e){}
+}
+function _fsEnter(cardEl, triggerBtn){
+  if(!cardEl) return;
+  _fsActiveCard=cardEl;
+  _fsLastTrigger=triggerBtn||document.activeElement;
+  var parentDialog=null;
+  try{ parentDialog=cardEl.closest?cardEl.closest("dialog.niti-statute-dialog"):null; }catch(e){}
+  try{ if(parentDialog) parentDialog.classList.add("is-dialog-fullscreen"); }catch(e){}
+  try{ cardEl.classList.add("is-niti-fullscreen"); }catch(e){}
+  var reqFs=null;
+  if(!parentDialog){
+    reqFs=cardEl.requestFullscreen||cardEl.webkitRequestFullscreen;
+  }
+  if(reqFs){
+    try{
+      var pr=reqFs.call(cardEl);
+      if(pr&&typeof pr.catch==="function") pr.catch(function(){ /* CSS fallback already applied */ });
+    }catch(e){ /* CSS fallback already applied */ }
+  }
+  _fsSyncButtons(cardEl);
+  try{
+    var closeBtn=cardEl.querySelector(".niti-fs-close-btn");
+    if(closeBtn) closeBtn.focus();
+  }catch(e){}
+}
+function _fsExit(cardEl){
+  var target=cardEl||_fsActiveCard;
+  if(!target) return;
+  try{ target.classList.remove("is-niti-fullscreen"); }catch(e){}
+  var parentDialog=null;
+  try{ parentDialog=target.closest?target.closest("dialog.niti-statute-dialog"):null; }catch(e){}
+  try{ if(parentDialog) parentDialog.classList.remove("is-dialog-fullscreen"); }catch(e){}
+  try{
+    if(document.fullscreenElement||document.webkitFullscreenElement){
+      var exitFs=document.exitFullscreen||document.webkitExitFullscreen;
+      if(exitFs){
+        var pr=exitFs.call(document);
+        if(pr&&typeof pr.catch==="function") pr.catch(function(){});
+      }
+    }
+  }catch(e){}
+  _fsSyncButtons(target);
+  if(_fsLastTrigger&&typeof _fsLastTrigger.focus==="function"){
+    try{ _fsLastTrigger.focus(); }catch(e){}
+  }
+  _fsActiveCard=null;
+}
+function _fsToggle(cardEl, triggerBtn){
+  if(_fsIsCardFullscreen(cardEl)) _fsExit(cardEl);
+  else _fsEnter(cardEl, triggerBtn);
+}
+function _fsBindGlobalListeners(){
+  if(_fsListenersBound) return;
+  _fsListenersBound=true;
+  ["fullscreenchange","webkitfullscreenchange"].forEach(function(evt){
+    document.addEventListener(evt,function(){
+      try{
+        if(!document.fullscreenElement&&!document.webkitFullscreenElement&&_fsActiveCard){
+          var card=_fsActiveCard;
+          try{ card.classList.remove("is-niti-fullscreen"); }catch(e){}
+          try{
+            var dlg=card.closest?card.closest("dialog.niti-statute-dialog"):null;
+            if(dlg) dlg.classList.remove("is-dialog-fullscreen");
+          }catch(e){}
+          _fsSyncButtons(card);
+          if(_fsLastTrigger&&typeof _fsLastTrigger.focus==="function"){ try{ _fsLastTrigger.focus(); }catch(e){} }
+          _fsActiveCard=null;
+        }
+      }catch(e){}
+    });
+  });
+  /* Capture-phase ESC: first ESC exits fullscreen (dialog stays open), second closes dialog. */
+  document.addEventListener("keydown",function(e){
+    if(e&&e.key==="Escape"&&_fsActiveCard&&_fsIsCardFullscreen(_fsActiveCard)){
+      e.preventDefault();
+      e.stopPropagation();
+      _fsExit(_fsActiveCard);
+    }
+  },true);
+}
+function _fsInjectControls(cardEl, secId, title){
+  if(!cardEl) return;
+  _fsBindGlobalListeners();
+  try{ if(cardEl.querySelector('[data-action="toggle-fullscreen"]')) return; }catch(e){}
+  /* 1. Sticky top bar (hidden normally, shown in fullscreen via CSS) */
+  try{
+    var topBar=document.createElement("div");
+    topBar.className="niti-fs-sticky-topbar";
+    var topLabel=document.createElement("span");
+    topLabel.innerHTML="<strong>มาตรา "+String(secId||"")+"</strong>"+(title?" — "+String(title):"")+" (โหมดขยายเต็มหน้าจอ • สื่อการศึกษา)";
+    var exitBtn=document.createElement("button");
+    exitBtn.type="button";
+    exitBtn.className="niti-fs-close-btn";
+    exitBtn.setAttribute("data-action","exit-fullscreen");
+    exitBtn.setAttribute("aria-label","ปิดโหมดเต็มหน้าจอ (ESC)");
+    exitBtn.textContent="✕ ย่อกลับขนาดเดิม (ESC)";
+    exitBtn.addEventListener("click",function(){ _fsExit(cardEl); });
+    topBar.appendChild(topLabel);
+    topBar.appendChild(exitBtn);
+    if(cardEl.firstChild) cardEl.insertBefore(topBar, cardEl.firstChild);
+    else cardEl.appendChild(topBar);
+  }catch(e){}
+  /* 2. Corner button on SVG wrapper */
+  try{
+    var svgWrap=cardEl.querySelector(".niti-svg-wrapper, .niti-ill-image");
+    if(svgWrap){
+      var cornerBtn=document.createElement("button");
+      cornerBtn.type="button";
+      cornerBtn.className="niti-btn-fs-corner";
+      cornerBtn.setAttribute("data-action","toggle-fullscreen");
+      cornerBtn.setAttribute("aria-pressed","false");
+      cornerBtn.setAttribute("aria-label","ขยายภาพเต็มหน้าจอ");
+      cornerBtn.innerHTML='<span aria-hidden="true">⛶</span> <span class="fs-btn-text">ขยายเต็มจอ</span>';
+      cornerBtn.addEventListener("click",function(){ _fsToggle(cardEl, cornerBtn); });
+      svgWrap.appendChild(cornerBtn);
+    }
+  }catch(e){}
+  /* 3. Toolbar button in share bar */
+  try{
+    var shareBar=cardEl.querySelector(".niti-share-bar, .niti-ill-sharebar");
+    if(shareBar){
+      var barBtn=document.createElement("button");
+      barBtn.type="button";
+      barBtn.className="niti-btn-fs-bar";
+      barBtn.setAttribute("data-action","toggle-fullscreen");
+      barBtn.setAttribute("aria-pressed","false");
+      barBtn.setAttribute("aria-label","ขยายภาพเต็มหน้าจอ");
+      barBtn.innerHTML='<span aria-hidden="true">⛶</span> <span class="fs-btn-text">ขยายเต็มจอ</span>';
+      barBtn.addEventListener("click",function(){ _fsToggle(cardEl, barBtn); });
+      if(shareBar.firstChild) shareBar.insertBefore(barBtn, shareBar.firstChild);
+      else shareBar.appendChild(barBtn);
+    }
+  }catch(e){}
+}
+if(typeof window!=="undefined"){
+  window.NitiFullscreen={attach:_fsInjectControls,toggle:_fsToggle,exit:_fsExit,isActive:_fsIsActive,isCardFullscreen:_fsIsCardFullscreen};
+}
+
 /* ---------- mount ---------- */
-function mount(host,model){
+function mount(host,model,options){
   var image=host.querySelector(".niti-ill-image");
   var details=host.querySelector(".niti-ill-details");
   var list=host.querySelector(".niti-ill-list");
   var counter=host.querySelector(".niti-ill-progress");
   var layoutEl=host.querySelector(".niti-ill-layout");
   if(!image||!details||!list||!model.parts||!model.parts.length)return {dispose:function(){}};
-  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz").forEach(function(el){el.remove();});
+  /* Fullscreen: host is the fullscreen card. Preserve state across re-mount. */
+  try{ host.classList.add("niti-module-card"); }catch(e){}
+  var _wasFs=false;
+  try{ _wasFs=host.classList.contains("is-niti-fullscreen")||(typeof document!=="undefined"&&document.fullscreenElement===host); }catch(e){}
+  /* Feature B: if reader already shows the 4-section summary on top, collapse the duplicate intro into a drawer below the image. */
+  var collapseIntro=false;
+  try{
+    collapseIntro=!!(options&&options.collapseIntroText)||host.dataset.hasTopSummary==="true";
+  }catch(e){}
+  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz,.niti-ill-context-drawer,.niti-fs-sticky-topbar").forEach(function(el){el.remove();});
+  try{ image.classList.add("niti-svg-wrapper"); }catch(e){}
   image.replaceChildren();list.replaceChildren();
   // Read/unread
   var readBar=node("div","niti-ill-readbar");
@@ -723,19 +901,22 @@ function mount(host,model){
   }
   try{ if(typeof window!=="undefined"&&window.addEventListener) window.addEventListener("niti:statute-read-change",onReadChange); }catch(e){}
   refreshRead();
-  // Meaning (verbatim)
-  var meaning=node("div","niti-ill-meaning");
-  meaning.appendChild(node("h3","niti-ill-meaning-title","ความหมายของมาตรา"));
-  if(model.principle) meaning.appendChild(node("p","niti-ill-meaning-text",String(model.principle)));
-  if(model.case){
-    meaning.appendChild(node("strong","niti-ill-meaning-case-label","สถานการณ์ตัวอย่าง"));
-    meaning.appendChild(node("p","niti-ill-meaning-case",String(model.case)));
+  // Meaning (verbatim) — shown OPEN above the image only when the reader has NOT already shown the summary on top.
+  // When collapseIntro is true, the same verbatim context moves into a collapsed <details> drawer BELOW the image (no duplication, no data loss).
+  if(!collapseIntro){
+    var meaning=node("div","niti-ill-meaning");
+    meaning.appendChild(node("h3","niti-ill-meaning-title","ความหมายของมาตรา"));
+    if(model.principle) meaning.appendChild(node("p","niti-ill-meaning-text",String(model.principle)));
+    if(model.case){
+      meaning.appendChild(node("strong","niti-ill-meaning-case-label","สถานการณ์ตัวอย่าง"));
+      meaning.appendChild(node("p","niti-ill-meaning-case",String(model.case)));
+    }
+    if(model.rule){
+      meaning.appendChild(node("strong","niti-ill-meaning-rule-label","หลักสำหรับเขียนตอบ"));
+      meaning.appendChild(node("p","niti-ill-meaning-rule",String(model.rule)));
+    }
+    if(layoutEl) safeInsertBefore(host, meaning, layoutEl); else safeInsertBefore(host, meaning, host.firstChild);
   }
-  if(model.rule){
-    meaning.appendChild(node("strong","niti-ill-meaning-rule-label","หลักสำหรับเขียนตอบ"));
-    meaning.appendChild(node("p","niti-ill-meaning-rule",String(model.rule)));
-  }
-  if(layoutEl) safeInsertBefore(host, meaning, layoutEl); else safeInsertBefore(host, meaning, host.firstChild);
   // Elements (verbatim)
   var elements=node("div","niti-ill-elements");
   elements.appendChild(node("h3","niti-ill-elements-title","องค์ประกอบที่ต้องตรวจ"));
@@ -744,6 +925,36 @@ function mount(host,model){
   var elemList=node("ol","niti-ill-elements-list");
   elements.appendChild(elemList);
   if(layoutEl && layoutEl.nextSibling) safeInsertBefore(host, elements, layoutEl.nextSibling); else host.appendChild(elements);
+  // Context drawer BELOW the image (collapsed by default when summary is on top; case still feeds the quiz verbatim).
+  if(collapseIntro){
+    var drawer=document.createElement("details");
+    drawer.className="niti-ill-context-drawer";
+    var drawerSummary=document.createElement("summary");
+    drawerSummary.className="niti-ill-context-summary";
+    drawerSummary.textContent="ข้อมูลประกอบแผนภาพ... คลิกเพื่อดูเพิ่มเติม";
+    drawer.appendChild(drawerSummary);
+    var drawerBody=node("div","niti-ill-context-body");
+    if(model.principle){
+      drawerBody.appendChild(node("h4","niti-ill-context-heading","ความหมายของมาตรา"));
+      drawerBody.appendChild(node("p","niti-ill-meaning-text",String(model.principle)));
+    }
+    if(model.case){
+      drawerBody.appendChild(node("strong","niti-ill-meaning-case-label","สถานการณ์ตัวอย่าง"));
+      drawerBody.appendChild(node("p","niti-ill-meaning-case",String(model.case)));
+    }
+    if(model.rule){
+      drawerBody.appendChild(node("strong","niti-ill-meaning-rule-label","หลักสำหรับเขียนตอบ"));
+      drawerBody.appendChild(node("p","niti-ill-meaning-rule",String(model.rule)));
+    }
+    if(model.exception){
+      drawerBody.appendChild(node("p","niti-ill-context-exception","ข้อควรระวัง: "+String(model.exception)));
+    }
+    drawer.appendChild(drawerBody);
+    // Place drawer right after the layout (below the image), before the elements list.
+    if(layoutEl && layoutEl.nextSibling) safeInsertBefore(host, drawer, layoutEl.nextSibling);
+    else if(elements && elements.parentNode===host) safeInsertBefore(host, drawer, elements);
+    else host.appendChild(drawer);
+  }
   // Strict Y-zoning SVG: viewBox 0 0 880 380 — Header 0-48 / Visual Strip 58-145 / Auto-Slot Cards 155-340 / Footer 340-380
   var illustration=svg(image,"svg",{viewBox:"0 0 880 380",role:"group","aria-label":"ภาพเหตุการณ์ "+(model.kindLabel||"")+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
   var defs=svg(illustration,"defs",{});
@@ -850,7 +1061,7 @@ function mount(host,model){
     gridList.appendChild(card); condCards.push(card);
   });
   // ---------- Share image ----------
-  var shareBar=node("div","niti-ill-sharebar");
+  var shareBar=node("div","niti-ill-sharebar niti-share-bar");
   var shareTitle=node("span","niti-ill-share-title","แชร์ภาพมาตรานี้");
   var btnShare=node("button","niti-ill-share-btn","แชร์รูป / ดาวน์โหลด PNG");
   btnShare.type="button";
@@ -993,11 +1204,20 @@ function mount(host,model){
   }
   host.addEventListener("keydown",onKeys);
   select(0,false);
+  /* Fullscreen attach (once per card) + restore fullscreen if mount re-ran while fullscreen. */
+  try{
+    if(_wasFs){ host.classList.add("is-niti-fullscreen"); }
+    if(typeof window!=="undefined"&&window.NitiFullscreen&&typeof window.NitiFullscreen.attach==="function"){
+      window.NitiFullscreen.attach(host, String(model.id||""), model.title||model.kindLabel||"");
+      if(_wasFs) _fsSyncButtons(host);
+    }
+  }catch(e){}
   return {dispose:function(){
+    try{ if(typeof window!=="undefined"&&window.NitiFullscreen&&typeof window.NitiFullscreen.isActive==="function"&&window.NitiFullscreen.isActive()){ try{ window.NitiFullscreen.exit(host); }catch(e){} } }catch(e){}
     try{ if(typeof window!=="undefined"&&window.removeEventListener) window.removeEventListener("niti:statute-read-change",onReadChange); }catch(e){}
     try{ host.removeEventListener("keydown",onKeys); }catch(e){}
     image.replaceChildren();
-    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz").forEach(function(el){el.remove();});
+    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz,.niti-ill-context-drawer,.niti-fs-sticky-topbar").forEach(function(el){el.remove();});
   }};
 }
 function computePointSlots(model){
