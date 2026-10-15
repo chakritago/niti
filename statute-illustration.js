@@ -83,27 +83,31 @@ function overallReadText(){
   return "อ่านแล้ว "+countReadFromMap(map)+" จาก "+keys.length+" มาตราที่เคยเปิด";
 }
 
-/* ---------- Quiz persistence (separate from read key) ---------- */
+/* ---------- Quiz persistence (v2 per-question answers; legacy v1 kept read-only) ---------- */
 var QUIZ_KEY="niti_quiz_status_v1";
+var QUIZ_SCHEMA_VERSION=2;
 var quizMem={};
+var quizSaveUnavailable=false;
 function loadQuizMap(){
   try{
-    if(typeof localStorage==="undefined") return {};
+    if(typeof localStorage==="undefined"){ quizSaveUnavailable=true; return {}; }
     var raw=localStorage.getItem(QUIZ_KEY);
     if(!raw) return {};
     var p=JSON.parse(raw);
     if(!p||typeof p!=="object"||Array.isArray(p)) return {};
     return p;
-  }catch(e){ return {}; }
+  }catch(e){ quizSaveUnavailable=true; return {}; }
 }
 function saveQuizMap(m){
-  try{ if(typeof localStorage!=="undefined") localStorage.setItem(QUIZ_KEY, JSON.stringify(m)); return true; }catch(e){ return false; }
+  try{ if(typeof localStorage!=="undefined") localStorage.setItem(QUIZ_KEY, JSON.stringify(m)); return true; }catch(e){ quizSaveUnavailable=true; return false; }
 }
+function quizSetVersionFor(id){ return String(id==null?"":id)+"-v2"; }
+/* Legacy v1 shim: {choice, isCorrect} kept for back-compat; NOT counted toward the v2 set. */
 function getQuizStatus(id){
   var k=String(id==null?"":id);
   var m=loadQuizMap();
   var e=m[k];
-  if(e&&typeof e==="object") return {choice:typeof e.choice==="string"?e.choice:null, isCorrect:e.isCorrect===true, updatedAt:typeof e.updatedAt==="string"?e.updatedAt:null};
+  if(e&&typeof e==="object"&&e.schemaVersion!==2) return {choice:typeof e.choice==="string"?e.choice:null, isCorrect:e.isCorrect===true, updatedAt:typeof e.updatedAt==="string"?e.updatedAt:null};
   return {choice:null, isCorrect:false, updatedAt:null};
 }
 function setQuizStatus(id, choice, isCorrect){
@@ -115,6 +119,35 @@ function setQuizStatus(id, choice, isCorrect){
   saveQuizMap(m);
   return {choice:choice, isCorrect:isCorrect===true, updatedAt:at};
 }
+/* v2: {schemaVersion:2, questionSetVersion:"<id>-v2", answers:{<qid>:{optionId, updatedAt}}} */
+function getQuizAnswers(id, questionSetVersion){
+  var k=String(id==null?"":id);
+  var m=loadQuizMap();
+  var e=m[k];
+  if(e&&typeof e==="object"&&e.schemaVersion===2&&e.questionSetVersion===questionSetVersion&&e.answers&&typeof e.answers==="object") return e.answers;
+  return {};
+}
+function setQuizAnswer(id, questionSetVersion, qid, optionId){
+  var k=String(id==null?"":id);
+  var at=new Date().toISOString();
+  var m=loadQuizMap();
+  var cur=m[k];
+  var answers={};
+  if(cur&&typeof cur==="object"&&cur.schemaVersion===2&&cur.questionSetVersion===questionSetVersion&&cur.answers&&typeof cur.answers==="object") answers=cur.answers;
+  answers[String(qid)]={optionId:String(optionId), updatedAt:at};
+  m[k]={schemaVersion:QUIZ_SCHEMA_VERSION, questionSetVersion:questionSetVersion, answers:answers};
+  quizMem[k]=m[k];
+  var ok=saveQuizMap(m);
+  return {ok:ok, answers:answers};
+}
+function clearQuizAnswers(id, questionSetVersion){
+  var k=String(id==null?"":id);
+  var m=loadQuizMap();
+  m[k]={schemaVersion:QUIZ_SCHEMA_VERSION, questionSetVersion:questionSetVersion, answers:{}};
+  quizMem[k]=m[k];
+  saveQuizMap(m);
+}
+function isQuizSaveUnavailable(){ return quizSaveUnavailable; }
 /* ---------- Universal slots: strict Y-zoning, gap >=16, all 64 sections ---------- */
 function computeUniversalSlots(n){
   var total=Number(n)||0;
@@ -854,6 +887,294 @@ if(typeof window!=="undefined"){
 }
 
 /* ---------- mount ---------- */
+/* ---------- Quiz builder v2: near-miss questions, verbatim-only ----------
+   Rules: every quote must exist verbatim in the same statute's own fields
+   (principle / rule / case / parts[].label / exception). No cross-statute
+   data, no invented exceptions, no assumed and/or between parts. A template
+   that cannot be built safely is SKIPPED, never guessed. */
+var QUIZ_LETTERS=["ก","ข","ค","ง"];
+function quizNorm(s){ return String(s==null?"":s).replace(/\s+/g," ").trim(); }
+function quizContains(hay, needle){
+  var h=quizNorm(hay), n=quizNorm(needle);
+  if(!n) return false;
+  return h.indexOf(n)>=0;
+}
+function fnv1aSeed(str){
+  var h=2166136261>>>0;
+  var s=String(str==null?"":str);
+  for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=(Math.imul(h,16777619))>>>0; }
+  return h>>>0;
+}
+function seededShuffle(arr, seedStr){
+  var a=arr.slice();
+  var s=fnv1aSeed(seedStr);
+  function next(){ s=(Math.imul(s,1664525)+1013904223)>>>0; return s/4294967296; }
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(next()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+function quizSplitClauses(text){
+  var t=quizNorm(text);
+  if(!t) return [];
+  var parts=t.split(/\s+(?:และ|หรือ|แต่|เว้นแต่|โดย|ซึ่ง)\s+|;\s*/);
+  return parts.map(function(p){ return quizNorm(p); }).filter(function(p){ return p.length>=12; });
+}
+function quizPartLabels(model){
+  var out=[];
+  if(model&&Array.isArray(model.parts)) model.parts.forEach(function(p){ var l=quizNorm(p&&p.label); if(l) out.push(l); });
+  var seen={}, res=[];
+  out.forEach(function(l){ if(!seen[l]){ seen[l]=true; res.push(l); } });
+  return res;
+}
+function quizHasExceptionLabel(labels){
+  for(var i=0;i<labels.length;i++){ if(/เว้นแต่|ยกเว้น|ข้อยกเว้น/.test(labels[i])) return true; }
+  return false;
+}
+function quizValidateQuestion(q, model){
+  if(!q||!quizNorm(q.prompt)||!Array.isArray(q.options)||q.options.length!==4) return false;
+  var correctCount=0, seen={};
+  for(var i=0;i<q.options.length;i++){
+    var o=q.options[i];
+    if(!o||!o.id||!quizNorm(o.text)||!quizNorm(o.reason)) return false;
+    if(seen["id:"+o.id]) return false; seen["id:"+o.id]=true;
+    if(seen["t:"+quizNorm(o.text)]) return false; seen["t:"+quizNorm(o.text)]=true;
+    if(o.isCorrect) correctCount++;
+  }
+  if(correctCount!==1) return false;
+  if(q.quote){
+    var ok=false;
+    var fields=[model?model.principle:"", model?model.rule:"", model?model.case:"", model?model.exception:""];
+    for(var j=0;j<fields.length;j++){ if(fields[j]&&quizContains(fields[j], q.quote)){ ok=true; break; } }
+    if(!ok&&model&&Array.isArray(model.parts)){
+      for(var k=0;k<model.parts.length;k++){ if(model.parts[k]&&quizContains(model.parts[k].label, q.quote)){ ok=true; break; } }
+    }
+    if(!ok) return false;
+  }
+  return true;
+}
+function quizQuoteSourceLabel(model, quote){
+  if(model&&model.rule&&quizContains(model.rule, quote)) return "หลักกฎหมายที่ใช้ฝึกเขียนตอบ";
+  if(model&&model.principle&&quizContains(model.principle, quote)) return "ความหมายโดยสรุป";
+  if(model&&model.case&&quizContains(model.case, quote)) return "สถานการณ์";
+  if(model&&model.exception&&quizContains(model.exception, quote)) return "ข้อควรระวัง";
+  return "ข้อมูลของมาตรานี้";
+}
+/* Reviewed 3-question spec for มาตรา 144 — verbatim quotes from the model. */
+function buildReviewed144Questions(model){
+  var rule=quizNorm(model&&model.rule);
+  var trap=quizNorm(model&&model.exception);
+  var labels=quizPartLabels(model);
+  if(!rule) return [];
+  if(!quizContains(rule, "เจ้าของทรัพย์ย่อมเป็นเจ้าของส่วนควบนั้นด้วย")) return [];
+  if(!quizContains(trap, "วัตถุที่ติดตั้งเพิ่มไม่ใช่ส่วนควบทุกกรณี")) return [];
+  if(labels.indexOf("เป็นส่วนสำคัญ")<0||labels.indexOf("แยกแล้วเสียหายหรือเปลี่ยนสภาพ")<0) return [];
+  var qs=[
+    {
+      id:"q1", kind:"elements",
+      prompt:"จากสถานการณ์ข้างต้น ข้อใดเลือกประเด็นตรวจสถานะขาโต๊ะได้ครบตามข้อมูล?",
+      options:[
+        {id:"q1-a", text:"ตรวจว่าขาโต๊ะเป็นส่วนสำคัญ แล้วจบการวิเคราะห์", isCorrect:false, reason:"ตรวจเพียงหนึ่งองค์ประกอบ"},
+        {id:"q1-b", text:"ตรวจผลจากการถอดขา แล้วจบการวิเคราะห์", isCorrect:false, reason:"ตรวจเพียงหนึ่งองค์ประกอบ"},
+        {id:"q1-c", text:"ตรวจทั้งความเป็นส่วนสำคัญและผลจากการแยกออก", isCorrect:true, reason:"ครบทั้งสองประเด็นที่ต้องตรวจ"},
+        {id:"q1-d", text:"ตรวจผลเรื่องเจ้าของส่วนควบ แล้วจบการวิเคราะห์", isCorrect:false, reason:"ข้ามไปตอบเรื่องกรรมสิทธิ์ก่อนตรวจสถานะ"}
+      ],
+      quote:rule, quoteSource:"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",
+      explanation:"อ้างอิง (หลักกฎหมายที่ใช้ฝึกเขียนตอบ): “"+rule+"” — ข้อ ค ครบทั้งสองประเด็นที่ต้องตรวจ (ความเป็นส่วนสำคัญ และผลจากการแยกออก) ข้อ ก และข้อ ข ตรวจเพียงด้านเดียว ส่วนข้อ ง ข้ามไปตอบเรื่องกรรมสิทธิ์ก่อนตรวจสถานะว่าเป็นส่วนควบหรือไม่"
+    },
+    {
+      id:"q2", kind:"consequence",
+      prompt:"หากตรวจตามข้อมูลแล้วว่าขาโต๊ะเป็นส่วนควบ ข้อความใดตอบประเด็นกรรมสิทธิ์โดยตรง?",
+      options:[
+        {id:"q2-a", text:"เจ้าของทรัพย์ย่อมเป็นเจ้าของส่วนควบนั้นด้วย", isCorrect:true, reason:"ตอบประเด็นกรรมสิทธิ์โดยตรง"},
+        {id:"q2-b", text:"เป็นส่วนสำคัญของทรัพย์ตามสภาพหรือจารีต", isCorrect:false, reason:"เป็นประเด็นตรวจสถานะ ไม่ใช่คำตอบเรื่องกรรมสิทธิ์"},
+        {id:"q2-c", text:"การแยกออกทำให้ทรัพย์เสียหายหรือเปลี่ยนสภาพ", isCorrect:false, reason:"เป็นประเด็นตรวจสถานะ ไม่ใช่คำตอบเรื่องกรรมสิทธิ์"},
+        {id:"q2-d", text:"วัตถุที่ติดตั้งเพิ่มไม่ใช่ส่วนควบทุกกรณี", isCorrect:false, reason:"เป็นข้อควรระวัง ไม่ใช่คำตอบเรื่องกรรมสิทธิ์"}
+      ],
+      quote:"เจ้าของทรัพย์ย่อมเป็นเจ้าของส่วนควบนั้นด้วย", quoteSource:"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",
+      explanation:"อ้างอิง (หลักกฎหมายที่ใช้ฝึกเขียนตอบ): “เจ้าของทรัพย์ย่อมเป็นเจ้าของส่วนควบนั้นด้วย” — ข้อ ก ตอบประเด็นกรรมสิทธิ์โดยตรง ข้อ ข และข้อ ค เป็นประเด็นตรวจสถานะว่าเป็นส่วนควบหรือไม่ ส่วนข้อ ง เป็นข้อควรระวัง ไม่ใช่คำตอบเรื่องกรรมสิทธิ์"
+    },
+    {
+      id:"q3", kind:"trap",
+      prompt:"ผู้เรียนเสนอว่า 'เมื่อเห็นว่าขาติดกับโต๊ะ ก็จบการตรวจว่าเป็นส่วนควบได้' ข้อใดประเมินวิธีคิดนี้ได้ครบที่สุด?",
+      options:[
+        {id:"q3-a", text:"ควรตรวจเพิ่มเฉพาะความเป็นส่วนสำคัญ", isCorrect:false, reason:"ตรวจเพิ่มเพียงด้านเดียว"},
+        {id:"q3-b", text:"ควรตรวจเพิ่มเฉพาะผลจากการแยกออก", isCorrect:false, reason:"ตรวจเพิ่มเพียงด้านเดียว"},
+        {id:"q3-c", text:"ควรตรวจเพิ่มเฉพาะผลเรื่องเจ้าของส่วนควบ", isCorrect:false, reason:"ไม่ตรวจสถานะว่าเป็นส่วนควบหรือไม่"},
+        {id:"q3-d", text:"ควรตรวจทั้งความเป็นส่วนสำคัญและผลจากการแยกออก", isCorrect:true, reason:"อุดช่องว่างครบทั้งสองด้าน"}
+      ],
+      quote:trap, quoteSource:"ข้อควรระวัง",
+      explanation:"อ้างอิง (ข้อควรระวัง): “"+trap+"” และ (หลักกฎหมายที่ใช้ฝึกเขียนตอบ): “"+rule+"” — ข้อ ง อุดช่องว่างครบทั้งสองด้าน ข้อ ก และข้อ ข ตรวจเพิ่มเพียงด้านเดียว ส่วนข้อ ค ไม่ตรวจสถานะว่าเป็นส่วนควบหรือไม่"
+    }
+  ];
+  var out=[];
+  for(var i=0;i<qs.length;i++){ if(quizValidateQuestion(qs[i], model)) out.push(qs[i]); }
+  return out.length===3?out:[];
+}
+/* Generic T1: elements checklist from parts labels (>=2 parts, no exception label). */
+function buildElementsQuestion(model, labels){
+  if(!model||labels.length<2||quizHasExceptionLabel(labels)) return null;
+  var rule=quizNorm(model.rule||""), principle=quizNorm(model.principle||"");
+  if(!rule&&!principle) return null;
+  var caseText=quizNorm(model.case||"");
+  var prompt=caseText?"จากสถานการณ์ข้างต้น ข้อใดเลือกประเด็นที่ต้องตรวจได้ครบตามข้อมูล?":"จากหลักของมาตรานี้ ข้อใดเลือกประเด็นที่ต้องตรวจได้ครบที่สุด?";
+  var all="ตรวจทั้ง “"+labels.join("” และ “")+"”";
+  var q={
+    id:"q-elements", kind:"elements", prompt:prompt,
+    options:[
+      {id:"t1-single-1", text:"ตรวจเฉพาะ “"+labels[0]+"” แล้วจบการวิเคราะห์", isCorrect:false, reason:"ตรวจเพียงหนึ่งประเด็น"},
+      {id:"t1-single-2", text:"ตรวจเฉพาะ “"+labels[1]+"” แล้วจบการวิเคราะห์", isCorrect:false, reason:"ตรวจเพียงหนึ่งประเด็น"},
+      {id:"t1-all", text:all, isCorrect:true, reason:"ครบทุกประเด็นที่ต้องตรวจ"},
+      {id:"t1-jump", text:"ข้ามไปตอบผลทางกฎหมายก่อนตรวจประเด็นสถานะ", isCorrect:false, reason:"ข้ามไปตอบผลก่อนตรวจประเด็นสถานะ"}
+    ],
+    quote:rule||principle, quoteSource:rule?"หลักกฎหมายที่ใช้ฝึกเขียนตอบ":"ความหมายโดยสรุป",
+    explanation:""
+  };
+  var expl="อ้างอิง ("+q.quoteSource+"): “"+q.quote+"” — ประเด็นที่ต้องตรวจให้ครบตามข้อมูล ได้แก่ “"+labels.join("” / “")+"”";
+  if(model.parts&&model.parts[0]&&quizNorm(model.parts[0].caution)) expl+=" ข้อควรระวังจากข้อมูลมาตรานี้: “"+quizNorm(model.parts[0].caution)+"”";
+  q.explanation=expl;
+  return quizValidateQuestion(q, model)?q:null;
+}
+/* Generic T2: condition vs consequence — split rule ONLY at an explicit
+   consequence marker already in the text (ย่อม / จึง / ถือว่า). */
+function buildConsequenceQuestion(model, labels){
+  if(!model||labels.length<2||quizHasExceptionLabel(labels)) return null;
+  var rule=quizNorm(model.rule||"");
+  var trap=quizNorm(model.exception||"");
+  if(!rule||!trap) return null;
+  var markers=["ย่อม","จึง","ถือว่า"];
+  var after=null;
+  for(var m=0;m<markers.length&&!after;m++){
+    var idx=rule.indexOf(markers[m]);
+    if(idx>15){
+      var cand=quizNorm(rule.slice(idx));
+      if(cand.length>=10&&cand.indexOf("หาก")<0&&cand.indexOf("เมื่อ")<0) after=cand;
+    }
+  }
+  if(!after) return null;
+  var opts=[
+    {id:"t2-cons", text:after, isCorrect:true, reason:"ตอบประเด็นผลทางกฎหมายโดยตรง"},
+    {id:"t2-status-1", text:"ประเด็น “"+labels[0]+"”", isCorrect:false, reason:"เป็นประเด็นตรวจสถานะ ไม่ใช่คำตอบเรื่องผลทางกฎหมาย"},
+    {id:"t2-status-2", text:"ประเด็น “"+labels[1]+"”", isCorrect:false, reason:"เป็นประเด็นตรวจสถานะ ไม่ใช่คำตอบเรื่องผลทางกฎหมาย"},
+    {id:"t2-trap", text:trap, isCorrect:false, reason:"เป็นข้อควรระวัง ไม่ใช่คำตอบเรื่องผลทางกฎหมาย"}
+  ];
+  var lens=opts.map(function(o){ return o.text.length; });
+  var mn=Math.min.apply(null, lens), mx=Math.max.apply(null, lens);
+  if(mx/mn>3) return null;
+  var q={
+    id:"q-consequence", kind:"consequence",
+    prompt:"หากตรวจตามข้อมูลแล้วว่าข้อเท็จจริงเข้าเงื่อนไขของมาตรานี้ ข้อความใดตอบประเด็นผลทางกฎหมายโดยตรง?",
+    options:opts, quote:rule, quoteSource:"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",
+    explanation:"อ้างอิง (หลักกฎหมายที่ใช้ฝึกเขียนตอบ): “"+rule+"” — ข้อที่ถูกตอบประเด็นผลทางกฎหมายโดยตรง (“"+after+"”) ส่วนตัวเลือกอื่นเป็นประเด็นตรวจสถานะหรือข้อควรระวัง"
+  };
+  return quizValidateQuestion(q, model)?q:null;
+}
+/* Generic T3: trap — evaluate the one-sided shortcut, using the trap verbatim. */
+function buildTrapQuestion(model, labels){
+  if(!model||labels.length<2||quizHasExceptionLabel(labels)) return null;
+  var trap=quizNorm(model.exception||"");
+  var rule=quizNorm(model.rule||""), principle=quizNorm(model.principle||"");
+  if(!trap||(!rule&&!principle)) return null;
+  var caseText=quizNorm(model.case||"");
+  var prompt=caseText?"ผู้เรียนเสนอว่า 'เมื่อเห็นข้อเท็จจริงเพียงด้านเดียวตรงกับสถานการณ์ ก็จบการตรวจได้' ข้อใดประเมินวิธีคิดนี้ได้ครบที่สุด?":"ผู้เรียนเสนอว่า 'เมื่อเห็นข้อเท็จจริงเพียงด้านเดียว ก็จบการตรวจได้' ข้อใดประเมินวิธีคิดนี้ได้ครบที่สุด?";
+  var all="ควรตรวจทั้ง “"+labels.join("” และ “")+"”";
+  var q={
+    id:"q-trap", kind:"trap", prompt:prompt,
+    options:[
+      {id:"t3-single-1", text:"ควรตรวจเพิ่มเฉพาะ “"+labels[0]+"”", isCorrect:false, reason:"ตรวจเพิ่มเพียงด้านเดียว"},
+      {id:"t3-single-2", text:"ควรตรวจเพิ่มเฉพาะ “"+labels[1]+"”", isCorrect:false, reason:"ตรวจเพิ่มเพียงด้านเดียว"},
+      {id:"t3-result", text:"ควรตรวจเพิ่มเฉพาะผลทางกฎหมาย", isCorrect:false, reason:"ไม่ตรวจสถานะให้ครบก่อน"},
+      {id:"t3-all", text:all, isCorrect:true, reason:"อุดช่องว่างครบทุกประเด็น"}
+    ],
+    quote:trap, quoteSource:"ข้อควรระวัง",
+    explanation:"อ้างอิง (ข้อควรระวัง): “"+trap+"” — ข้อที่ถูกอุดช่องว่างครบทุกประเด็น ตัวเลือกอื่นตรวจเพิ่มเพียงด้านเดียวหรือไม่ตรวจสถานะให้ครบก่อน"
+  };
+  if(rule) q.explanation+=" และ (หลักกฎหมายที่ใช้ฝึกเขียนตอบ): “"+rule+"”";
+  return quizValidateQuestion(q, model)?q:null;
+}
+/* Fallback: quote-identification reading comprehension from verbatim clauses. */
+function buildQuoteQuestion(kind, model, usedSet){
+  var rule=quizNorm(model?model.rule:""), principle=quizNorm(model?model.principle:"");
+  var caseText=quizNorm(model?model.case:""), trap=quizNorm(model?model.exception:"");
+  var src="", srcLabel="", prompt="", distSrcs=[];
+  if(kind==="rule"){ src=rule; srcLabel="หลักกฎหมายที่ใช้ฝึกเขียนตอบ"; prompt="ข้อความใดต่อไปนี้ปรากฏในหลักกฎหมายที่ใช้ฝึกเขียนตอบของมาตรานี้?";
+    distSrcs=[{text:principle, label:"ความหมายโดยสรุป"}, {text:caseText, label:"สถานการณ์"}, {text:trap, label:"ข้อควรระวัง"}];
+  } else if(kind==="case"){ src=caseText; srcLabel="สถานการณ์"; prompt="สถานการณ์ข้างต้นกล่าวถึงข้อเท็จจริงใด?";
+    distSrcs=[{text:rule, label:"หลักกฎหมายที่ใช้ฝึกเขียนตอบ"}, {text:principle, label:"ความหมายโดยสรุป"}, {text:trap, label:"ข้อควรระวัง"}];
+  } else if(kind==="principle"){ src=principle; srcLabel="ความหมายโดยสรุป"; prompt="ข้อความใดต่อไปนี้ปรากฏในความหมายโดยสรุปของมาตรานี้?";
+    distSrcs=[{text:rule, label:"หลักกฎหมายที่ใช้ฝึกเขียนตอบ"}, {text:caseText, label:"สถานการณ์"}, {text:trap, label:"ข้อควรระวัง"}];
+  } else return null;
+  if(!src) return null;
+  var clauses=quizSplitClauses(src).filter(function(c){ return !usedSet[c]; });
+  var correct=null;
+  for(var i=0;i<clauses.length;i++){
+    var c=clauses[i], inOther=false;
+    for(var j=0;j<distSrcs.length;j++){ if(distSrcs[j].text&&quizContains(distSrcs[j].text, c)){ inOther=true; break; } }
+    if(!inOther){ correct=c; break; }
+  }
+  if(!correct) return null;
+  var dOpts=[], seen={};
+  seen[correct]=true;
+  for(var j=0;j<distSrcs.length&&dOpts.length<3;j++){
+    var ds=distSrcs[j];
+    if(!ds.text) continue;
+    var dcs=quizSplitClauses(ds.text);
+    for(var k=0;k<dcs.length&&dOpts.length<3;k++){
+      var dc=dcs[k];
+      if(seen[dc]) continue;
+      if(quizContains(src, dc)) continue;
+      seen[dc]=true;
+      dOpts.push({text:dc, from:ds.label});
+    }
+    var whole=quizNorm(ds.text);
+    if(dOpts.length<3&&whole.length>=12&&!seen[whole]&&!quizContains(src, whole)){
+      seen[whole]=true;
+      dOpts.push({text:whole, from:ds.label});
+    }
+  }
+  if(dOpts.length<3) return null;
+  // Length guard: the CORRECT option must not be an outlier — not tiny vs
+  // even the shortest distractor, not huge vs the typical (median) one.
+  // (Distractors may vary among themselves without hinting the answer.)
+  var dLens=dOpts.map(function(d){ return d.text.length; }).sort(function(a,b){ return a-b; });
+  var median=dLens[Math.floor(dLens.length/2)];
+  if(correct.length<0.4*dLens[0]||correct.length>2.5*median) return null;
+  usedSet[correct]=true;
+  var opts=[{id:"rq-"+kind+"-correct", text:correct, isCorrect:true, reason:"ปรากฏใน"+srcLabel}];
+  dOpts.forEach(function(d, idx){
+    opts.push({id:"rq-"+kind+"-d"+(idx+1), text:d.text, isCorrect:false, reason:"ข้อความนี้มาจาก"+d.from+" ไม่ปรากฏใน"+srcLabel});
+  });
+  var q={id:"q-quote-"+kind, kind:"quote-"+kind, prompt:prompt, options:opts, quote:correct, quoteSource:srcLabel,
+    explanation:"อ้างอิง ("+srcLabel+"): “"+correct+"”"};
+  return quizValidateQuestion(q, model)?q:null;
+}
+function buildQuizQuestions(model){
+  if(!model) return [];
+  var id=String(model.id!=null?model.id:"");
+  if(id==="144"){
+    var reviewed=buildReviewed144Questions(model);
+    if(reviewed.length===3) return reviewed;
+  }
+  var qs=[];
+  var labels=quizPartLabels(model);
+  var t1=buildElementsQuestion(model, labels);
+  if(t1) qs.push(t1);
+  var t2=buildConsequenceQuestion(model, labels);
+  if(t2) qs.push(t2);
+  var t3=buildTrapQuestion(model, labels);
+  if(t3) qs.push(t3);
+  if(qs.length<3){
+    var used={};
+    qs.forEach(function(q){ if(q.quote) used[q.quote]=true; });
+    var kinds=["rule","case","principle"];
+    for(var i=0;i<kinds.length&&qs.length<3;i++){
+      var rq=buildQuoteQuestion(kinds[i], model, used);
+      if(rq) qs.push(rq);
+    }
+  }
+  qs.forEach(function(q, idx){ q.id="q"+(idx+1); });
+  var out=[];
+  for(var j=0;j<qs.length;j++){ if(quizValidateQuestion(qs[j], model)) out.push(qs[j]); }
+  return out;
+}
 function mount(host,model,options){
   var image=host.querySelector(".niti-ill-image");
   var details=host.querySelector(".niti-ill-details");
@@ -1135,67 +1456,130 @@ function mount(host,model,options){
       window.navigator.clipboard.writeText(link).then(function(){ setShareStatus("คัดลอกลิงก์แล้ว"); }).catch(function(){ fallback(); });
     } else { fallback(); }
   });
-  // ---------- Mini-quiz ก / ข (SAFE: correct = principle/rule verbatim, distractor = generic, never invented rule) ----------
+  // ---------- Quiz v2: near-miss questions, 4 options each, per-question feedback ----------
   var quizWrap=node("div","niti-ill-quiz");
   quizWrap.appendChild(node("h3","niti-ill-quiz-title","ลองตอบ: สถานการณ์มาตรา "+String(model.id||"")));
-  var quizQ=node("p","niti-ill-quiz-q","สถานการณ์: "+String(model.case||""));
-  quizWrap.appendChild(quizQ);
-  quizWrap.appendChild(node("p","niti-ill-quiz-instr","เลือกคำตอบที่ตรงกับหลักของมาตรานี้ที่สุด (ข้อ ก / ข้อ ข)"));
-  var quizOpts=node("div","niti-ill-quiz-opts");
-  quizWrap.appendChild(quizOpts);
-  var quizFeedback=node("div","niti-ill-quiz-feedback","");
-  quizFeedback.setAttribute("aria-live","polite");
-  quizWrap.appendChild(quizFeedback);
-  // Insert quiz after shareBar
+  if(model.case) quizWrap.appendChild(node("p","niti-ill-quiz-q","สถานการณ์: "+String(model.case)));
+  var quizScore=node("p","niti-ill-quiz-score","");
+  quizScore.setAttribute("aria-live","polite");
+  quizWrap.appendChild(quizScore);
+  quizWrap.appendChild(node("p","niti-ill-quiz-instr","เลือกคำตอบที่ตรงกับหลักของมาตรานี้ที่สุด (ข้อ ก / ข / ค / ง) ตอบแล้วดูเฉลยอธิบายของแต่ละข้อ"));
   if(shareBar.nextSibling) safeInsertBefore(host, quizWrap, shareBar.nextSibling); else host.appendChild(quizWrap);
-  var correctText=String(model.rule||model.principle||"").trim();
-  var distractorText="ไม่ต้องพิจารณาเงื่อนไขอื่นเลย";
-  var numericPart=parseInt(String(model.id||""),10);
-  if(isNaN(numericPart)) numericPart=0;
-  var correctIsA=(numericPart%2===0);
-  var quizOptions=[];
-  if(correctIsA){ quizOptions=[{key:"ก", text:correctText, isCorrect:true},{key:"ข", text:distractorText, isCorrect:false}]; }
-  else { quizOptions=[{key:"ก", text:distractorText, isCorrect:false},{key:"ข", text:correctText, isCorrect:true}]; }
-  var quizButtons=[];
-  quizOptions.forEach(function(opt){
-    var b=node("button","niti-ill-quiz-btn","ข้อ "+opt.key+" — "+truncateDisplay(opt.text,180));
-    b.type="button"; b.setAttribute("data-quiz-key",opt.key); b.setAttribute("aria-pressed","false");
-    b.addEventListener("click", function(){ answerQuiz(opt.key); });
-    quizOpts.appendChild(b); quizButtons.push(b);
-  });
-  function renderQuizFeedback(choiceKey, isCorrect){
-    quizFeedback.replaceChildren();
-    var correctKey=correctIsA?"ก":"ข";
-    var head=node("p","niti-ill-quiz-result", isCorrect?("ตอบถูกต้อง! (ข้อ "+choiceKey+")") : ("ยังไม่ตรงตามหลักมาตรา "+String(model.id||"")+" (คำตอบที่ถูกคือ ข้อ "+correctKey+")"));
-    quizFeedback.appendChild(head);
-    var expl=node("p","niti-ill-quiz-expl","");
-    var fullCorrect=correctText;
-    expl.textContent="เฉลย: "+fullCorrect;
-    quizFeedback.appendChild(expl);
-    if(model.exception){
-      var exc=node("p","niti-ill-quiz-exc","ข้อควรระวัง: "+String(model.exception));
-      quizFeedback.appendChild(exc);
-    }
-    quizFeedback.appendChild(node("p","niti-ill-quiz-disc",FOOTER_DISCLAIMER));
-    quizButtons.forEach(function(btn){
-      var k=btn.getAttribute("data-quiz-key");
-      var isCorr=(k===correctKey);
-      btn.classList.toggle("is-correct", isCorr);
-      btn.classList.toggle("is-picked", k===choiceKey);
-      btn.classList.toggle("is-wrong-picked", k===choiceKey && !isCorrect);
-      btn.setAttribute("aria-pressed", String(k===choiceKey));
+  var quizQuestions=[];
+  try{ quizQuestions=buildQuizQuestions(model)||[]; }catch(e){ quizQuestions=[]; }
+  var quizSetVersion=quizSetVersionFor(model.id);
+  var quizSaved={};
+  try{ quizSaved=getQuizAnswers(model.id, quizSetVersion)||{}; }catch(e){ quizSaved={}; }
+  if(!quizQuestions.length){
+    quizWrap.appendChild(node("p","niti-ill-quiz-empty","ข้อมูลยังไม่เพียงพอสำหรับแบบทดสอบ"));
+    quizScore.textContent="คะแนน: —";
+  } else {
+    var quizItems=[];
+    quizQuestions.forEach(function(q, qi){
+      var item=node("div","niti-ill-quiz-item");
+      item.appendChild(node("p","niti-ill-quiz-item-q","ข้อที่ "+(qi+1)+" — "+q.prompt));
+      var optsEl=node("div","niti-ill-quiz-item-opts");
+      item.appendChild(optsEl);
+      var fb=node("div","niti-ill-quiz-item-feedback","");
+      fb.setAttribute("aria-live","polite");
+      item.appendChild(fb);
+      quizWrap.appendChild(item);
+      var entry={q:q, qi:qi, optsEl:optsEl, fb:fb, buttons:[]};
+      var shuffled=seededShuffle(q.options, String(model.id)+":"+qi);
+      shuffled.forEach(function(opt, oi){
+        var letter=QUIZ_LETTERS[oi];
+        var b=node("button","niti-ill-quiz-btn","ข้อ "+letter+" — "+opt.text);
+        b.type="button"; b.setAttribute("data-quiz-qid",q.id); b.setAttribute("data-quiz-opt",opt.id); b.setAttribute("aria-pressed","false");
+        b.addEventListener("click", function(){ answerQuizItem(entry, opt); });
+        optsEl.appendChild(b);
+        entry.buttons.push({btn:b, opt:opt, letter:letter});
+      });
+      quizItems.push(entry);
     });
+    // Drop saved answers whose option no longer exists in the current set.
+    Object.keys(quizSaved).forEach(function(qid){
+      var ok=false;
+      for(var i=0;i<quizItems.length;i++){
+        if(quizItems[i].q.id!==qid) continue;
+        for(var j=0;j<quizItems[i].q.options.length;j++){ if(quizItems[i].q.options[j].id===(quizSaved[qid]&&quizSaved[qid].optionId)) ok=true; }
+      }
+      if(!ok) delete quizSaved[qid];
+    });
+    function quizComputeScore(){
+      var total=quizQuestions.length, answered=0, correct=0;
+      quizItems.forEach(function(entry){
+        var a=quizSaved[entry.q.id];
+        if(a&&a.optionId){
+          var o=null;
+          for(var i=0;i<entry.q.options.length;i++){ if(entry.q.options[i].id===a.optionId){ o=entry.q.options[i]; break; } }
+          if(o){ answered++; if(o.isCorrect) correct++; }
+        }
+      });
+      return {total:total, answered:answered, correct:correct};
+    }
+    function renderQuizScore(){
+      var s=quizComputeScore();
+      quizScore.textContent="ตอบแล้ว "+s.answered+"/"+s.total+" ข้อ · ถูก "+s.correct+"/"+s.total+" ข้อ";
+    }
+    function renderQuizItemFeedback(entry){
+      var a=quizSaved[entry.q.id];
+      entry.fb.replaceChildren();
+      if(!a||!a.optionId) return;
+      var picked=null, correctOpt=null;
+      entry.q.options.forEach(function(o){ if(o.id===a.optionId) picked=o; if(o.isCorrect) correctOpt=o; });
+      if(!picked||!correctOpt) return;
+      var pickedLetter="", correctLetter="";
+      entry.buttons.forEach(function(b){ if(b.opt.id===picked.id) pickedLetter=b.letter; if(b.opt.id===correctOpt.id) correctLetter=b.letter; });
+      var isCorrect=!!picked.isCorrect;
+      entry.fb.appendChild(node("p","niti-ill-quiz-result", isCorrect?("ตอบถูกต้อง! (ข้อ "+pickedLetter+")"):("ยังไม่ตรง (คำตอบที่ถูกคือ ข้อ "+correctLetter+")")));
+      var list=node("ul","niti-ill-quiz-reason-list");
+      entry.buttons.forEach(function(b){
+        var li=node("li","niti-ill-quiz-reason","");
+        li.textContent="ข้อ "+b.letter+" — "+b.opt.text+" — "+(b.opt.isCorrect?"ถูก: ":"ผิด: ")+b.opt.reason;
+        li.classList.add(b.opt.isCorrect?"is-correct":"is-wrong");
+        list.appendChild(li);
+      });
+      entry.fb.appendChild(list);
+      entry.fb.appendChild(node("p","niti-ill-quiz-expl", entry.q.explanation));
+      entry.fb.appendChild(node("p","niti-ill-quiz-disc",FOOTER_DISCLAIMER));
+      entry.buttons.forEach(function(b){
+        b.btn.classList.toggle("is-correct", !!b.opt.isCorrect);
+        b.btn.classList.toggle("is-picked", b.opt.id===picked.id);
+        b.btn.classList.toggle("is-wrong-picked", b.opt.id===picked.id && !isCorrect);
+        b.btn.setAttribute("aria-pressed", String(b.opt.id===picked.id));
+        b.btn.disabled=true;
+      });
+    }
+    function answerQuizItem(entry, opt){
+      if(quizSaved[entry.q.id]&&quizSaved[entry.q.id].optionId) return;
+      try{
+        var res=setQuizAnswer(model.id, quizSetVersion, entry.q.id, opt.id);
+        if(res&&res.answers) quizSaved=res.answers;
+        else quizSaved[entry.q.id]={optionId:opt.id};
+      }catch(e){ quizSaved[entry.q.id]={optionId:opt.id}; }
+      renderQuizItemFeedback(entry);
+      renderQuizScore();
+    }
+    quizItems.forEach(function(entry){ renderQuizItemFeedback(entry); });
+    renderQuizScore();
+    var retryBtn=node("button","niti-ill-quiz-retry","ลองทำใหม่");
+    retryBtn.type="button";
+    retryBtn.addEventListener("click", function(){
+      try{ clearQuizAnswers(model.id, quizSetVersion); }catch(e){}
+      quizSaved={};
+      quizItems.forEach(function(entry){
+        entry.fb.replaceChildren();
+        entry.buttons.forEach(function(b){ b.btn.disabled=false; b.btn.classList.remove("is-correct","is-picked","is-wrong-picked"); b.btn.setAttribute("aria-pressed","false"); });
+      });
+      renderQuizScore();
+    });
+    quizWrap.appendChild(retryBtn);
+    if(isQuizSaveUnavailable()){
+      quizWrap.appendChild(node("p","niti-ill-quiz-save-note","หมายเหตุ: บันทึกคำตอบไว้ในเครื่องนี้ไม่ได้ คำตอบจะไม่ถูกเก็บไว้เมื่อโหลดหน้าใหม่"));
+    }
+    quizWrap.appendChild(node("p","niti-ill-quiz-disc",FOOTER_DISCLAIMER));
   }
-  function answerQuiz(choiceKey){
-    var isCorrect=(choiceKey===(correctIsA?"ก":"ข"));
-    try{ setQuizStatus(model.id, choiceKey, isCorrect); }catch(e){}
-    renderQuizFeedback(choiceKey, isCorrect);
-  }
-  // Restore on reload
-  try{
-    var saved=getQuizStatus(model.id);
-    if(saved && saved.choice){ renderQuizFeedback(saved.choice, saved.isCorrect); }
-  }catch(e){}
+
 
   function onKeys(ev){
     if(!ev||!ev.key) return;
@@ -1228,5 +1612,5 @@ function computePointSlots(model){
   return out;
 }
 function pointSlots(model){return computePointSlots(model);}
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,QUIZ_KEY:QUIZ_KEY,__build:"20261015d"};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,getQuizAnswers:getQuizAnswers,setQuizAnswer:setQuizAnswer,clearQuizAnswers:clearQuizAnswers,buildQuizQuestions:buildQuizQuestions,QUIZ_KEY:QUIZ_KEY,QUIZ_SCHEMA_VERSION:QUIZ_SCHEMA_VERSION,__build:"20261015e"};
 })();
