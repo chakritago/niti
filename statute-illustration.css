@@ -89,3 +89,32 @@
 .niti-condition-label{font-size:.96rem;line-height:1.8;color:#334155;overflow-wrap:anywhere}
 @media(max-width:520px){.niti-conditions-grid{padding:12px}.niti-conditions-list{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.niti-condition-card{transition:none!important;transform:none!important}}
+
+
+/* Share bar + Quiz (v3) — HTML only, no overlap */
+.niti-ill-sharebar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px;border:1px solid #d7e2ea;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(23,47,67,.06);margin:14px 0}
+.niti-ill-share-title{font-weight:800;font-size:.95rem;color:#111827}
+.niti-ill-share-btn{min-height:44px;padding:9px 14px;border:1.5px solid #c5d5df;border-radius:12px;background:#fff;color:#1b364e;font:inherit;font-size:.92rem;font-weight:750;cursor:pointer}
+.niti-ill-share-btn:hover{border-color:#1761a5;transform:translateY(-1px);box-shadow:0 3px 10px rgba(23,47,67,.10)}
+.niti-ill-share-btn:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
+.niti-ill-share-status{font-size:.9rem;color:#52657a;overflow-wrap:anywhere}
+.niti-ill-quiz{padding:18px 20px;border-radius:16px;background:#fff;border:1px solid #d7e2ea;box-shadow:0 2px 12px rgba(23,47,67,.06);margin:14px 0}
+.niti-ill-quiz-title{margin:0 0 8px;font:800 1.15rem/1.5 "IBM Plex Sans Thai",Tahoma,sans-serif;color:#1E40AF}
+.niti-ill-quiz-q{font-size:1.02rem;line-height:1.9;margin:0 0 8px;overflow-wrap:anywhere}
+.niti-ill-quiz-instr{font-size:.92rem;color:#52657a;margin:0 0 12px}
+.niti-ill-quiz-opts{display:grid;gap:10px}
+@media(min-width:640px){.niti-ill-quiz-opts{grid-template-columns:1fr 1fr}}
+.niti-ill-quiz-btn{min-height:56px;padding:12px 14px;border:1.5px solid #c5d5df;border-radius:12px;background:#F8FAFD;color:#1b364e;font:inherit;font-size:.98rem;line-height:1.65;text-align:start;cursor:pointer;overflow-wrap:anywhere}
+.niti-ill-quiz-btn:hover{border-color:#1761a5}
+.niti-ill-quiz-btn:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
+.niti-ill-quiz-btn.is-correct{border-color:#047857;background:#ECFDF5;box-shadow:0 0 0 2px #047857 inset}
+.niti-ill-quiz-btn.is-picked.is-correct{border-color:#047857;background:#ECFDF5}
+.niti-ill-quiz-btn.is-wrong-picked{border-color:#B91C1C;background:#FEF2F2;box-shadow:0 0 0 2px #B91C1C inset}
+.niti-ill-quiz-feedback{margin-top:12px}
+.niti-ill-quiz-result{font-weight:800;font-size:1.02rem;margin:0 0 8px}
+.niti-ill-quiz-expl,.niti-ill-quiz-exc,.niti-ill-quiz-disc{font-size:.98rem;line-height:1.85;margin:6px 0;overflow-wrap:anywhere}
+.niti-ill-quiz-disc{color:#6B7280;border-top:1px dashed #CBD5E1;padding-top:10px}
+@media(prefers-reduced-motion:reduce){.niti-ill-share-btn,.niti-ill-quiz-btn{transition:none!important;transform:none!important}}
+/* Universal SVG cards: ensure text never bleeds, decorative art never blocks clicks */
+.niti-law-svg .niti-ill-hotspot{pointer-events:auto}
+.niti-law-svg .niti-visual-decor{pointer-events:none}
