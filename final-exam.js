@@ -108,7 +108,7 @@ function render(){
   found.forEach(function(id){
    var note=byId[id]||{id:id,title:"อ่านตัวบทกฎหมาย"};
    var card=el("article","final-card");card.id="final-section-"+id;
-   var top=el("div","final-card-top");top.appendChild(el("span","final-statute","§ "+id));
+   var top=el("div","final-card-top");top.appendChild(el("span","final-statute","มาตรา "+id));
    var cbLabel=el("label","final-check");var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!saved[id];cb.setAttribute("aria-label","อ่านมาตรา "+id+" แล้ว");
    cb.addEventListener("change",function(){saved[id]=cb.checked;try{localStorage.setItem(key,JSON.stringify(saved));}catch(e){}tally();if(filter!=="all")render();});
    cbLabel.appendChild(cb);cbLabel.appendChild(document.createTextNode(" อ่านแล้ว"));top.appendChild(cbLabel);card.appendChild(top);
