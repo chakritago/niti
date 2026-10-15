@@ -1647,5 +1647,5 @@ function computePointSlots(model){
   return out;
 }
 function pointSlots(model){return computePointSlots(model);}
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,getQuizAnswers:getQuizAnswers,setQuizAnswer:setQuizAnswer,clearQuizAnswers:clearQuizAnswers,buildQuizQuestions:buildQuizQuestions,QUIZ_KEY:QUIZ_KEY,QUIZ_SCHEMA_VERSION:QUIZ_SCHEMA_VERSION,__build:"20261015f"};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,getQuizAnswers:getQuizAnswers,setQuizAnswer:setQuizAnswer,clearQuizAnswers:clearQuizAnswers,buildQuizQuestions:buildQuizQuestions,QUIZ_KEY:QUIZ_KEY,QUIZ_SCHEMA_VERSION:QUIZ_SCHEMA_VERSION,__build:"20261015g"};
 })();
