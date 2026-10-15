@@ -41,8 +41,19 @@ function setup(){
  dialog.setAttribute("aria-labelledby","niti-statute-dialog-title");
  dialog.setAttribute("aria-describedby","niti-statute-dialog-description");
  dialog.addEventListener("click",function(event){if(event.target===dialog)dialog.close();});
+ dialog.addEventListener("cancel",function(event){
+  try{
+    if(window.NitiFullscreen&&typeof window.NitiFullscreen.isActive==="function"&&window.NitiFullscreen.isActive()){
+      event.preventDefault();
+      window.NitiFullscreen.exit();
+    }
+  }catch(e){}
+ });
  dialog.addEventListener("close",function(){
   if(viewer)viewer.src="about:blank";
+  try{
+    if(window.NitiFullscreen&&typeof window.NitiFullscreen.isActive==="function"&&window.NitiFullscreen.isActive()) window.NitiFullscreen.exit();
+  }catch(e){}
   if(previousFocus&&typeof previousFocus.focus==="function")previousFocus.focus();
  });
  document.body.appendChild(dialog);
@@ -50,7 +61,7 @@ function setup(){
 
 
 /* Accessible two-dimensional interactive illustration. */
-function buildIllustration(model){
+function buildIllustration(model, opts){
  var outer=element("section","niti-illustration");
  outer.setAttribute("aria-label","ภาพประกอบกฎหมายมาตรา "+model.id);
  outer.appendChild(element("h3","niti-ill-heading","🖼️ ภาพโต้ตอบ · "+model.kindLabel+" (มาตรา "+model.id+")"));
@@ -68,9 +79,11 @@ function buildIllustration(model){
  outer.appendChild(list);
  outer.appendChild(element("div","niti-ill-progress",""));
  outer.appendChild(element("p","niti-ill-caution","ภาพเป็นเหตุการณ์สมมติเพื่อการศึกษา ไม่ใช่คำพิพากษา ข้อเท็จจริงบางข้อเป็นทางเลือกหรือข้อยกเว้น ต้องดูทุกวรรคจากตัวบทกฎหมายทางการประกอบ"));
+ outer.classList.add("niti-module-card");
+ try{ outer.dataset.hasTopSummary=(opts&&opts.collapseIntroText)?"true":"false"; }catch(e){}
  var app=window.NITI_STATUTE_ILLUSTRATION;
  if(app&&typeof app.mount==="function"){
-  try{ app.mount(outer,model); }
+  try{ app.mount(outer,model,opts||{}); }
   catch(err){
    try{ console.warn("[NITI] illustration mount failed:", err); }catch(e){}
    details.appendChild(element("p","","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
@@ -137,21 +150,23 @@ function openStatute(value,opener){
   var description=element("p","niti-reader-disclaimer","กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ");
   description.id="niti-statute-dialog-description";
   body.appendChild(description);
-  if(model){
-   try{ body.appendChild(buildIllustration(model)); }
-   catch(err){
-    try{ console.warn("[NITI] illustration failed:", err); }catch(e){}
-    body.appendChild(element("p","niti-reader-missing","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
-   }
-  }
-  if(note){
-   var summary=element("div","niti-reader-summary");
+  var hasSummaryContent=!!(note&&(note.plain||note.exam||note.conditions||note.trap));
+  if(note&&hasSummaryContent){
+   var summary=element("div","niti-reader-summary niti-summary-top-priority");
    section(summary,"ความหมายโดยสรุป",note.plain);
    section(summary,"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",note.exam);
    section(summary,"องค์ประกอบที่ต้องพิจารณา",note.conditions);
    section(summary,"ข้อควรระวัง",note.trap);
    body.appendChild(summary);
-  }else{
+  }
+  if(model){
+   try{ body.appendChild(buildIllustration(model,{collapseIntroText:hasSummaryContent})); }
+   catch(err){
+    try{ console.warn("[NITI] illustration failed:", err); }catch(e){}
+    body.appendChild(element("p","niti-reader-missing","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
+   }
+  }
+  if(!note){
    body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
   }
   if(ref){
