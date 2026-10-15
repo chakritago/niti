@@ -138,6 +138,111 @@ function normalizeIllustrationAfterMount(outer, opts){
     if(!outer.querySelector('[data-action="toggle-fullscreen"]')) injectFallbackFullscreen(outer);
   }catch(e){}
 }
+/* Stale-illustration quiz-letter repair (defense in depth).
+   The remapper in fresh illustration.js is correct (verified with the real
+   144 Q1 spec + real shuffle), but browsers/CDN can serve a stale
+   illustration.js after a push while reader.js is already fresh. Then the
+   explanation tail keeps SPEC-order letters while buttons show shuffled
+   letters. This repair rebuilds the tail from the DOM reason list, whose
+   letters always match the buttons. It runs only when the loaded
+   illustration build predates the remapper build, and only when the tail's
+   first credited letter disagrees with the displayed correct letter, so
+   with fresh files it is a no-op. A MutationObserver catches feedback
+   rendered later by a fresh answer click, not just mount-time feedback. */
+var QUIZ_LETTER_FIX_BUILD="20261015g";
+var quizFixObserver=null;
+function quizExplIsStaleBuild(){
+  try{
+    var app=window.NITI_STATUTE_ILLUSTRATION;
+    var b=app&&app.__build;
+    if(!b) return true;
+    return String(b)<QUIZ_LETTER_FIX_BUILD;
+  }catch(e){ return true; }
+}
+function quizReasonItems(item){
+  var out=[];
+  try{
+    var list=item.querySelectorAll(".niti-ill-quiz-reason");
+    for(var i=0;i<list.length;i++){
+      var li=list[i];
+      var text=String(li.textContent||"");
+      var m=text.match(/^ข้อ\s*([กขคง])\s*—\s*(.*)$/);
+      if(!m) continue;
+      var rest=m[2];
+      var idx=rest.lastIndexOf(" — ");
+      var tail=idx>=0?rest.slice(idx+3):"";
+      var correct=false;
+      try{ correct=li.classList.contains("is-correct"); }catch(e){}
+      if(!correct) correct=/^ถูก\s*:/.test(tail);
+      var reason=tail.replace(/^(ถูก|ผิด)\s*:\s*/,"");
+      out.push({letter:m[1], reason:reason, isCorrect:correct});
+    }
+  }catch(e){}
+  return out;
+}
+function repairQuizExpl(expl){
+  try{
+    if(!expl||expl.getAttribute("data-niti-letter-fixed")==="1") return;
+    if(!quizExplIsStaleBuild()) return;
+    var item=null;
+    try{ item=expl.closest?expl.closest(".niti-ill-quiz-item"):null; }catch(e){ item=null; }
+    if(!item) return;
+    var text=String(expl.textContent||"");
+    var sep=" — ";
+    var idx=text.lastIndexOf(sep);
+    if(idx<0) return;
+    var head=text.slice(0, idx+sep.length);
+    var tail=text.slice(idx+sep.length);
+    var first=tail.match(/ข้อ\s*([กขคง])/);
+    if(!first) return;
+    var reasons=quizReasonItems(item);
+    if(!reasons.length) return;
+    var correct=null;
+    for(var i=0;i<reasons.length;i++){ if(reasons[i].isCorrect) correct=reasons[i]; }
+    if(!correct) return;
+    if(first[1]===correct.letter) return;
+    var parts=["คำตอบที่ถูกคือ ข้อ "+correct.letter+" — "+correct.reason+"."];
+    for(var j=0;j<reasons.length;j++){
+      if(reasons[j].isCorrect) continue;
+      parts.push("ข้อ "+reasons[j].letter+" — "+reasons[j].reason+".");
+    }
+    expl.textContent=head+parts.join(" ");
+    expl.setAttribute("data-niti-letter-fixed","1");
+  }catch(e){}
+}
+function repairAllQuizExpl(){
+  try{
+    if(!dialog) return;
+    var nodes=dialog.querySelectorAll(".niti-ill-quiz-expl");
+    for(var i=0;i<nodes.length;i++) repairQuizExpl(nodes[i]);
+  }catch(e){}
+}
+function startStaleQuizFix(){
+  try{ repairAllQuizExpl(); }catch(e){}
+  try{
+    if(quizFixObserver) return;
+    if(typeof window.MutationObserver!=="function") return;
+    if(!quizExplIsStaleBuild()) return;
+    quizFixObserver=new window.MutationObserver(function(mutations){
+      for(var i=0;i<mutations.length;i++){
+        var mut=mutations[i];
+        for(var j=0;j<mut.addedNodes.length;j++){
+          var n=mut.addedNodes[j];
+          if(!n||n.nodeType!==1) continue;
+          if(n.classList&&n.classList.contains("niti-ill-quiz-expl")) repairQuizExpl(n);
+          try{
+            var inner=n.querySelectorAll?n.querySelectorAll(".niti-ill-quiz-expl"):[];
+            for(var k=0;k<inner.length;k++) repairQuizExpl(inner[k]);
+          }catch(e){}
+        }
+      }
+    });
+    if(dialog) quizFixObserver.observe(dialog,{childList:true,subtree:true});
+  }catch(e){}
+}
+function stopStaleQuizFix(){
+  try{ if(quizFixObserver){ quizFixObserver.disconnect(); quizFixObserver=null; } }catch(e){}
+}
 function normalize(value){
  if(typeof sourceMap.normalizeId==="function")return sourceMap.normalizeId(value);
  var match=String(value||"").trim().match(/^(\d+(?:\/\d+)?)/);
@@ -186,6 +291,7 @@ function setup(){
   }catch(e){}
  });
  dialog.addEventListener("close",function(){
+  try{ stopStaleQuizFix(); }catch(e){}
   if(viewer)viewer.src="about:blank";
   try{
     if(window.NitiFullscreen&&typeof window.NitiFullscreen.isActive==="function"&&window.NitiFullscreen.isActive()) window.NitiFullscreen.exit();
@@ -332,6 +438,7 @@ function openStatute(value,opener){
   dialog.appendChild(body);
   if(typeof dialog.showModal==="function"){ dialog.showModal(); }
   else { dialog.setAttribute("open",""); }
+  try{ startStaleQuizFix(); }catch(e){}
   try{ close.focus(); }catch(e){}
   return true;
  }catch(e){
@@ -363,5 +470,5 @@ document.addEventListener("click",function(event){
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261015d"};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261015g"};
 })();
