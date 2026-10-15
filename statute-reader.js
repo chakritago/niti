@@ -69,78 +69,147 @@ function buildIllustration(model){
  outer.appendChild(element("div","niti-ill-progress",""));
  outer.appendChild(element("p","niti-ill-caution","ภาพเป็นเหตุการณ์สมมติเพื่อการศึกษา ไม่ใช่คำพิพากษา ข้อเท็จจริงบางข้อเป็นทางเลือกหรือข้อยกเว้น ต้องดูทุกวรรคจากตัวบทกฎหมายทางการประกอบ"));
  var app=window.NITI_STATUTE_ILLUSTRATION;
- if(app&&typeof app.mount==="function")app.mount(outer,model);
- else details.appendChild(element("p","","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
+ if(app&&typeof app.mount==="function"){
+  try{ app.mount(outer,model); }
+  catch(err){
+   try{ console.warn("[NITI] illustration mount failed:", err); }catch(e){}
+   details.appendChild(element("p","","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
+  }
+ } else details.appendChild(element("p","","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
  return outer;
 }
 
+var suppressHashOpen=false;
+function knownStatuteIds(){
+ var ids={};
+ try{ Object.keys(noteById).forEach(function(k){ids[k]=true;}); }catch(e){}
+ try{ if(window.NITI_DIORAMA_DATA&&Array.isArray(window.NITI_DIORAMA_DATA.ids)) window.NITI_DIORAMA_DATA.ids.forEach(function(k){ids[String(k)]=true;}); }catch(e){}
+ try{ if(sourceMap.direct) Object.keys(sourceMap.direct).forEach(function(k){ids[k]=true;}); }catch(e){}
+ return ids;
+}
+function idFromHash(){
+ try{
+  var h=String(window.location.hash||"");
+  var m=h.match(/^#statute-(.+)$/);
+  if(!m) return "";
+  var raw=""; try{ raw=decodeURIComponent(m[1]); }catch(e){ raw=m[1]; }
+  raw=String(raw||"").trim();
+  if(!raw) return "";
+  var known=knownStatuteIds();
+  if(known[raw]) return raw;
+  var slash=raw.replace("-","/");
+  if(known[slash]) return slash;
+  return normalize(raw);
+ }catch(e){ return ""; }
+}
+function maybeOpenFromHash(){
+ if(suppressHashOpen){ suppressHashOpen=false; return; }
+ if(dialog&&dialog.open) return;
+ var id=idFromHash();
+ if(id) openStatute(id,null);
+}
 function openStatute(value,opener){
- var id=normalize(value),ref=typeof sourceMap.resolve==="function"?sourceMap.resolve(id):null;
- if(!id||!ref)return false;
- setup();
- if(typeof dialog.showModal!=="function")return false;
- previousFocus=opener||document.activeElement;
- dialog.replaceChildren();
- var head=element("div","niti-reader-header");
- var heading=element("h2","", "ป.พ.พ. มาตรา "+id);
- heading.id="niti-statute-dialog-title";
- var close=element("button","niti-reader-close","ปิด ×");
- close.type="button";
- close.setAttribute("aria-label","ปิดหน้าต่างอ่านมาตรา");
- close.addEventListener("click",function(){dialog.close();});
- head.appendChild(heading);
- head.appendChild(close);
- dialog.appendChild(head);
- var body=element("div","niti-reader-body");
- var title=(noteById[id]||{}).title||(sourceMap.titles||{})[id]||"บทบัญญัติกฎหมายแพ่งและพาณิชย์";
- body.appendChild(element("p","niti-reader-subtitle",title));
- var description=element("p","niti-reader-disclaimer","กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ");
- description.id="niti-statute-dialog-description";
- body.appendChild(description);
- var model=window.NITI_DIORAMA_DATA&&window.NITI_DIORAMA_DATA.get(id);
- if(model)body.appendChild(buildIllustration(model));
- var note=noteById[id];
- if(note){
-  var summary=element("div","niti-reader-summary");
-  section(summary,"ความหมายโดยสรุป",note.plain);
-  section(summary,"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",note.exam);
-  section(summary,"องค์ประกอบที่ต้องพิจารณา",note.conditions);
-  section(summary,"ข้อควรระวัง",note.trap);
-  body.appendChild(summary);
- }else{
-  body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
+ try{
+  var id=normalize(value);
+  if(!id) return false;
+  var note=noteById[id]||null;
+  var model=null;
+  try{ model=window.NITI_DIORAMA_DATA&&window.NITI_DIORAMA_DATA.get(id); }catch(e){ model=null; }
+  var ref=typeof sourceMap.resolve==="function"?sourceMap.resolve(id):null;
+  if(!ref&&!note&&!model) return false;
+  setup();
+  if(dialog.open){ try{ dialog.close(); }catch(e){} }
+  previousFocus=opener||document.activeElement;
+  dialog.replaceChildren();
+  var head=element("div","niti-reader-header");
+  var heading=element("h2","", "ป.พ.พ. มาตรา "+id);
+  heading.id="niti-statute-dialog-title";
+  var close=element("button","niti-reader-close","ปิด ×");
+  close.type="button";
+  close.setAttribute("aria-label","ปิดหน้าต่างอ่านมาตรา");
+  close.addEventListener("click",function(){dialog.close();});
+  head.appendChild(heading);
+  head.appendChild(close);
+  dialog.appendChild(head);
+  var body=element("div","niti-reader-body");
+  var title=(noteById[id]||{}).title||(sourceMap.titles||{})[id]||"บทบัญญัติกฎหมายแพ่งและพาณิชย์";
+  body.appendChild(element("p","niti-reader-subtitle",title));
+  var description=element("p","niti-reader-disclaimer","กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ");
+  description.id="niti-statute-dialog-description";
+  body.appendChild(description);
+  if(model){
+   try{ body.appendChild(buildIllustration(model)); }
+   catch(err){
+    try{ console.warn("[NITI] illustration failed:", err); }catch(e){}
+    body.appendChild(element("p","niti-reader-missing","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดอ่านคำอธิบายมาตราจากส่วนถัดไป"));
+   }
+  }
+  if(note){
+   var summary=element("div","niti-reader-summary");
+   section(summary,"ความหมายโดยสรุป",note.plain);
+   section(summary,"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",note.exam);
+   section(summary,"องค์ประกอบที่ต้องพิจารณา",note.conditions);
+   section(summary,"ข้อควรระวัง",note.trap);
+   body.appendChild(summary);
+  }else{
+   body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
+  }
+  if(ref){
+   var actions=element("div","niti-reader-actions");
+   actions.appendChild(link(ref.primaryUrl,"เปิดตัวบทฉบับทางการ PDF หน้า "+ref.page+" ↗","niti-reader-primary"));
+   var inside=link("./study.html#"+anchorId(id),"ดูการ์ดมาตรานี้ในหน้าเว็บ ↓","niti-reader-inside");
+   inside.addEventListener("click",function(){ suppressHashOpen=true; dialog.close(); });
+   actions.appendChild(inside);
+   body.appendChild(actions);
+   var textHeading=element("h3","niti-reader-pdf-title","อ่านข้อความมาตราในเอกสารต้นฉบับ");
+   body.appendChild(textHeading);
+   body.appendChild(element("p","niti-reader-pdf-note","กรอบนี้แสดง PDF ของหน่วยงานรัฐ โดยกำหนดหน้า "+ref.page+" หากไม่แสดงหรือไม่เลื่อนไปหน้าที่กำหนด ให้ใช้ปุ่มเปิด PDF ด้านบน"));
+   viewer=element("iframe","niti-reader-pdf");
+   viewer.title="ตัวบทมาตรา "+id+" จากเอกสารกฎหมายทางการ หน้า "+ref.page;
+   viewer.setAttribute("loading","lazy");
+   viewer.setAttribute("referrerpolicy","no-referrer");
+   viewer.src=ref.primaryUrl;
+   body.appendChild(viewer);
+   if(ref.sourceType==="gov-consolidated"){
+    body.appendChild(element("p","niti-reader-pdf-note","เอกสารรวมบางฉบับอาจมีข้อความก่อนการแก้ไขเพิ่มเติม ควรตรวจฉบับปัจจุบันของศาลยุติธรรมประกอบ"));
+   }
+   if(sourceMap.currentConsolidated&&sourceMap.currentConsolidated.url){
+    body.appendChild(link(sourceMap.currentConsolidated.url,"ตรวจประมวลฉบับปรับปรุงจากศาลยุติธรรม ↗","niti-reader-updated"));
+   }
+  }
+  dialog.appendChild(body);
+  if(typeof dialog.showModal==="function"){ dialog.showModal(); }
+  else { dialog.setAttribute("open",""); }
+  try{ close.focus(); }catch(e){}
+  return true;
+ }catch(e){
+  try{
+   setup();
+   if(dialog.open){ try{ dialog.close(); }catch(_){} }
+   dialog.replaceChildren();
+   var h2=element("h2","","ป.พ.พ. มาตรา "+String(value||""));
+   var cls=element("button","niti-reader-close","ปิด ×");
+   cls.type="button";
+   cls.addEventListener("click",function(){dialog.close();});
+   dialog.appendChild(h2);
+   dialog.appendChild(cls);
+   dialog.appendChild(element("p","niti-reader-missing","ไม่สามารถเปิดภาพโต้ตอบได้ โปรดลองอีกครั้ง หรืออ่านคำอธิบายมาตราจากการ์ดมาตราในหน้าเว็บ"));
+   if(typeof dialog.showModal==="function"){ dialog.showModal(); }
+   else { dialog.setAttribute("open",""); }
+   return true;
+  }catch(_2){ return false; }
  }
- var actions=element("div","niti-reader-actions");
- actions.appendChild(link(ref.primaryUrl,"เปิดตัวบทฉบับทางการ PDF หน้า "+ref.page+" ↗","niti-reader-primary"));
- var inside=link("./study.html#"+anchorId(id),"ดูการ์ดมาตรานี้ในหน้าเว็บ ↓","niti-reader-inside");
- inside.addEventListener("click",function(){dialog.close();});
- actions.appendChild(inside);
- body.appendChild(actions);
- var textHeading=element("h3","niti-reader-pdf-title","อ่านข้อความมาตราในเอกสารต้นฉบับ");
- body.appendChild(textHeading);
- body.appendChild(element("p","niti-reader-pdf-note","กรอบนี้แสดง PDF ของหน่วยงานรัฐ โดยกำหนดหน้า "+ref.page+" หากไม่แสดงหรือไม่เลื่อนไปหน้าที่กำหนด ให้ใช้ปุ่มเปิด PDF ด้านบน"));
- viewer=element("iframe","niti-reader-pdf");
- viewer.title="ตัวบทมาตรา "+id+" จากเอกสารกฎหมายทางการ หน้า "+ref.page;
- viewer.setAttribute("loading","lazy");
- viewer.setAttribute("referrerpolicy","no-referrer");
- viewer.src=ref.primaryUrl;
- body.appendChild(viewer);
- if(ref.sourceType==="gov-consolidated"){
-  body.appendChild(element("p","niti-reader-pdf-note","เอกสารรวมบางฉบับอาจมีข้อความก่อนการแก้ไขเพิ่มเติม ควรตรวจฉบับปัจจุบันของศาลยุติธรรมประกอบ"));
- }
- if(sourceMap.currentConsolidated&&sourceMap.currentConsolidated.url){
-  body.appendChild(link(sourceMap.currentConsolidated.url,"ตรวจประมวลฉบับปรับปรุงจากศาลยุติธรรม ↗","niti-reader-updated"));
- }
- dialog.appendChild(body);
- dialog.showModal();
- close.focus();
- return true;
 }
 document.addEventListener("click",function(event){
  var target=event.target&&event.target.closest?event.target.closest("a[data-statute]"):null;
  if(!target)return;
  var id=normalize(target.getAttribute("data-statute"));
- if(openStatute(id,target))event.preventDefault();
+ var opened=false;
+ try{ opened=openStatute(id,target); }catch(e){ opened=false; }
+ if(opened)event.preventDefault();
 });
+if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
+else { setTimeout(maybeOpenFromHash,0); }
+window.addEventListener("hashchange",maybeOpenFromHash);
 window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId};
 })();
