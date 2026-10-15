@@ -1,7 +1,8 @@
 /* NITI illustrated legal scenarios: accessible 2D SVG and no external rendering dependencies.
- * Zero-collision build: SVG holds ONLY short role/verb/number badges (wrapped, measured).
- * Long Thai explanations live in HTML panels (meaning / elements / conditions grid) where text can flow.
- * SVG selection and HTML controls explain facts, not issue an automated legal judgment.
+ * Zero-collision build v3: SVG viewBox 0 0 880 380, strict Y-zoning Header 0-48 / Visual Strip 58-145 / Auto-Slot Cards 155-340.
+ * SVG holds ONLY short role/verb/number badges (wrapped, measured, opaque backing + clipPath). Long Thai lives in HTML only.
+ * Features: share PNG + copy link, mini-quiz ก/ข with instant feedback (safe distractors, no invented rules), localStorage read/unread + quiz status.
+ * Legal texts rendered verbatim only; no new legal facts.
  */
 (function(){
 "use strict";
@@ -81,6 +82,105 @@ function overallReadText(){
   if(!keys.length) return "";
   return "อ่านแล้ว "+countReadFromMap(map)+" จาก "+keys.length+" มาตราที่เคยเปิด";
 }
+
+/* ---------- Quiz persistence (separate from read key) ---------- */
+var QUIZ_KEY="niti_quiz_status_v1";
+var quizMem={};
+function loadQuizMap(){
+  try{
+    if(typeof localStorage==="undefined") return {};
+    var raw=localStorage.getItem(QUIZ_KEY);
+    if(!raw) return {};
+    var p=JSON.parse(raw);
+    if(!p||typeof p!=="object"||Array.isArray(p)) return {};
+    return p;
+  }catch(e){ return {}; }
+}
+function saveQuizMap(m){
+  try{ if(typeof localStorage!=="undefined") localStorage.setItem(QUIZ_KEY, JSON.stringify(m)); return true; }catch(e){ return false; }
+}
+function getQuizStatus(id){
+  var k=String(id==null?"":id);
+  var m=loadQuizMap();
+  var e=m[k];
+  if(e&&typeof e==="object") return {choice:typeof e.choice==="string"?e.choice:null, isCorrect:e.isCorrect===true, updatedAt:typeof e.updatedAt==="string"?e.updatedAt:null};
+  return {choice:null, isCorrect:false, updatedAt:null};
+}
+function setQuizStatus(id, choice, isCorrect){
+  var k=String(id==null?"":id);
+  var at=new Date().toISOString();
+  var m=loadQuizMap();
+  m[k]={choice:choice, isCorrect:isCorrect===true, updatedAt:at};
+  quizMem[k]=m[k];
+  saveQuizMap(m);
+  return {choice:choice, isCorrect:isCorrect===true, updatedAt:at};
+}
+/* ---------- Universal slots: strict Y-zoning, gap >=16, all 64 sections ---------- */
+function computeUniversalSlots(n){
+  var total=Number(n)||0;
+  if(total<=0) return [];
+  var margin=16, gap=16, top=155, availH=185, availW=880-32;
+  var cols, rows;
+  if(total<=1){ cols=1; rows=1; }
+  else if(total<=3){ cols=total; rows=1; }
+  else if(total===4){ cols=2; rows=2; }
+  else { cols=3; rows=2; }
+  var w=Math.floor((availW-(cols-1)*gap)/cols);
+  var h=Math.floor((availH-(rows-1)*gap)/rows);
+  var out=[];
+  for(var i=0;i<total;i++){
+    var col=i%cols, row=Math.floor(i/cols);
+    var rowCount=(row===rows-1 && (total%cols)!==0) ? (total%cols) : cols;
+    // For full rows rowCount==cols; for last partial row center it.
+    if(row<rows-1) rowCount=cols;
+    var rowW=rowCount*w+(rowCount-1)*gap;
+    var x0=Math.floor((880-rowW)/2);
+    out.push({x:x0+col*(w+gap), y:top+row*(h+gap), w:w, h:h});
+  }
+  return out;
+}
+function computePointSlotsUniversal(n){ return computeUniversalSlots(n); }
+/* Opaque pill backing helper: every SVG text sits on #FFFFFF opacity 100% + clipPath */
+function pillBacking(g, x, y, w, h, fill, stroke, dashed, clipId){
+  // clipPath to guarantee no text bleeds outside card
+  var defs=g.ownerDocument?null:null;
+  var clip=null;
+  try{
+    var svgRoot=g.ownerSVGElement||g;
+    // find nearest svg ancestor via parent chain
+    var p=g;
+    while(p && p.tagName!=="svg") p=p.parentNode;
+    if(p){
+      var d=p.querySelector("defs");
+      if(d){
+        clip=document.createElementNS(NS,"clipPath");
+        clip.setAttribute("id",clipId);
+        var cr=document.createElementNS(NS,"rect");
+        cr.setAttribute("x",String(x)); cr.setAttribute("y",String(y));
+        cr.setAttribute("width",String(w)); cr.setAttribute("height",String(h));
+        cr.setAttribute("rx","12");
+        clip.appendChild(cr); d.appendChild(clip);
+      }
+    }
+  }catch(e){}
+  var r=rect(g,x,y,w,h,"#FFFFFF",12,"none");
+  r.setAttribute("opacity","1");
+  r.setAttribute("fill","#FFFFFF");
+  r.setAttribute("fill-opacity","1");
+  if(clipId) r.setAttribute("clip-path","url(#"+clipId+")");
+  var border=rect(g,x,y,w,h,fill||"#FFFFFF",12,stroke||"#CBD5E1");
+  border.setAttribute("fill","none");
+  border.setAttribute("stroke-width","2");
+  if(dashed) border.setAttribute("stroke-dasharray","6 4");
+  return {backing:r, border:border, clipId:clipId};
+}
+function truncateDisplay(s, maxChars){
+  var t=String(s||"").replace(/\s+/g," ").trim();
+  var m=maxChars||180;
+  if(t.length<=m) return t;
+  return t.slice(0,m-1)+"…";
+}
+
 function inferPartType(part){
   var s=(part&&part.label)||"";
   if(/ข้อยกเว้น|ยกเว้น|เว้นแต่|ไม่ต้อง|ไม่จำเป็น/.test(s))return "exception";
@@ -315,25 +415,28 @@ function drawObject(g,kind,x,y,s){
 
 /* ---------- Compact header (measured, no overlap) ---------- */
 function drawHeader(g,model){
-  rect(g,0,0,880,64,"#FFFFFF",0,"#CBD5E1");
-  rect(g,16,16,104,32,"#1E40AF",16);
-  svgMultiline(g,68,37,"มาตรา "+String(model.id||""),{fontSize:14,maxWidth:96,maxLines:1,fill:"#FFFFFF",weight:"800"});
+  // Strict zone Header 0-48, opaque backing, measured legend, no overlap
+  rect(g,0,0,880,48,"#FFFFFF",0,"#CBD5E1");
+  rect(g,16,10,104,28,"#1E40AF",14);
+  svgMultiline(g,68,28,"มาตรา "+String(model.id||""),{fontSize:13,maxWidth:96,maxLines:1,fill:"#FFFFFF",weight:"800"});
   var title=String(model.title||("มาตรา "+String(model.id||"")));
-  svgMultiline(g,132,30,title,{fontSize:18,maxWidth:560,maxLines:1,fill:"#111827",weight:"800",anchor:"start"});
-  svgMultiline(g,132,52,"หมวด: "+String(model.kindLabel||model.kind||""),{fontSize:12.5,maxWidth:560,maxLines:1,fill:"#4B5563",weight:"600",anchor:"start"});
-  // Legend: 3 role pills, measured spacing, right-aligned, never overlapping title
+  svgMultiline(g,132,22,title,{fontSize:16,maxWidth:500,maxLines:1,fill:"#111827",weight:"800",anchor:"start"});
+  svgMultiline(g,132,40,"หมวด: "+String(model.kindLabel||model.kind||""),{fontSize:11,maxWidth:500,maxLines:1,fill:"#4B5563",weight:"600",anchor:"start"});
+  // Legend right-aligned, measured, gap >=8
   var lx=880-16;
   var pills=ROLE_STYLES.slice().reverse();
   pills.forEach(function(r){
-    var w=Math.ceil(measureThaiTextWidth(r.label,11,"700"))+28;
+    var w=Math.ceil(measureThaiTextWidth(r.label,10,"700"))+24;
     lx-=w;
-    var rr=rect(g,lx,20,w,24,r.bg,12,r.color); rr.setAttribute("stroke-width","1.5");
-    svgMultiline(g,lx+w/2,36,r.label,{fontSize:11,maxWidth:w-12,maxLines:1,fill:r.color,weight:"700"});
+    var rr=rect(g,lx,12,w,24,r.bg,12,r.color); rr.setAttribute("stroke-width","1.5");
+    svgMultiline(g,lx+w/2,28,r.label,{fontSize:10,maxWidth:w-10,maxLines:1,fill:r.color,weight:"700"});
     lx-=8;
   });
 }
 function drawFooter(g){
-  svgMultiline(g,440,386,FOOTER_DISCLAIMER,{fontSize:12,maxWidth:800,maxLines:1,fill:"#6B7280",weight:"600"});
+  // Footer zone 340-380, opaque backing
+  rect(g,0,340,880,40,"#FFFFFF",0,"#E5E7EB");
+  svgMultiline(g,440,364,FOOTER_DISCLAIMER,{fontSize:11,maxWidth:800,maxLines:1,fill:"#6B7280",weight:"600"});
 }
 
 /* ---------- Action-based stages: WHO does WHAT to WHOM + consequence ---------- */
@@ -456,6 +559,122 @@ function renderSvgMarkers(g, model, select){
   return marks;
 }
 
+
+/* ---------- Visual Strip 58-145: icons/arrows only, NO long sentences, pointer-events none on decor ---------- */
+function setNoPointer(el){
+  try{ if(el&&el.setAttribute) el.setAttribute("pointer-events","none"); }catch(e){}
+  return el;
+}
+function drawVisualStrip(g, model){
+  // Background
+  rect(g,0,58,880,87,"#F8FAFD",0);
+  var id=String(model.id||"");
+  var kind=String(model.kind||"");
+  // Helper to place icon with no-pointer
+  function icon(kindName, x, y, s){
+    var p=drawObject(g,kindName,x,y,s);
+    setNoPointer(p);
+    // also set children
+    try{ p.querySelectorAll("*").forEach(function(c){ c.setAttribute("pointer-events","none"); }); }catch(e){}
+    return p;
+  }
+  function arrow(x1,y1,x2,y2){
+    var a=drawArrow(g,x1,y1,x2,y2,"#047857");
+    setNoPointer(a);
+    return a;
+  }
+  var cy=102;
+  if(id==="728"){
+    icon("house",110,cy,0.55);
+    arrow(165,cy,235,cy);
+    icon("letter",300,cy,0.6);
+    arrow(365,cy,435,cy);
+    icon("calendar",500,cy,0.6);
+    arrow(565,cy,635,cy);
+    icon("gavel",700,cy,0.7);
+    // small verb badges (short only, opaque backing)
+    svgBadge(g,110,138,110,20,"บ้านจำนอง",{color:"#C2410C",bg:"#FFEDD5"});
+    svgBadge(g,300,138,110,20,"บอกกล่าว",{color:"#1E40AF",bg:"#DBEAFE"});
+    svgBadge(g,500,138,110,20,"≥ 60 วัน",{color:"#B45309",bg:"#FEF3C7"});
+    svgBadge(g,700,138,110,20,"บังคับจำนอง",{color:"#047857",bg:"#D1FAE5"});
+  } else if(id==="1387"){
+    icon("parcel",180,cy,0.6);
+    arrow(280,cy,360,cy);
+    icon("path",440,cy,0.6);
+    arrow(520,cy,600,cy);
+    icon("parcel",690,cy,0.6);
+    svgBadge(g,180,138,120,20,"สามยทรัพย์",{color:"#1E40AF",bg:"#DBEAFE"});
+    svgBadge(g,440,138,120,20,"ทางผ่าน",{color:"#047857",bg:"#D1FAE5"});
+    svgBadge(g,690,138,120,20,"ภารยทรัพย์",{color:"#C2410C",bg:"#FFEDD5"});
+  } else if(id==="1382"){
+    icon("person",170,cy,0.6);
+    arrow(240,cy,320,cy);
+    icon("fence",410,cy,0.55);
+    arrow(500,cy,580,cy);
+    icon("clock",670,cy,0.6);
+    svgBadge(g,170,138,120,20,"ครอบครอง",{color:"#1E40AF",bg:"#DBEAFE"});
+    svgBadge(g,410,138,120,20,"สงบ เปิดเผย",{color:"#047857",bg:"#D1FAE5"});
+    svgBadge(g,670,138,120,20,"10 ปี / 5 ปี",{color:"#B45309",bg:"#FEF3C7"});
+  } else if(kind==="guarantee"){
+    icon("person",170,cy,0.6); arrow(240,cy,320,cy); icon("person",410,cy,0.6); arrow(480,cy,560,cy); icon("bank",680,cy,0.6);
+    svgBadge(g,410,138,120,20,"ค้ำประกัน",{color:"#047857",bg:"#D1FAE5"});
+  } else if(kind==="mortgage"){
+    icon("house",200,cy,0.6); arrow(280,cy,360,cy); icon("document",440,cy,0.6); arrow(520,cy,600,cy); icon("bank",690,cy,0.6);
+    svgBadge(g,440,138,120,20,"ตราจำนอง",{color:"#1E40AF",bg:"#DBEAFE"});
+  } else if(kind==="pledge"){
+    icon("watch",220,cy,0.6); arrow(300,cy,380,cy); icon("handshake",470,cy,0.6); arrow(550,cy,630,cy); icon("coins",700,cy,0.6);
+    svgBadge(g,470,138,120,20,"ส่งมอบ",{color:"#047857",bg:"#D1FAE5"});
+  } else if(kind==="lease"||kind==="hire"){
+    icon("house",200,cy,0.6); arrow(280,cy,360,cy); icon("document",440,cy,0.6); arrow(520,cy,600,cy); icon("person",690,cy,0.6);
+    svgBadge(g,440,138,120,20,"ให้ใช้ทรัพย์",{color:"#1E40AF",bg:"#DBEAFE"});
+  } else if(kind==="time"){
+    icon("document",220,cy,0.6); arrow(300,cy,380,cy); icon("clock",470,cy,0.6); arrow(550,cy,630,cy); icon("gavel",700,cy,0.6);
+    svgBadge(g,470,138,120,20,"นับเวลา",{color:"#B45309",bg:"#FEF3C7"});
+  } else {
+    icon("person",200,cy,0.6); arrow(280,cy,360,cy); icon("handshake",440,cy,0.6); arrow(520,cy,600,cy); icon("person",690,cy,0.6);
+    svgBadge(g,440,138,120,20,"ทำนิติกรรม",{color:"#047857",bg:"#D1FAE5"});
+  }
+}
+/* ---------- Universal Auto-Slot Cards 155-340 ---------- */
+function renderUniversalCards(g, model, select, current){
+  var slots=computeUniversalSlots(model.parts.length);
+  var marks=[];
+  model.parts.forEach(function(part, i){
+    var slot=slots[i]||{x:16,y:155,w:200,h:80};
+    var type=inferPartType(part);
+    var st=TYPE_STYLES[type]||TYPE_STYLES.mandatory;
+    var clipId="niti-clip-"+String(model.id||"x").replace(/[^A-Za-z0-9_-]/g,"-")+"-"+i;
+    var grp=svg(g,"g",{"class":"niti-ill-hotspot",role:"button",tabindex:"0","aria-label":"ประเด็น "+(i+1)+" "+part.label+" — "+st.label,"aria-pressed":String(i===current),"data-type":type});
+    // Opaque pill backing + clipPath
+    pillBacking(grp, slot.x, slot.y, slot.w, slot.h, "#FFFFFF", st.color, !!st.dashed, clipId);
+    // Number circle
+    var cx=slot.x+22, cyy=slot.y+24;
+    var circ=circle(grp,cx,cyy,14,st.color);
+    circ.setAttribute("stroke","#FFFFFF"); circ.setAttribute("stroke-width","2");
+    svgMultiline(grp,cx,cyy+5,String(i+1),{fontSize:12,maxWidth:24,maxLines:1,fill:"#FFFFFF",weight:"800"});
+    // Type badge (short)
+    var badgeW=Math.ceil(measureThaiTextWidth(st.label,10,"700"))+18;
+    var bx=slot.x+42, by=slot.y+10;
+    var br=rect(grp,bx,by,badgeW,20,st.bg,10,st.color); br.setAttribute("stroke-width","1.5"); if(st.dashed) br.setAttribute("stroke-dasharray","6 4");
+    svgMultiline(grp,bx+badgeW/2,by+14,st.label,{fontSize:10,maxWidth:badgeW-8,maxLines:1,fill:st.color,weight:"700"});
+    // Title: max 2 lines, wrapped, inside opaque backing (clip ensures no overflow)
+    var titleLines=wrapThaiSvgLines(part.label, slot.w-24, 13, 2);
+    var titleY=slot.y+52;
+    titleLines.forEach(function(ln, li){
+      svgMultiline(grp, slot.x+slot.w/2, titleY+li*20, ln, {fontSize:13, maxWidth:slot.w-24, maxLines:1, fill:"#111827", weight:"700"});
+    });
+    // Tiny verb hint (first clause, truncated) — still short, inside card
+    var verb=svgVerbForPart(part,i);
+    if(verb && titleLines.length<2){
+      svgMultiline(grp, slot.x+slot.w/2, slot.y+slot.h-12, verb, {fontSize:11, maxWidth:slot.w-24, maxLines:1, fill:"#4B5563", weight:"600"});
+    }
+    // Click / keyboard
+    (function(idx,el){ el.addEventListener("click",function(){select(idx,true);}); el.addEventListener("keydown",function(ev){if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();select(idx,true);}}); })(i,grp);
+    marks.push(grp);
+  });
+  return marks;
+}
+
 /* ---------- mount ---------- */
 function mount(host,model){
   var image=host.querySelector(".niti-ill-image");
@@ -463,7 +682,7 @@ function mount(host,model){
   var list=host.querySelector(".niti-ill-list");
   var counter=host.querySelector(".niti-ill-progress");
   if(!image||!details||!list||!model.parts||!model.parts.length)return {dispose:function(){}};
-  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid").forEach(function(el){el.remove();});
+  host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz").forEach(function(el){el.remove();});
   image.replaceChildren();list.replaceChildren();
   // Read/unread
   var readBar=node("div","niti-ill-readbar");
@@ -514,16 +733,13 @@ function mount(host,model){
   var elemList=node("ol","niti-ill-elements-list");
   elements.appendChild(elemList);
   if(image.nextSibling) host.insertBefore(elements,image.nextSibling); else host.appendChild(elements);
-  // Compact SVG: viewBox 0 0 880 400 — visual only
-  var illustration=svg(image,"svg",{viewBox:"0 0 880 400",role:"group","aria-label":"ภาพเหตุการณ์ "+(model.kindLabel||"")+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
+  // Strict Y-zoning SVG: viewBox 0 0 880 380 — Header 0-48 / Visual Strip 58-145 / Auto-Slot Cards 155-340 / Footer 340-380
+  var illustration=svg(image,"svg",{viewBox:"0 0 880 380",role:"group","aria-label":"ภาพเหตุการณ์ "+(model.kindLabel||"")+" มีจุดให้คลิกอ่านองค์ประกอบ "+model.parts.length+" ประเด็น",preserveAspectRatio:"xMidYMid meet",class:"niti-law-svg"});
   var defs=svg(illustration,"defs",{});
   var marker=svg(defs,"marker",{id:"niti-svg-arrow",markerWidth:8,markerHeight:8,refX:6,refY:3,orient:"auto"});polygon(marker,"0,0 6,3 0,6","#278b93");
   drawHeader(illustration,model);
-  var stage=svg(illustration,"g",{transform:"translate(0,64)"});
-  drawActionStage(stage,model);
-  // Footer inside SVG (short, wrapped)
-  svgMultiline(illustration,440,386,FOOTER_DISCLAIMER,{fontSize:12,maxWidth:800,maxLines:1,fill:"#6B7280",weight:"600"});
-  // SVG dots — markers only, bound later via select
+  drawVisualStrip(illustration,model);
+  drawFooter(illustration);
   var mark=[]; var buttons=[]; var elemButtons=[]; var condCards=[];
   var states=model.parts.map(function(){return "unknown";});
   var current=0;
@@ -581,8 +797,13 @@ function mount(host,model){
     elemProgress.textContent="ตรวจแล้ว "+checked+" / "+states.length+" ประเด็น";
   }
   // Build SVG dot markers now that select exists
-  var markerGroup=svg(illustration,"g",{class:"niti-law-markers"});
-  mark=renderSvgMarkers(markerGroup,model,select);
+  // Universal Auto-Slot Cards 155-340 (gap >=16, opaque backing + clipPath)
+  var cardGroup=svg(illustration,"g",{class:"niti-law-markers"});
+  // mark will be filled after select is defined; placeholder, real cards built below via renderUniversalCards after select exists
+  // We build cards now with a forward-ref select wrapper
+  var selectRef={fn:null};
+  mark=renderUniversalCards(cardGroup,model,function(idx,focus){ if(selectRef.fn) selectRef.fn(idx,focus); },0);
+  selectRef.fn=select;
   // Build HTML lists + conditions grid
   model.parts.forEach(function(part,i){
     var button=node("button","niti-ill-pick",(i+1)+". "+part.label);
@@ -617,6 +838,143 @@ function mount(host,model){
     card.addEventListener("click",function(){select(i,true);});
     gridList.appendChild(card); condCards.push(card);
   });
+  // ---------- Share image ----------
+  var shareBar=node("div","niti-ill-sharebar");
+  var shareTitle=node("span","niti-ill-share-title","แชร์ภาพมาตรานี้");
+  var btnShare=node("button","niti-ill-share-btn","แชร์รูป / ดาวน์โหลด PNG");
+  btnShare.type="button";
+  var btnCopyLink=node("button","niti-ill-share-btn","คัดลอกลิงก์มาตรานี้");
+  btnCopyLink.type="button";
+  var shareStatus=node("span","niti-ill-share-status","");
+  shareStatus.setAttribute("aria-live","polite");
+  shareBar.appendChild(shareTitle); shareBar.appendChild(btnShare); shareBar.appendChild(btnCopyLink); shareBar.appendChild(shareStatus);
+  // Insert shareBar after image (SVG container)
+  if(image.nextSibling) host.insertBefore(shareBar, image.nextSibling); else host.appendChild(shareBar);
+  function sectionLink(){
+    try{
+      var origin=window.location.origin||"";
+      var path=window.location.pathname||"";
+      return origin+path+"#statute-"+String(model.id||"");
+    }catch(e){ return "#statute-"+String(model.id||""); }
+  }
+  function setShareStatus(msg){ try{ shareStatus.textContent=msg||""; }catch(e){} }
+  function exportPng(){
+    try{
+      var svgEl=image.querySelector("svg.niti-law-svg");
+      if(!svgEl){ setShareStatus("ไม่สามารถสร้างรูปได้"); return; }
+      var clone=svgEl.cloneNode(true);
+      clone.setAttribute("xmlns","http://www.w3.org/2000/svg");
+      clone.setAttribute("width","880"); clone.setAttribute("height","380");
+      // Ensure title + disclaimer present in clone (already in SVG header/footer)
+      var xml=new XMLSerializer().serializeToString(clone);
+      var blob=new Blob([xml],{type:"image/svg+xml;charset=utf-8"});
+      var url=URL.createObjectURL(blob);
+      var img=new Image();
+      img.onload=function(){
+        try{
+          var canvas=document.createElement("canvas");
+          canvas.width=1760; canvas.height=760;
+          var ctx=canvas.getContext("2d");
+          ctx.fillStyle="#FFFFFF"; ctx.fillRect(0,0,1760,760);
+          ctx.drawImage(img,0,0,1760,760);
+          URL.revokeObjectURL(url);
+          var fileName="NITI-มาตรา-"+String(model.id||"")+".png";
+          if(canvas.toBlob){
+            canvas.toBlob(function(b){
+              if(!b){ setShareStatus("ไม่สามารถสร้าง PNG ได้"); return; }
+              try{
+                var file=new File([b], fileName, {type:"image/png"});
+                if(window.navigator && window.navigator.share && window.navigator.canShare && window.navigator.canShare({files:[file]})){
+                  window.navigator.share({files:[file], title:"NITI มาตรา "+String(model.id||""), text:"ภาพอธิบายมาตรา "+String(model.id||"")+" — "+FOOTER_DISCLAIMER}).then(function(){ setShareStatus("แชร์รูปแล้ว"); }).catch(function(err){ if(err && err.name==="AbortError"){ /* silent */ } else { // fallback download
+                    var a=document.createElement("a"); var u=URL.createObjectURL(b); a.href=u; a.download=fileName; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(u); }, 1000); setShareStatus("ดาวน์โหลด PNG แล้ว"); } });
+                } else {
+                  var a2=document.createElement("a"); var u2=URL.createObjectURL(b); a2.href=u2; a2.download=fileName; document.body.appendChild(a2); a2.click(); a2.remove(); setTimeout(function(){ URL.revokeObjectURL(u2); }, 1000); setShareStatus("ดาวน์โหลด PNG แล้ว");
+                }
+              }catch(e){ setShareStatus("แชร์ไม่สำเร็จ ลองดาวน์โหลดแทน"); }
+            },"image/png");
+          } else { setShareStatus("เบราว์เซอร์นี้ไม่รองรับการส่งออก PNG"); }
+        }catch(e){ setShareStatus("สร้างรูปไม่สำเร็จ"); }
+      };
+      img.onerror=function(){ try{ URL.revokeObjectURL(url); }catch(e){} setShareStatus("โหลดภาพสำหรับแชร์ไม่สำเร็จ"); };
+      img.src=url;
+    }catch(e){ setShareStatus("แชร์รูปไม่สำเร็จ"); }
+  }
+  btnShare.addEventListener("click", exportPng);
+  btnCopyLink.addEventListener("click", function(){
+    var link=sectionLink();
+    function fallback(){
+      try{
+        var ta=document.createElement("textarea"); ta.value=link; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select();
+        var ok=false; try{ ok=document.execCommand("copy"); }catch(e){ ok=false; } ta.remove();
+        setShareStatus(ok?("คัดลอกลิงก์แล้ว: "+link):("ลิงก์มาตรานี้: "+link));
+      }catch(e){ setShareStatus("ลิงก์มาตรานี้: "+link); }
+    }
+    if(window.navigator && window.navigator.clipboard && window.navigator.clipboard.writeText){
+      window.navigator.clipboard.writeText(link).then(function(){ setShareStatus("คัดลอกลิงก์แล้ว"); }).catch(function(){ fallback(); });
+    } else { fallback(); }
+  });
+  // ---------- Mini-quiz ก / ข (SAFE: correct = principle/rule verbatim, distractor = generic, never invented rule) ----------
+  var quizWrap=node("div","niti-ill-quiz");
+  quizWrap.appendChild(node("h3","niti-ill-quiz-title","ลองตอบ: สถานการณ์มาตรา "+String(model.id||"")));
+  var quizQ=node("p","niti-ill-quiz-q","สถานการณ์: "+String(model.case||""));
+  quizWrap.appendChild(quizQ);
+  quizWrap.appendChild(node("p","niti-ill-quiz-instr","เลือกคำตอบที่ตรงกับหลักของมาตรานี้ที่สุด (ข้อ ก / ข้อ ข)"));
+  var quizOpts=node("div","niti-ill-quiz-opts");
+  quizWrap.appendChild(quizOpts);
+  var quizFeedback=node("div","niti-ill-quiz-feedback","");
+  quizFeedback.setAttribute("aria-live","polite");
+  quizWrap.appendChild(quizFeedback);
+  // Insert quiz after shareBar
+  if(shareBar.nextSibling) host.insertBefore(quizWrap, shareBar.nextSibling); else host.appendChild(quizWrap);
+  var correctText=String(model.rule||model.principle||"").trim();
+  var distractorText="ไม่ต้องพิจารณาเงื่อนไขอื่นเลย";
+  var numericPart=parseInt(String(model.id||""),10);
+  if(isNaN(numericPart)) numericPart=0;
+  var correctIsA=(numericPart%2===0);
+  var quizOptions=[];
+  if(correctIsA){ quizOptions=[{key:"ก", text:correctText, isCorrect:true},{key:"ข", text:distractorText, isCorrect:false}]; }
+  else { quizOptions=[{key:"ก", text:distractorText, isCorrect:false},{key:"ข", text:correctText, isCorrect:true}]; }
+  var quizButtons=[];
+  quizOptions.forEach(function(opt){
+    var b=node("button","niti-ill-quiz-btn","ข้อ "+opt.key+" — "+truncateDisplay(opt.text,180));
+    b.type="button"; b.setAttribute("data-quiz-key",opt.key); b.setAttribute("aria-pressed","false");
+    b.addEventListener("click", function(){ answerQuiz(opt.key); });
+    quizOpts.appendChild(b); quizButtons.push(b);
+  });
+  function renderQuizFeedback(choiceKey, isCorrect){
+    quizFeedback.replaceChildren();
+    var correctKey=correctIsA?"ก":"ข";
+    var head=node("p","niti-ill-quiz-result", isCorrect?("ตอบถูกต้อง! (ข้อ "+choiceKey+")") : ("ยังไม่ตรงตามหลักมาตรา "+String(model.id||"")+" (คำตอบที่ถูกคือ ข้อ "+correctKey+")"));
+    quizFeedback.appendChild(head);
+    var expl=node("p","niti-ill-quiz-expl","");
+    var fullCorrect=correctText;
+    expl.textContent="เฉลย: "+fullCorrect;
+    quizFeedback.appendChild(expl);
+    if(model.exception){
+      var exc=node("p","niti-ill-quiz-exc","ข้อควรระวัง: "+String(model.exception));
+      quizFeedback.appendChild(exc);
+    }
+    quizFeedback.appendChild(node("p","niti-ill-quiz-disc",FOOTER_DISCLAIMER));
+    quizButtons.forEach(function(btn){
+      var k=btn.getAttribute("data-quiz-key");
+      var isCorr=(k===correctKey);
+      btn.classList.toggle("is-correct", isCorr);
+      btn.classList.toggle("is-picked", k===choiceKey);
+      btn.classList.toggle("is-wrong-picked", k===choiceKey && !isCorrect);
+      btn.setAttribute("aria-pressed", String(k===choiceKey));
+    });
+  }
+  function answerQuiz(choiceKey){
+    var isCorrect=(choiceKey===(correctIsA?"ก":"ข"));
+    try{ setQuizStatus(model.id, choiceKey, isCorrect); }catch(e){}
+    renderQuizFeedback(choiceKey, isCorrect);
+  }
+  // Restore on reload
+  try{
+    var saved=getQuizStatus(model.id);
+    if(saved && saved.choice){ renderQuizFeedback(saved.choice, saved.isCorrect); }
+  }catch(e){}
+
   function onKeys(ev){
     if(!ev||!ev.key) return;
     if(ev.key==="ArrowRight"||ev.key==="ArrowDown"){ ev.preventDefault(); select((current+1)%model.parts.length,true); }
@@ -628,7 +986,7 @@ function mount(host,model){
     try{ if(typeof window!=="undefined"&&window.removeEventListener) window.removeEventListener("niti:statute-read-change",onReadChange); }catch(e){}
     try{ host.removeEventListener("keydown",onKeys); }catch(e){}
     image.replaceChildren();
-    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid").forEach(function(el){el.remove();});
+    host.querySelectorAll(".niti-ill-readbar,.niti-ill-meaning,.niti-ill-elements,.niti-conditions-grid,.niti-ill-sharebar,.niti-ill-quiz").forEach(function(el){el.remove();});
   }};
 }
 function computePointSlots(model){
@@ -639,5 +997,5 @@ function computePointSlots(model){
   return out;
 }
 function pointSlots(model){return computePointSlots(model);}
-window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY};
+window.NITI_STATUTE_ILLUSTRATION={mount:mount,draw:backdrop,computePointSlots:computePointSlots,pointSlots:computePointSlots,computeUniversalSlots:computeUniversalSlots,inferPartType:inferPartType,wrapThaiSvgLines:wrapThaiSvgLines,measureThaiTextWidth:measureThaiTextWidth,getReadStatus:getReadStatus,setReadStatus:setReadStatus,isRead:isRead,READ_KEY:READ_KEY,getQuizStatus:getQuizStatus,setQuizStatus:setQuizStatus,QUIZ_KEY:QUIZ_KEY};
 })();
