@@ -55,15 +55,16 @@ function makeStatuteCard(note,small,reference){
  var detail=newNode("article",small?"statute-small":"statute-card");
  if(!small)detail.id="statute-"+String(note.id).replace(/\//g,"-");
  var direct=referenceData&&typeof referenceData.resolve==="function"?referenceData.resolve(note.id):null;
+ var hasIllustration=false;try{hasIllustration=!!(window.NITI_DIORAMA_DATA&&typeof window.NITI_DIORAMA_DATA.get==="function"&&window.NITI_DIORAMA_DATA.get(note.id));}catch(e){}
  var head=newNode("div","statute-head");
  var title=newNode("h3","","");
  var textTitle="มาตรา "+(reference||note.id)+" — "+note.title;
  if(direct){
-  var titleLink=makeLink("./study.html#statute-"+String(note.id).replace(/\//g,"-"),textTitle+" · ดูภาพโต้ตอบ");
+  var titleLink=makeLink("./study.html#statute-"+String(note.id).replace(/\//g,"-"),textTitle+(hasIllustration?" · ดูภาพโต้ตอบ":" · ดูสรุปมาตรา"));
   titleLink.className="statute-heading-link";
   titleLink.target="_self";
   titleLink.setAttribute("data-statute",note.id);
-  titleLink.title="เปิดภาพประกอบโต้ตอบของมาตรา "+note.id+" ภายในเว็บไซต์";
+  titleLink.title=(hasIllustration?"เปิดภาพประกอบโต้ตอบของมาตรา ":"เปิดสรุปและตัวบทมาตรา ")+note.id+" ภายในเว็บไซต์";
   title.appendChild(titleLink);
  }else{
   title.textContent=textTitle;
@@ -85,7 +86,7 @@ function makeStatuteCard(note,small,reference){
  var links=newNode("div","statute-sources");
  links.appendChild(newNode("strong","statute-sources-title","แหล่งตัวบทกฎหมาย"));
  if(direct){
-  var sceneLink=makeLink("./study.html#statute-"+String(note.id).replace(/\//g,"-"),"🖼️ เปิดภาพอธิบายมาตรา "+note.id+" · คลิกดูองค์ประกอบ");
+  var sceneLink=makeLink("./study.html#statute-"+String(note.id).replace(/\//g,"-"),(hasIllustration?"🖼️ เปิดภาพอธิบายมาตรา ":"📖 เปิดสรุปมาตรา ")+note.id+(hasIllustration?" · คลิกดูองค์ประกอบ":" · อ่านหลักกฎหมาย"));
   sceneLink.target="_self";sceneLink.setAttribute("data-statute",note.id);
   sceneLink.className="statute-source-illustration";
   links.appendChild(sceneLink);
