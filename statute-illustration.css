@@ -43,3 +43,33 @@
 @media(max-width:900px){.niti-ill-layout{grid-template-columns:1fr}.niti-ill-details{min-height:0}}
 @media(max-width:520px){.niti-illustration{margin-inline:-6px;padding:11px}.niti-ill-details{padding:13px}.niti-ill-pick{font-size:.9rem}.niti-law-svg{min-height:225px}}
 @media(prefers-reduced-motion:reduce){.niti-ill-hotspot,.niti-ill-hotspot rect,.niti-ill-pick,.niti-ill-answer{transition:none!important;transform:none!important}}
+
+/* Round 2 (visual-only): meaning + elements + read/unread, no legal text changes */
+.niti-ill-readbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px;border:1px solid var(--md-border,#d7e2ea);border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(23,47,67,.06);margin-bottom:14px}
+.niti-ill-read-badge{display:inline-flex;padding:6px 12px;border-radius:999px;font-weight:800;font-size:.9rem;border:2px solid #94a3b8;color:#475569;background:#f1f5f9}
+.niti-ill-read-badge[data-read="true"]{color:#047857;background:#ECFDF5;border-color:#047857}
+.niti-ill-read-overall{font-size:.9rem;font-weight:700;color:#52657a}
+.niti-ill-read-controls{display:flex;gap:8px;flex-wrap:wrap;margin-inline-start:auto}
+.niti-ill-read-btn{min-height:44px;padding:9px 14px;border:1.5px solid #c5d5df;border-radius:12px;background:#fff;color:#1b364e;font:inherit;font-size:.92rem;font-weight:750;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease}
+.niti-ill-read-btn:hover{border-color:#1761a5;transform:translateY(-1px);box-shadow:0 3px 10px rgba(23,47,67,.10)}
+.niti-ill-read-btn[aria-pressed="true"]{background:#1761a5;border-color:#1761a5;color:#fff}
+.niti-ill-read-btn:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
+.niti-ill-meaning{padding:18px 20px;border-radius:16px;background:linear-gradient(180deg,#EFF6FF,#fff);border:1px solid #BFDBFE;box-shadow:0 2px 12px rgba(23,47,67,.06);margin-bottom:14px}
+.niti-ill-meaning-title,.niti-ill-elements-title{margin:0 0 8px;font:800 1.15rem/1.5 "IBM Plex Sans Thai",Tahoma,sans-serif;color:#1E40AF}
+.niti-ill-meaning-text{font-size:1.02rem;line-height:1.9;margin:0 0 10px}
+.niti-ill-meaning-case-label,.niti-ill-meaning-rule-label{display:block;font-size:.92rem;font-weight:800;color:#334155;margin-top:8px}
+.niti-ill-meaning-case,.niti-ill-meaning-rule{font-size:1rem;line-height:1.9;margin:4px 0 0}
+.niti-ill-elements{padding:18px 20px;border-radius:16px;background:#fff;border:1px solid #d7e2ea;box-shadow:0 2px 12px rgba(23,47,67,.06);margin:14px 0}
+.niti-ill-elements-progress{font-size:.92rem;font-weight:800;color:#52657a;margin:0 0 10px}
+.niti-ill-elements-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.niti-ill-element-item{border-radius:12px}
+.niti-ill-element-btn{display:block;width:100%;text-align:start;padding:12px 14px;border:1.5px solid #d7e2ea;border-radius:12px;background:#F8FAFD;color:#1b364e;font:inherit;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease,border-color .15s}
+.niti-ill-element-btn:hover{border-color:#1761a5;transform:translateY(-1px);box-shadow:0 3px 10px rgba(23,47,67,.10)}
+.niti-ill-element-btn[aria-pressed="true"],.niti-ill-element-item.is-active .niti-ill-element-btn{border-color:#1761a5;background:#EFF6FF;box-shadow:0 4px 14px rgba(23,64,175,.12)}
+.niti-ill-element-btn:focus-visible{outline:3px solid #F59E0B;outline-offset:3px}
+.niti-ill-element-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.niti-ill-element-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#1E40AF;color:#fff;font-weight:800;font-size:.92rem;flex:none}
+.niti-ill-element-label{font-weight:800;font-size:1.02rem;line-height:1.55}
+.niti-ill-element-expl{display:block;font-size:.96rem;line-height:1.85;color:#334155}
+@media(max-width:520px){.niti-ill-read-controls{margin-inline-start:0}.niti-ill-meaning,.niti-ill-elements{padding:13px}}
+@media(prefers-reduced-motion:reduce){.niti-ill-read-btn,.niti-ill-element-btn{transition:none!important;transform:none!important}}
