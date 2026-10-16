@@ -228,6 +228,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <script src="./exam-data.js"></script>
 <script src="./contract-exams.js"></script>
 <script src="./subject-menu-data.js?v=20261016a"></script>
+<script src="./surety-practice-02.js?v=20261016a"></script>
 <script src="./statute-sources.js"></script>
 <script>
 (function(){
@@ -263,7 +264,7 @@ var list=$("list");list.replaceChildren();
 filtered.forEach(function(q){
 var s=store[q.id]||{};var b=document.createElement("button");b.type="button";b.className="q-item"+(current===q.id?" active":"");b.setAttribute("aria-current",current===q.id?"true":"false");
 var status=s.completed?"finished":hasDraft(s)?"started":"";
-b.innerHTML='<span class="q-item-top"><span>'+(q.id===window.NITI_SUBJECT_FEATURED_ID?"โจทย์จากผู้ใช้ · ข้อ 1":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่":escapeHTML(q.semester)+"/"+escapeHTML(q.year)+" · ข้อ "+escapeHTML(q.number))+'</span><span class="dot '+status+'" title="'+(s.completed?"ตรวจแล้ว":hasDraft(s)?"มีร่างคำตอบ":"ยังไม่เริ่ม")+'"></span></span><strong>'+escapeHTML(q.title)+'</strong><small>'+escapeHTML(q.course)+" · "+escapeHTML(q.topic)+"</small>";
+b.innerHTML='<span class="q-item-top"><span>'+((window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?"โจทย์จากผู้ใช้ · ข้อ 1":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่":escapeHTML(q.semester)+"/"+escapeHTML(q.year)+" · ข้อ "+escapeHTML(q.number))+'</span><span class="dot '+status+'" title="'+(s.completed?"ตรวจแล้ว":hasDraft(s)?"มีร่างคำตอบ":"ยังไม่เริ่ม")+'"></span></span><strong>'+escapeHTML(q.title)+'</strong><small>'+escapeHTML(q.course)+" · "+escapeHTML(q.topic)+"</small>";
 b.addEventListener("click",function(){load(q.id)});list.appendChild(b);
 });
 $("empty").hidden=filtered.length!==0;
@@ -348,6 +349,7 @@ refreshList();if(target)load(target.id);
 </script>
 <script src="./statute-notes.js"></script>
 <script src="./statute-notes-extra.js"></script>
+<script src="./surety-statute-notes.js?v=20261016a"></script>
 <script src="./final-exam.js?v=20261016b"></script>
 <script src="./statute-diorama-data.js"></script>
 <script src="./statute-illustration.js?v=20261015g"></script>
