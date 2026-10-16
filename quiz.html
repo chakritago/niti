@@ -146,7 +146,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
     <p>เอกสารนี้เผยแพร่โดยเว็บไซต์ภายนอก ไม่ใช่ไฟล์ต้นฉบับที่มหาวิทยาลัยรับรอง และเว็บไซต์ปลายทางอาจไม่อนุญาตให้แสดงในกรอบ <a id="original-link-fallback" href="https://mjsheetramfree.com/" target="_blank" rel="noopener noreferrer">เปิดหน้าข้อสอบโดยตรง ↗</a></p>
   </div>
 </section>
-<h3 class="box-title">สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)</h3><div id="scenario" class="scenario"></div>
+<h3 class="box-title" id="scenario-heading">สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)</h3><div id="scenario" class="scenario"></div>
 <div class="prompt"><div class="box-title">ประเด็นที่ต้องวินิจฉัย</div><div id="issue"></div></div>
 <section class="user-issue-outline" id="user-issue-outline" aria-labelledby="user-issue-title" hidden>
 <h3 id="user-issue-title">โครงสร้างวินิจฉัยสำหรับโจทย์ข้อนี้</h3><p>เขียนแต่ละประเด็นตามลำดับ หลักกฎหมาย → ปรับบท → สรุป เพื่อไม่ให้ตกหล่น</p><div id="user-issue-list" class="user-issue-list"></div>
@@ -286,6 +286,7 @@ stopTimer();remaining=1500;updateTimer();current=id;window.NITI_CURRENT_QUESTION
 $("topic-tag").textContent=q.topic;$("exam-meta").textContent=q.kind==="practice"?q.course+" | โจทย์ฝึกแต่งใหม่ ไม่ใช่ข้อสอบเก่า":q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
 $("question-title").textContent=q.title;$("question-id").textContent="รหัสโจทย์: "+q.id+" · "+(q.kind==="practice"?"สถานการณ์สมมติที่แต่งใหม่เพื่อฝึกเขียน":"เนื้อหาเรียบเรียงใหม่จากโจทย์ที่เผยแพร่บนเว็บไซต์อ้างอิง");
 $("scenario").textContent=q.synopsis;$("issue").textContent=q.issue;
+$("scenario-heading").textContent=q.id===window.NITI_SUBJECT_FEATURED_ID?"ข้อ 1 · โจทย์ที่ผู้ใช้ส่งมา":"สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)";
 var custom=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})[q.id]||[];
 $("user-issue-outline").hidden=!custom.length;
 $("user-issue-list").replaceChildren();
@@ -295,7 +296,7 @@ var rule=document.createElement("p");rule.textContent="หลักกฎหม�
 var hint=document.createElement("p");hint.textContent="เขียนหลักกฎหมาย → ปรับข้อเท็จจริง → สรุปผลวินิจฉัย";card.appendChild(hint);
 $("user-issue-list").appendChild(card);});
 var link=q.sourceUrl||q.lawSourceUrl;$("source").href=link;$("source-again").href=link;$("original-link-fallback").href=link;
-$("source-description").textContent=q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
+$("source-description").textContent=q.id===window.NITI_SUBJECT_FEATURED_ID?"โจทย์จากผู้ใช้สำหรับฝึกเขียนคำตอบ ไม่ใช่ข้อสอบย้อนหลังที่ยืนยันต้นทางได้ และไม่มีธงคำตอบจากมหาวิทยาลัย ลิงก์นี้ใช้ตรวจตัวบทกฎหมายจากหน่วยงานทางการ":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
 $("source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("source-again").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("original-card").hidden=q.kind==="practice";
 var statutesArea=$("statutes");statutesArea.replaceChildren();
 q.sections.forEach(function(label){
