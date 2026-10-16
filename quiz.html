@@ -92,11 +92,24 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&amp;family=Sarabun:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+
+<style>
+/* Subject-specific two-issue answer framework */
+.tutor-page .user-issue-outline{padding:19px 21px;border:1px solid var(--md-border);border-left:5px solid var(--md-primary);border-radius:15px;background:var(--md-surface-low);margin:21px 0;color:var(--md-text)}
+.tutor-page .user-issue-outline h3{font-size:1.16rem;margin:0 0 7px}
+.tutor-page .user-issue-outline>p{color:var(--md-text-secondary);margin:0 0 13px}
+.tutor-page .user-issue-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tutor-page .user-issue-item{background:var(--md-surface);border:1px solid var(--md-border);border-radius:11px;padding:15px;color:var(--md-text)}
+.tutor-page .user-issue-item h4{font-size:1.02rem;margin:0 0 10px;color:var(--md-text)}
+.tutor-page .user-issue-item p{font-size:.9rem;line-height:1.8;margin:5px 0;color:var(--md-text)}
+.tutor-page .user-issue-outline>a{display:inline-block;margin-top:11px;color:var(--md-primary);font-weight:750}
+@media(max-width:700px){.tutor-page .user-issue-list{grid-template-columns:1fr}.tutor-page .user-issue-outline{padding:15px}}
+</style>
 <link rel="stylesheet" href="./theme.css">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
 </head>
 <body class="tutor-page">
-<header><nav class="wrap nav" aria-label="เมนูหลัก"><a class="brand" href="./index.html"><span class="monogram" aria-hidden="true">น</span>NITI <small style="font:12px Arial,sans-serif;letter-spacing:.04em;color:#cbd7e1">LAW LAB</small></a><div class="nav-right"><a href="./index.html">← หน้าหลัก</a><a href="./final-exam.html">ข้อสอบปลายภาค 18 มาตรา ↗</a><a href="./study.html">แผนอ่านสอบ + ทริคจำ ↗</a><a href="./study.html#statute-notes">สรุปมาตรา + ตัวบทเต็ม ↗</a><a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">ต้นทาง LAW2001 ↗</a><a href="https://mjsheetramfree.com/category/law2005/" target="_blank" rel="noopener noreferrer">ต้นทาง LAW2005 ↗</a><a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button>
+<header><nav class="wrap nav" aria-label="เมนูหลัก"><a class="brand" href="./index.html"><span class="monogram" aria-hidden="true">น</span>NITI <small style="font:12px Arial,sans-serif;letter-spacing:.04em;color:#cbd7e1">LAW LAB</small></a><div class="nav-right"><a href="./index.html">← หน้าหลัก</a><a href="./subjects.html">เมนูวิชา 9 หัวข้อ ↗</a><a href="./final-exam.html">ข้อสอบปลายภาค 18 มาตรา ↗</a><a href="./study.html">แผนอ่านสอบ + ทริคจำ ↗</a><a href="./study.html#statute-notes">สรุปมาตรา + ตัวบทเต็ม ↗</a><a href="https://mjsheetramfree.com/law2001-la201-lw204-kdhmay-phaeng-laea-phanichy-wa-dwy-thraphy/" target="_blank" rel="noopener noreferrer">ต้นทาง LAW2001 ↗</a><a href="https://mjsheetramfree.com/category/law2005/" target="_blank" rel="noopener noreferrer">ต้นทาง LAW2005 ↗</a><a href="https://github.com/chakritago/niti" target="_blank" rel="noopener noreferrer">GitHub ↗</a><button id="theme-toggle" class="theme-toggle" type="button" aria-label="เปลี่ยนธีม" aria-pressed="false"><span class="theme-toggle-icon" aria-hidden="true">☾</span><span class="theme-toggle-label">โหมดมืด</span></button>
         <div class="font-controls" role="group" aria-label="ปรับขนาดตัวอักษรเพื่อให้อ่านได้สบายตา">
           <span class="font-label">ตัวอักษร</span>
           <button id="font-decrease" class="font-button" type="button" aria-label="ลดขนาดตัวอักษร" title="ลดขนาดตัวอักษร">ก−</button>
@@ -108,6 +121,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <main class="wrap layout">
 <aside class="panel" aria-label="รายการข้อสอบ"><div class="aside-head"><h2>เลือกโจทย์ฝึก</h2><p>ข้อสอบย้อนหลังมีลิงก์รายข้อ และโจทย์ฝึกแต่งใหม่ติดป้ายแยก</p></div><div class="controls">
 <div><label class="field-label" for="search">ค้นหาคำสำคัญ</label><input id="search" type="search" placeholder="เช่น ภาระจำยอม, ที่ดิน"></div>
+<div><a href="./subjects.html" class="btn outline full">เลือกจากเมนูวิชา 9 หัวข้อ ↗</a></div>
 <div><label class="field-label" for="course">เลือกวิชา</label><select id="course"><option value="">ทุกวิชา</option><option value="LAW2001">LAW2001 / LAW2101 · ทรัพย์สิน</option><option value="LAW2005">LAW2005 / LAW2105 · ซื้อขาย แลกเปลี่ยน ให้</option><option value="LAW2008">LAW2008 / LAW2108 · เช่าทรัพย์ เช่าซื้อ</option><option value="LAW2009">LAW2009 / LAW2109 · ยืม</option><option value="LAW2010">LAW2010 / LAW2110 · ค้ำประกัน จำนอง จำนำ</option></select></div>
 <div><label class="field-label" for="topic">หมวดกฎหมาย</label><select id="topic"><option value="">ทุกหมวด</option></select></div>
 <div><label class="field-label" for="year">ปีการศึกษา</label><select id="year"><option value="">ทุกปีการศึกษา</option></select></div>
@@ -134,6 +148,10 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 </section>
 <h3 class="box-title">สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)</h3><div id="scenario" class="scenario"></div>
 <div class="prompt"><div class="box-title">ประเด็นที่ต้องวินิจฉัย</div><div id="issue"></div></div>
+<section class="user-issue-outline" id="user-issue-outline" aria-labelledby="user-issue-title" hidden>
+<h3 id="user-issue-title">โครงสร้างวินิจฉัยสำหรับโจทย์ข้อนี้</h3><p>เขียนแต่ละประเด็นตามลำดับ หลักกฎหมาย → ปรับบท → สรุป เพื่อไม่ให้ตกหล่น</p><div id="user-issue-list" class="user-issue-list"></div>
+<a href="./subjects.html#featured-problem">กลับไปดูโจทย์ข้อ 1 และแนวตอบโดยละเอียด ↗</a>
+</section>
 <section class="exam-statute-card" id="exam-statute-card" aria-labelledby="exam-statute-title">
     <h3 id="exam-statute-title">มาตราที่ใช้ตอบข้อนี้ — สรุปสำหรับเขียนข้อสอบ</h3>
     <p>อ่านหลักกฎหมายแบบย่อ (เฉพาะมาตราที่มีสรุปตรวจทาน) และตรวจเอกสารทางการตามลิงก์ของแต่ละมาตรา</p>
@@ -209,6 +227,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
 <footer><div class="wrap">NITI · แพลตฟอร์มฝึกเขียนคำตอบเพื่อการศึกษาเท่านั้น · ข้อมูลคำตอบเก็บในเบราว์เซอร์ของคุณ · <a href="./index.html">หน้าหลัก</a> · <a href="https://github.com/chakritago/niti">Source code</a></div></footer>
 <script src="./exam-data.js"></script>
 <script src="./contract-exams.js"></script>
+<script src="./subject-menu-data.js?v=20261016a"></script>
 <script src="./statute-sources.js"></script>
 <script>
 (function(){
@@ -267,6 +286,14 @@ stopTimer();remaining=1500;updateTimer();current=id;window.NITI_CURRENT_QUESTION
 $("topic-tag").textContent=q.topic;$("exam-meta").textContent=q.kind==="practice"?q.course+" | โจทย์ฝึกแต่งใหม่ ไม่ใช่ข้อสอบเก่า":q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
 $("question-title").textContent=q.title;$("question-id").textContent="รหัสโจทย์: "+q.id+" · "+(q.kind==="practice"?"สถานการณ์สมมติที่แต่งใหม่เพื่อฝึกเขียน":"เนื้อหาเรียบเรียงใหม่จากโจทย์ที่เผยแพร่บนเว็บไซต์อ้างอิง");
 $("scenario").textContent=q.synopsis;$("issue").textContent=q.issue;
+var custom=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})[q.id]||[];
+$("user-issue-outline").hidden=!custom.length;
+$("user-issue-list").replaceChildren();
+custom.forEach(function(x){var card=document.createElement("article");card.className="user-issue-item";
+var heading=document.createElement("h4");heading.textContent=x.heading;card.appendChild(heading);
+var rule=document.createElement("p");rule.textContent="หลักกฎหมาย ป.พ.พ. มาตรา "+x.sections.join(" และ ");card.appendChild(rule);
+var hint=document.createElement("p");hint.textContent="เขียนหลักกฎหมาย → ปรับข้อเท็จจริง → สรุปผลวินิจฉัย";card.appendChild(hint);
+$("user-issue-list").appendChild(card);});
 var link=q.sourceUrl||q.lawSourceUrl;$("source").href=link;$("source-again").href=link;$("original-link-fallback").href=link;
 $("source-description").textContent=q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
 $("source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("source-again").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("original-card").hidden=q.kind==="practice";
@@ -313,6 +340,8 @@ fillFilters();counters();
 var params=new URLSearchParams(window.location.search),examId=params.get("exam"),target=data.find(function(q){return q.id===examId;});
 var chosen=target?(target.subject||"LAW2001"):params.get("subject");
 if(chosen&&Array.from($("course").options).some(function(o){return o.value===chosen;}))$("course").value=chosen;
+var requestedTopic=params.get("topic");
+if(!target&&requestedTopic&&Array.from($("topic").options).some(function(o){return o.value===requestedTopic;}))$("topic").value=requestedTopic;
 refreshList();if(target)load(target.id);
 })();
 </script>
