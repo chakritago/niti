@@ -147,8 +147,8 @@ function renderQuiz(id){
  var value=$("exam-ranking-value"),desc=$("exam-ranking-description");
  if(value&&desc){
  if(q.kind==="practice"){
- value.textContent="โจทย์ฝึกแต่งใหม่ — ไม่จัดอันดับ";
- desc.textContent="โจทย์เรื่องแลกเปลี่ยนแต่งขึ้นเพื่อฝึกทักษะ ไม่ใช่ข้อสอบย้อนหลัง จึงไม่รวมในการนับความถี่ "+exams.length+" ข้อสอบที่มีแหล่งต้นทาง";
+ value.textContent="โจทย์ฝึก (ไม่ใช่ข้อสอบย้อนหลัง) — ไม่จัดอันดับ";
+ desc.textContent="โจทย์ฝึกข้อนี้ไม่ใช่ข้อสอบย้อนหลังที่ยืนยันต้นทางได้ จึงไม่รวมในการนับความถี่ "+exams.length+" ข้อสอบที่มีแหล่งต้นทาง";
  }else{
  var count=countByTopic[q.topic]||0, b=band(count);
  value.textContent="กลุ่ม "+b+" · "+bandName(b)+" — อันดับ "+rankForTopic(q.topic)+" ในคลังตัวอย่าง";
