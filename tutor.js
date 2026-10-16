@@ -30,7 +30,7 @@ log.scrollTop=log.scrollHeight;
 }
 function answerArea(){return document.getElementById("answer-"+names[Math.min(coachStep,3)]);}
 function currentPrompt(){return prompts[Math.min(coachStep,3)];}
-function intro(){var q=question();return "สวัสดีครับ เราจะฝึก"+(q.kind==="practice"?"โจทย์แต่งใหม่ (ไม่ใช่ข้อสอบย้อนหลัง)":"ข้อ "+q.number+" ภาค "+q.semester+"/"+q.year)+" เรื่อง "+q.topic+" แบบถามตอบทีละขั้น ผมเป็นระบบแนะแนวอัตโนมัติ ไม่ใช่โมเดล AI จึงไม่สามารถตัดสินถูกผิดทางกฎหมายจากภาษาธรรมชาติได้ \n\n"+prompts[0];}
+function intro(){var q=question();return "สวัสดีครับ เราจะฝึก"+(q.id===window.NITI_SUBJECT_FEATURED_ID?"โจทย์ที่ผู้ใช้ส่งมา (ไม่ใช่ข้อสอบย้อนหลัง)":q.kind==="practice"?"โจทย์แต่งใหม่ (ไม่ใช่ข้อสอบย้อนหลัง)":"ข้อ "+q.number+" ภาค "+q.semester+"/"+q.year)+" เรื่อง "+q.topic+" แบบถามตอบทีละขั้น ผมเป็นระบบแนะแนวอัตโนมัติ ไม่ใช่โมเดล AI จึงไม่สามารถตัดสินถูกผิดทางกฎหมายจากภาษาธรรมชาติได้ \n\n"+prompts[0];}
 function render(){
 if(!currentId)return;
 var q=question(),a=meta();if(!q||!a)return;
@@ -44,7 +44,7 @@ $("coach-input").placeholder=coachStep>=4?"ฝึกครบแล้ว เป
 $("coach-input").value="";
 $("coach-hint").disabled=coachStep>=4;
 $("coach-status").textContent=coachStep>=4?"ครบ 4 ขั้นแล้ว — คุณสามารถเปิดเฉลยตัวอย่างด้านล่าง และเทียบกับคำตอบของตน":"คำตอบที่ส่งจะใส่ลงกระดาษคำตอบ 4 ส่วนให้อัตโนมัติ";
-$("original-caption").textContent=q.kind==="practice"?"โจทย์แต่งใหม่ ไม่มีต้นฉบับข้อสอบย้อนหลัง":"ข้อ "+q.number+" · ภาค "+q.semester+"/"+q.year+" · อ่านเนื้อหาต้นฉบับและธงคำตอบในหน้าเดียวกัน (หากเว็บไซต์ปลายทางอนุญาตให้ฝัง)";
+$("original-caption").textContent=q.id===window.NITI_SUBJECT_FEATURED_ID?"โจทย์จากผู้ใช้ ไม่มีธงคำตอบเก่าจากมหาวิทยาลัย":q.kind==="practice"?"โจทย์แต่งใหม่ ไม่มีต้นฉบับข้อสอบย้อนหลัง":"ข้อ "+q.number+" · ภาค "+q.semester+"/"+q.year+" · อ่านเนื้อหาต้นฉบับและธงคำตอบในหน้าเดียวกัน (หากเว็บไซต์ปลายทางอนุญาตให้ฝัง)";
 $("original-link").href=q.sourceUrl||q.lawSourceUrl;
 $("tutor-answer-source").href=q.sourceUrl||q.lawSourceUrl;
 $("tutor-answer-source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านธงคำตอบต้นทาง ↗";
@@ -106,7 +106,7 @@ addAnswerSection(el,"2. หลักกฎหมาย",a.rule);
 addAnswerSection(el,"3. วินิจฉัยปรับบท",a.application);
 addAnswerSection(el,"4. สรุปคำตอบ",a.bottomLine);
 var note=document.createElement("p");note.className="model-caution";note.textContent="ข้อควรระวัง: "+q.pitfall;el.appendChild(note);
-$("tutor-answer-meta").textContent=q.course+" · "+(q.kind==="practice"?"โจทย์ฝึกแต่งใหม่ (ไม่ใช่ข้อสอบเก่า)":"ภาค "+q.semester+"/"+q.year+" · ข้อ "+q.number)+" · เฉลยเรียบเรียงใหม่เพื่อการศึกษา";
+$("tutor-answer-meta").textContent=q.course+" · "+(q.id===window.NITI_SUBJECT_FEATURED_ID?"โจทย์จากผู้ใช้ (ไม่ใช่ข้อสอบย้อนหลัง)":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่ (ไม่ใช่ข้อสอบเก่า)":"ภาค "+q.semester+"/"+q.year+" · ข้อ "+q.number)+" · เฉลยเรียบเรียงใหม่เพื่อการศึกษา";
 }
 function toggleAnswer(force){
 var panel=$("tutor-answer-body"),button=$("tutor-answer-toggle");var open=typeof force==="boolean"?force:panel.hidden;panel.hidden=!open;
