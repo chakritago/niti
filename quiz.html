@@ -117,7 +117,7 @@ footer{background:var(--dark);color:#bcc7d0;padding:25px 0;font-size:12px}footer
           <button id="font-increase" class="font-button" type="button" aria-label="เพิ่มขนาดตัวอักษร" title="เพิ่มขนาดตัวอักษร">ก+</button>
         </div></div></nav></header>
 <section class="hero"><div class="wrap"><div class="kicker">LAW2001 · LAW2005 · LAW2008 · LAW2009 · LAW2010</div><h1>สนามฝึกเขียนข้อสอบ<br><span>กฎหมายทรัพย์สินและเอกเทศสัญญา</span></h1><p>อ่านข้อเท็จจริงที่ถอดความจากข้อสอบซึ่งเผยแพร่ในแหล่งอ้างอิง ฝึกวินิจฉัยตามลำดับ ประเด็น → หลักกฎหมาย → ปรับบท → สรุป และตรวจองค์ประกอบคำตอบด้วยตนเอง</p><div class="hero-actions"><span class="chip">ข้อสอบย้อนหลังอ้างอิงรายข้อ · โจทย์ฝึกแยกชัดเจน</span><span class="chip">คำตอบบันทึกในเครื่องของคุณ</span></div></div></section>
-<div class="wrap summary" aria-label="ภาพรวมคลังโจทย์"><div class="summary-item"><b id="total-stat">—</b><span>โจทย์พร้อมแหล่งอ้างอิง</span></div><div class="summary-item"><b id="draft-stat">0</b><span>ข้อที่เคยเริ่มเขียน</span></div><div class="summary-item"><b id="complete-stat">0</b><span>ข้อที่ประเมินตนเองแล้ว</span></div></div>
+<div class="wrap summary" aria-label="ภาพรวมคลังโจทย์"><div class="summary-item"><b id="total-stat">—</b><span>ข้อสอบย้อนหลังและโจทย์ฝึก</span></div><div class="summary-item"><b id="draft-stat">0</b><span>ข้อที่เคยเริ่มเขียน</span></div><div class="summary-item"><b id="complete-stat">0</b><span>ข้อที่ประเมินตนเองแล้ว</span></div></div>
 <main class="wrap layout">
 <aside class="panel" aria-label="รายการข้อสอบ"><div class="aside-head"><h2>เลือกโจทย์ฝึก</h2><p>ข้อสอบย้อนหลังมีลิงก์รายข้อ และโจทย์ฝึกแต่งใหม่ติดป้ายแยก</p></div><div class="controls">
 <div><label class="field-label" for="search">ค้นหาคำสำคัญ</label><input id="search" type="search" placeholder="เช่น ภาระจำยอม, ที่ดิน"></div>
@@ -264,7 +264,7 @@ var list=$("list");list.replaceChildren();
 filtered.forEach(function(q){
 var s=store[q.id]||{};var b=document.createElement("button");b.type="button";b.className="q-item"+(current===q.id?" active":"");b.setAttribute("aria-current",current===q.id?"true":"false");
 var status=s.completed?"finished":hasDraft(s)?"started":"";
-b.innerHTML='<span class="q-item-top"><span>'+((window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?"โจทย์จากผู้ใช้ · ข้อ 1":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่":escapeHTML(q.semester)+"/"+escapeHTML(q.year)+" · ข้อ "+escapeHTML(q.number))+'</span><span class="dot '+status+'" title="'+(s.completed?"ตรวจแล้ว":hasDraft(s)?"มีร่างคำตอบ":"ยังไม่เริ่ม")+'"></span></span><strong>'+escapeHTML(q.title)+'</strong><small>'+escapeHTML(q.course)+" · "+escapeHTML(q.topic)+"</small>";
+b.innerHTML='<span class="q-item-top"><span>'+((window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?"โจทย์จากผู้ใช้ · ข้อ "+q.number:q.kind==="practice"?"โจทย์ฝึกแต่งใหม่":escapeHTML(q.semester)+"/"+escapeHTML(q.year)+" · ข้อ "+escapeHTML(q.number))+'</span><span class="dot '+status+'" title="'+(s.completed?"ตรวจแล้ว":hasDraft(s)?"มีร่างคำตอบ":"ยังไม่เริ่ม")+'"></span></span><strong>'+escapeHTML(q.title)+'</strong><small>'+escapeHTML(q.course)+" · "+escapeHTML(q.topic)+"</small>";
 b.addEventListener("click",function(){load(q.id)});list.appendChild(b);
 });
 $("empty").hidden=filtered.length!==0;
@@ -284,10 +284,10 @@ score();
 function load(id,noList){
 var q=data.find(function(x){return x.id===id});if(!q)return;
 stopTimer();remaining=1500;updateTimer();current=id;window.NITI_CURRENT_QUESTION=id;showReview=false;$("review").hidden=true;$("review-toggle").setAttribute("aria-expanded","false");$("review-toggle").textContent="ดูแนวธงคำตอบและเกณฑ์ตรวจ ↓";
-$("topic-tag").textContent=q.topic;$("exam-meta").textContent=q.id===window.NITI_SUBJECT_FEATURED_ID?q.course+" | ข้อ 1 จากผู้ใช้ · ไม่ใช่ข้อสอบย้อนหลัง":q.kind==="practice"?q.course+" | โจทย์ฝึกแต่งใหม่ ไม่ใช่ข้อสอบเก่า":q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
+$("topic-tag").textContent=q.topic;$("exam-meta").textContent=(window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?q.course+" | ข้อ "+q.number+" จากผู้ใช้ · ไม่ใช่ข้อสอบย้อนหลัง":q.kind==="practice"?q.course+" | โจทย์ฝึกแต่งใหม่ ไม่ใช่ข้อสอบเก่า":q.course+" | ภาค "+q.semester+"/"+q.year+" | ข้อ "+q.number;
 $("question-title").textContent=q.title;$("question-id").textContent="รหัสโจทย์: "+q.id+" · "+(q.kind==="practice"?"สถานการณ์สมมติที่แต่งใหม่เพื่อฝึกเขียน":"เนื้อหาเรียบเรียงใหม่จากโจทย์ที่เผยแพร่บนเว็บไซต์อ้างอิง");
 $("scenario").textContent=q.synopsis;$("issue").textContent=q.issue;
-$("scenario-heading").textContent=q.id===window.NITI_SUBJECT_FEATURED_ID?"ข้อ 1 · โจทย์ที่ผู้ใช้ส่งมา":"สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)";
+$("scenario-heading").textContent=(window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?"ข้อ "+q.number+" · โจทย์ที่ผู้ใช้ส่งมา":"สถานการณ์ตามโจทย์ (เรียบเรียงใหม่)";
 var custom=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})[q.id]||[];
 $("user-issue-outline").hidden=!custom.length;
 $("user-issue-list").replaceChildren();
@@ -297,7 +297,7 @@ var rule=document.createElement("p");rule.textContent="หลักกฎหม�
 var hint=document.createElement("p");hint.textContent="เขียนหลักกฎหมาย → ปรับข้อเท็จจริง → สรุปผลวินิจฉัย";card.appendChild(hint);
 $("user-issue-list").appendChild(card);});
 var link=q.sourceUrl||q.lawSourceUrl;$("source").href=link;$("source-again").href=link;$("original-link-fallback").href=link;
-$("source-description").textContent=q.id===window.NITI_SUBJECT_FEATURED_ID?"โจทย์จากผู้ใช้สำหรับฝึกเขียนคำตอบ ไม่ใช่ข้อสอบย้อนหลังที่ยืนยันต้นทางได้ และไม่มีธงคำตอบจากมหาวิทยาลัย ลิงก์นี้ใช้ตรวจตัวบทกฎหมายจากหน่วยงานทางการ":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
+$("source-description").textContent=(window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?"โจทย์จากผู้ใช้สำหรับฝึกเขียนคำตอบ ไม่ใช่ข้อสอบย้อนหลังที่ยืนยันต้นทางได้ และไม่มีธงคำตอบจากมหาวิทยาลัย ลิงก์นี้ใช้ตรวจตัวบทกฎหมายจากหน่วยงานทางการ":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่โดย NITI ไม่ใช่ข้อสอบที่เคยออก ไม่มีธงคำตอบต้นฉบับ ลิงก์นี้เป็นทางไปตรวจสอบตัวบทกฎหมายทางการ":"ข้อสอบย้อนหลังจาก MJ Sheet Ram Free: หน้าอ้างอิงมีโจทย์ตามปี ภาค และเลขข้อ พร้อมธงคำตอบ ข้อความที่แสดงใน NITI เป็นสรุปถอดความ";
 $("source").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("source-again").textContent=q.kind==="practice"?"ตรวจตัวบทกฎหมายทางการ ↗":"อ่านข้อสอบและธงคำตอบต้นทาง ↗";$("original-card").hidden=q.kind==="practice";
 var statutesArea=$("statutes");statutesArea.replaceChildren();
 q.sections.forEach(function(label){
