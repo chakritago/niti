@@ -251,8 +251,22 @@ function normalize(value){
 function anchorId(id){return "statute-"+String(id).replace(/\//g,"-");}
 function requestedParts(value){
  if(value&&typeof value==="object")return {id:normalize(value.id),paragraphs:Array.isArray(value.paragraphs)?value.paragraphs.map(String):[],item:value.item?String(value.item):""};
- var s=String(value||""),m=s.match(/^(\d{1,4}(?:\/\d{1,3})?)(?:-p([1-9](?:_[1-9])*))?(?:-i([1-9]))?$/);
- return {id:m?m[1]:normalize(s),paragraphs:m&&m[2]?m[2].split("_"):[],item:m&&m[3]||""};
+ var s=String(value||"").trim(),m=s.match(/^(\d{1,4}(?:\/\d{1,3})?)(?:-p([1-9](?:_[1-9])*))?(?:-i([1-9]))?$/);
+ if(m)return {id:m[1],paragraphs:m[2]?m[2].split("_"):[],item:m[3]||""};
+ var id=normalize(s);
+ var item=(s.match(/^\d{1,4}(?:\/\d{1,3})?\s*\(([1-9])\)/)||[])[1]||"";
+ var pm=s.match(/วรรค\s*(?:ที่\s*)?(แรก|หนึ่ง|สอง|สาม|สี่|ห้า|หก|[1-6๑-๖])(?:\s*(?:-|–|—|ถึง|และ)\s*(?:วรรค\s*)?(แรก|หนึ่ง|สอง|สาม|สี่|ห้า|หก|[1-6๑-๖]))?/);
+ var n={"แรก":1,"หนึ่ง":1,"สอง":2,"สาม":3,"สี่":4,"ห้า":5,"หก":6,"๑":1,"๒":2,"๓":3,"๔":4,"๕":5,"๖":6};
+ var pars=[];
+ if(pm){
+  pars.push(String(n[pm[1]]||pm[1]));
+  if(pm[2]){
+   var end=Number(n[pm[2]]||pm[2]);
+   if(/-|–|—|ถึง/.test(pm[0]))for(var j=Number(pars[0])+1;j<=end&&j<=6;j++)pars.push(String(j));
+   else pars.push(String(end));
+  }
+ }
+ return {id:id,paragraphs:pars,item:item};
 }
 var NUM_NAMES={"1":"หนึ่ง","2":"สอง","3":"สาม","4":"สี่","5":"ห้า","6":"หก"};
 function paragraphTitle(p){return "วรรค"+(NUM_NAMES[String(p)]||String(p));}
@@ -532,5 +546,5 @@ document.addEventListener("click",function(event){
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017b"};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017c"};
 })();
