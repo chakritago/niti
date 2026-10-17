@@ -173,6 +173,33 @@ body.final-page .final-hero p{color:#f4f8fd!important}
 .final-page .final-book-anchors{border-top:1px solid var(--f-line);margin-top:13px;padding-top:11px;display:grid;gap:5px}
 .final-page .final-book-anchors strong{font-size:.84rem;color:var(--f-text)}
 .final-page .final-book-anchor{font-size:.86rem;color:var(--f-blue);font-weight:700;line-height:1.75}
+
+/* Consistent name colours for final-exam actors. Text+background pairs keep
+   yellow readable on white and all labels readable in dark mode. */
+body.final-page .niti-person{font-weight:850;padding:.025em .18em;border-radius:.27em;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+body.final-page .niti-person--red{color:#9b1830!important;background:#ffeaee!important}
+body.final-page .niti-person--yellow{color:#785000!important;background:#fff0aa!important}
+body.final-page .niti-person--blue{color:#164aa0!important;background:#e7f0ff!important}
+body.final-page .niti-person--green{color:#166039!important;background:#e5f7ed!important}
+body.final-page .niti-person--teal{color:#0e6665!important;background:#e0f6f4!important}
+body.final-page .niti-person--purple{color:#6c2e8b!important;background:#f4e9fa!important}
+body.final-page .niti-person--violet{color:#503697!important;background:#eee9ff!important}
+body.final-page .niti-person--orange{color:#90410a!important;background:#fff0de!important}
+body.final-page .niti-person--pink{color:#8c245f!important;background:#ffe8f4!important}
+body.final-page .niti-person--gold{color:#795004!important;background:#fff0ce!important}
+body.final-page .niti-person--indigo{color:#324c85!important;background:#e8edfd!important}
+[data-theme="dark"] body.final-page .niti-person--red{color:#ffb7c2!important;background:#58202c!important}
+[data-theme="dark"] body.final-page .niti-person--yellow{color:#ffe79a!important;background:#584216!important}
+[data-theme="dark"] body.final-page .niti-person--blue{color:#bad6ff!important;background:#213b66!important}
+[data-theme="dark"] body.final-page .niti-person--green{color:#adf0c6!important;background:#1c4a36!important}
+[data-theme="dark"] body.final-page .niti-person--teal{color:#acf0eb!important;background:#1d484a!important}
+[data-theme="dark"] body.final-page .niti-person--purple{color:#e8c5ff!important;background:#462a59!important}
+[data-theme="dark"] body.final-page .niti-person--violet{color:#d2c4ff!important;background:#3d316b!important}
+[data-theme="dark"] body.final-page .niti-person--orange{color:#ffdaad!important;background:#603920!important}
+[data-theme="dark"] body.final-page .niti-person--pink{color:#ffc5e2!important;background:#592c46!important}
+[data-theme="dark"] body.final-page .niti-person--gold{color:#ffe4a1!important;background:#56431b!important}
+[data-theme="dark"] body.final-page .niti-person--indigo{color:#ccd8ff!important;background:#2c3d62!important}
+body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:11px 0 0;line-height:2}
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261017c">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
@@ -211,6 +238,7 @@ body.final-page .final-hero p{color:#f4f8fd!important}
   <div><span class="final-book-kicker">SOURCE-BASED EXAM PRACTICE</span><h2 id="book-heading">ข้อสอบตามหนังสือ · คัดจาก PDF ที่อัปโหลด</h2>
    <p>คัดเฉพาะคำถามท้ายบทที่สัมพันธ์กับขอบเขต 18 มาตราที่กำหนด เรียบเรียงโจทย์จากต้นฉบับและระบุหน้า PDF / ข้อที่มา ไม่ใช่ข้อสอบย้อนหลังของมหาวิทยาลัย</p>
    <p>คำตอบมี <b>หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</b> พร้อม <strong class="exam-score-keyword">คีย์เวิร์ดภาษากฎหมาย</strong> สำหรับฝึกเขียนสอบระดับปริญญาตรี</p>
+   <p class="book-person-legend">แยกตัวละครด้วยสีที่คงที่ตลอดหน้า: <span>นายแดง</span> · <span>นายขาว</span> · <span>นายดำ</span> และชื่ออื่น ๆ จะใช้สีประจำตัวเช่นกัน เพื่อช่วยอ่านโจทย์และวิเคราะห์ข้อเท็จจริง ไม่ใช่เกณฑ์ให้คะแนน</p>
   </div>
  </div>
  <div class="book-toolbar">
@@ -246,6 +274,7 @@ body.final-page .final-hero p{color:#f4f8fd!important}
 <script src="./statute-illustration.js?v=20261015g"></script>
 <script src="./statute-reader.js?v=20261017d"></script>
 <script src="./statute-autolink.js?v=20261017c"></script>
+<script src="./final-person-colors.js?v=20261017a"></script>
 <script src="./theme.js"></script>
 </body>
 </html>
