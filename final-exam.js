@@ -123,6 +123,15 @@ function render(){
     var historic=el("div","final-history");historic.appendChild(el("strong","","ข้อสอบย้อนหลังในคลัง ("+match.length+" ข้อ)"));
     match.forEach(function(q){historic.appendChild(anchor("./quiz.html?exam="+encodeURIComponent(q.id),q.title+" · ภาค "+q.semester+"/"+q.year,"final-exam-link"));});card.appendChild(historic);
    }else card.appendChild(el("p","final-no-history","ยังไม่มีข้อสอบย้อนหลังที่อ้างมาตรานี้โดยตรงในคลัง"));
+   var textbook=(window.NITI_FINAL_BOOK_QUESTIONS||[]).filter(function(q){return q.sections.indexOf(id)>=0;});
+   if(textbook.length){
+    var bookRefs=el("div","final-book-anchors");
+    bookRefs.appendChild(el("strong","","ข้อสอบตามหนังสือ ("+textbook.length+" ข้อ)"));
+    textbook.forEach(function(q){
+     bookRefs.appendChild(anchor("#"+q.id,q.title+" · PDF หน้า "+q.page+" "+q.bookQuestion,"final-book-anchor"));
+    });
+    card.appendChild(bookRefs);
+   }
    var pq=cases[id]||[];
    var details=el("details","final-practice");var summary=el("summary","","โจทย์ฝึกแต่งใหม่ · ฝึกเขียนตอบ ↓");details.appendChild(summary);
    var wrap=el("div","final-practice-body");
