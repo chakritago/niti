@@ -249,6 +249,59 @@ function normalize(value){
  return match?match[1]:"";
 }
 function anchorId(id){return "statute-"+String(id).replace(/\//g,"-");}
+function requestedParts(value){
+ if(value&&typeof value==="object")return {id:normalize(value.id),paragraphs:Array.isArray(value.paragraphs)?value.paragraphs.map(String):[],item:value.item?String(value.item):""};
+ var s=String(value||""),m=s.match(/^(\d{1,4}(?:\/\d{1,3})?)(?:-p([1-9](?:_[1-9])*))?(?:-i([1-9]))?$/);
+ return {id:m?m[1]:normalize(s),paragraphs:m&&m[2]?m[2].split("_"):[],item:m&&m[3]||""};
+}
+var NUM_NAMES={"1":"หนึ่ง","2":"สอง","3":"สาม","4":"สี่","5":"ห้า","6":"หก"};
+function paragraphTitle(p){return "วรรค"+(NUM_NAMES[String(p)]||String(p));}
+function appendClause(parent,type,key,info,selected){
+ var article=element("article","niti-reader-clause"+(selected?" is-selected":""));
+ var heading=(type==="item"?"ข้อ ("+key+")":paragraphTitle(key))+" · "+(info.title||"");
+ article.appendChild(element("h4","niti-reader-clause-title",heading));
+ if(info.text){
+  article.appendChild(element("p","niti-reader-clause-text-label","ข้อความตัวบทกฎหมาย"));
+  article.appendChild(element("p","niti-reader-clause-legal-text",info.text));
+ }
+ section(article,"ความหมายและองค์ประกอบ",info.summary);
+ section(article,"แนวเขียนสอบ",info.exam);
+ parent.appendChild(article);
+}
+function paragraphContent(body,id,selection){
+ var store=window.NITI_STATUTE_PARAGRAPHS||null;
+ var data=store&&typeof store.get==="function"?store.get(id):null;
+ var paras=data&&data.paragraphs||{},items=data&&data.items||{};
+ var requested=selection.paragraphs||[],requestedItem=selection.item||"";
+ var any=!!(requested.length||requestedItem),count=Object.keys(paras).length+Object.keys(items).length;
+ if(!count){
+  if(any)body.appendChild(element("p","niti-reader-missing","ยังไม่มีข้อมูลรายวรรค/ข้อที่ตรวจทานแล้วสำหรับมาตรา "+id+" โปรดตรวจตัวบททางการด้านล่าง"));
+  return;
+ }
+ var wrapper=element("section","niti-reader-clauses");
+ wrapper.appendChild(element("h3","niti-reader-clauses-heading",any?"คำอธิบายตามวรรค/ข้อที่อ้างอิง":"คำอธิบายแยกรายวรรคและอนุมาตรา"));
+ var selectedBox=element("div","niti-reader-active-clauses"),others=element("div","niti-reader-other-clauses"),found=0;
+ Object.keys(paras).forEach(function(k){
+  var chosen=requested.indexOf(k)!==-1;
+  if(chosen)found++;
+  appendClause(chosen||!any?selectedBox:others,"paragraph",k,paras[k],chosen);
+ });
+ Object.keys(items).forEach(function(k){
+  var chosen=requestedItem===k;
+  if(chosen)found++;
+  appendClause(chosen||!any?selectedBox:others,"item",k,items[k],chosen);
+ });
+ if(any&&(found<requested.length+(requestedItem?1:0)))selectedBox.appendChild(element("p","niti-reader-missing","บางวรรคหรืออนุมาตราที่ยกขึ้นอ้างยังไม่มีคำอธิบายที่ตรวจทานแล้วในฐานข้อมูล โปรดตรวจตัวบทฉบับปัจจุบัน"));
+ wrapper.appendChild(selectedBox);
+ if(any&&others.childElementCount){
+  var details=document.createElement("details");details.className="niti-reader-other-details";
+  details.appendChild(element("summary","","อ่านวรรค/อนุมาตราอื่นในมาตรานี้"));
+  details.appendChild(others);wrapper.appendChild(details);
+ }
+ if(data.source)wrapper.appendChild(link(data.source,"เปรียบเทียบข้อความตัวบทจากเว็บไซต์เอกชน ↗","niti-reader-paragraph-source"));
+ body.appendChild(wrapper);
+}
+
 function element(tag,cls,content){
  var node=document.createElement(tag);
  if(cls)node.className=cls;
@@ -348,14 +401,14 @@ function idFromHash(){
   var h=String(window.location.hash||"");
   var m=h.match(/^#statute-(.+)$/);
   if(!m) return "";
-  var raw=""; try{ raw=decodeURIComponent(m[1]); }catch(e){ raw=m[1]; }
+  var raw=""; try{raw=decodeURIComponent(m[1]);}catch(e){raw=m[1];}
   raw=String(raw||"").trim();
-  if(!raw) return "";
-  var known=knownStatuteIds();
-  if(known[raw]) return raw;
-  var slash=raw.replace("-","/");
-  if(known[slash]) return slash;
-  return normalize(raw);
+  if(!raw)return "";
+  var pm=raw.match(/-p([1-9](?:_[1-9])*)/),im=raw.match(/-i([1-9])/);
+  var base=raw.replace(/-p[1-9](?:_[1-9])*/,"").replace(/-i[1-9]/,"");
+  var known=knownStatuteIds(),slash=base.replace("-","/");
+  var id=known[base]?base:(known[slash]?slash:normalize(base));
+  return id?{id:id,paragraphs:pm?pm[1].split("_"):[],item:im?im[1]:""}:"";
  }catch(e){ return ""; }
 }
 function maybeOpenFromHash(){
@@ -366,7 +419,8 @@ function maybeOpenFromHash(){
 }
 function openStatute(value,opener){
  try{
-  var id=normalize(value);
+  var selection=requestedParts(value);
+  var id=selection.id;
   if(!id) return false;
   var note=noteById[id]||null;
   var model=null;
@@ -378,7 +432,8 @@ function openStatute(value,opener){
   previousFocus=opener||document.activeElement;
   dialog.replaceChildren();
   var head=element("div","niti-reader-header");
-  var heading=element("h2","", "ป.พ.พ. มาตรา "+id);
+  var focus=selection.paragraphs.length?" "+selection.paragraphs.map(paragraphTitle).join(", "):(selection.item?" ข้อ ("+selection.item+")":"");
+  var heading=element("h2","", "ป.พ.พ. มาตรา "+id+focus);
   heading.id="niti-statute-dialog-title";
   var close=element("button","niti-reader-close","ปิด ×");
   close.type="button";
@@ -393,6 +448,7 @@ function openStatute(value,opener){
   var description=element("p","niti-reader-disclaimer",model?"กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ":"มาตรานี้มีสรุปและตัวบทกฎหมายให้อ่าน แต่ยังไม่มีภาพประกอบโต้ตอบ โปรดตรวจต้นฉบับ PDF ของหน่วยงานรัฐประกอบ");
   description.id="niti-statute-dialog-description";
   body.appendChild(description);
+  paragraphContent(body,id,selection);
   var hasSummaryContent=!!(note&&(note.plain||note.exam||note.conditions||note.trap));
   if(note&&hasSummaryContent){
    var summary=element("div","niti-reader-summary niti-summary-top-priority");
@@ -468,12 +524,13 @@ document.addEventListener("click",function(event){
  var target=event.target&&event.target.closest?event.target.closest("a[data-statute]"):null;
  if(!target)return;
  var id=normalize(target.getAttribute("data-statute"));
+ var paragraphs=(target.dataset.paragraphs||"").split(",").filter(Boolean);
  var opened=false;
- try{ opened=openStatute(id,target); }catch(e){ opened=false; }
+ try{ opened=openStatute({id:id,paragraphs:paragraphs,item:target.dataset.statuteItem||""},target); }catch(e){ opened=false; }
  if(opened)event.preventDefault();
 });
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017a"};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017b"};
 })();
