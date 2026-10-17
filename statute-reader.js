@@ -372,7 +372,7 @@ function openStatute(value,opener){
   var model=null;
   try{ model=window.NITI_DIORAMA_DATA&&window.NITI_DIORAMA_DATA.get(id); }catch(e){ model=null; }
   var ref=typeof sourceMap.resolve==="function"?sourceMap.resolve(id):null;
-  if(!ref&&!note&&!model) return false;
+  if(!ref) ref={id:id,primaryUrl:"https://www.ocs.go.th/searchlaw",page:null,sourceType:"official-search"};
   setup();
   if(dialog.open){ try{ dialog.close(); }catch(e){} }
   previousFocus=opener||document.activeElement;
@@ -410,24 +410,29 @@ function openStatute(value,opener){
    }
   }
   if(!note){
-   body.appendChild(element("p","niti-reader-missing","หัวข้อ: "+title+" — อ่านตัวบทฉบับทางการในกรอบด้านล่าง"));
+   body.appendChild(element("p","niti-reader-missing","ยังไม่มีคำอธิบายมาตรา "+id+" ในคลัง NITI กรุณาตรวจข้อความตัวบทจากหน่วยงานรัฐตามลิงก์ด้านล่าง"));
   }
   if(ref){
    var actions=element("div","niti-reader-actions");
-   actions.appendChild(link(ref.primaryUrl,"เปิดตัวบทฉบับทางการ PDF หน้า "+ref.page+" ↗","niti-reader-primary"));
-   var inside=link("./study.html#"+anchorId(id),"ดูการ์ดมาตรานี้ในหน้าเว็บ ↓","niti-reader-inside");
-   inside.addEventListener("click",function(){ suppressHashOpen=true; dialog.close(); });
-   actions.appendChild(inside);
+   var isPdf=/\.pdf(?:[?#]|$)/i.test(String(ref.primaryUrl||""));
+   var sourceLabel=isPdf?"เปิดตัวบทกฎหมาย PDF"+(ref.page?" หน้า "+ref.page:"")+" ↗":"ค้นตัวบทฉบับปัจจุบันจากสำนักงานคณะกรรมการกฤษฎีกา ↗";
+   actions.appendChild(link(ref.primaryUrl,sourceLabel,"niti-reader-primary"));
+   if(note){
+    var inside=link("./study.html#"+anchorId(id),"ดูการ์ดมาตรานี้ในหน้าเว็บ ↓","niti-reader-inside");
+    inside.addEventListener("click",function(){ suppressHashOpen=true; dialog.close(); });
+    actions.appendChild(inside);
+   }
    body.appendChild(actions);
-   var textHeading=element("h3","niti-reader-pdf-title","อ่านข้อความมาตราในเอกสารต้นฉบับ");
-   body.appendChild(textHeading);
-   body.appendChild(element("p","niti-reader-pdf-note","กรอบนี้แสดง PDF ของหน่วยงานรัฐ โดยกำหนดหน้า "+ref.page+" หากไม่แสดงหรือไม่เลื่อนไปหน้าที่กำหนด ให้ใช้ปุ่มเปิด PDF ด้านบน"));
-   viewer=element("iframe","niti-reader-pdf");
-   viewer.title="ตัวบทมาตรา "+id+" จากเอกสารกฎหมายทางการ หน้า "+ref.page;
-   viewer.setAttribute("loading","lazy");
-   viewer.setAttribute("referrerpolicy","no-referrer");
-   viewer.src=ref.primaryUrl;
-   body.appendChild(viewer);
+   if(isPdf){
+    body.appendChild(element("h3","niti-reader-pdf-title","อ่านข้อความมาตราในเอกสารต้นฉบับ"));
+    body.appendChild(element("p","niti-reader-pdf-note",ref.page?"กรอบนี้แสดง PDF ของหน่วยงานรัฐ หน้า "+ref.page+" หากไม่เลื่อนไปหน้าที่กำหนด ให้กดเปิด PDF ด้านบน":"กรอบนี้แสดง PDF กฎหมายจากหน่วยงานรัฐ โปรดค้นหามาตรา "+id+" ในเอกสาร หากไม่แสดงผลให้ใช้ปุ่มเปิด PDF ด้านบน"));
+    viewer=element("iframe","niti-reader-pdf");
+    viewer.title="เอกสารกฎหมายทางการสำหรับมาตรา "+id+(ref.page?" หน้า "+ref.page:"");
+    viewer.setAttribute("loading","lazy");
+    viewer.setAttribute("referrerpolicy","no-referrer");
+    viewer.src=ref.primaryUrl;
+    body.appendChild(viewer);
+   }
    if(ref.sourceType==="gov-consolidated"){
     body.appendChild(element("p","niti-reader-pdf-note","เอกสารรวมบางฉบับอาจมีข้อความก่อนการแก้ไขเพิ่มเติม ควรตรวจฉบับปัจจุบันของศาลยุติธรรมประกอบ"));
    }
@@ -470,5 +475,5 @@ document.addEventListener("click",function(event){
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261015g"};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017a"};
 })();
