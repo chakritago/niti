@@ -52,3 +52,15 @@
 .niti-statute-dialog .niti-reader-other-details summary{font-weight:800;cursor:pointer;color:var(--md-primary);margin:0 0 10px}
 .niti-statute-dialog .niti-reader-paragraph-source{display:inline-block;margin-top:13px;text-decoration:underline;font-weight:750}
 @media(max-width:640px){.niti-statute-dialog .niti-reader-clauses{padding:11px;margin:10px 0 16px}.niti-statute-dialog .niti-reader-clause{padding:11px}}
+
+
+/* Reliable legal text preview for articles whose off-site PDF cannot be embedded. */
+.niti-statute-dialog .niti-reader-exact-text{margin:16px 0 22px;padding:18px 20px;background:var(--md-surface-low);border:1px solid var(--md-outline);border-left:5px solid var(--md-primary);border-radius:12px}
+.niti-statute-dialog .niti-reader-exact-title{margin:0 0 12px;color:var(--md-primary);font-size:1.16rem;line-height:1.65}
+.niti-statute-dialog .niti-reader-exact-body{font-size:1.08rem;line-height:2.05;margin:0 0 12px;white-space:pre-wrap;color:var(--md-text);font-weight:650}
+.niti-statute-dialog .niti-reader-exact-notice{font-size:.83rem;line-height:1.7;color:var(--md-text-secondary);margin:8px 0 12px}
+.niti-statute-dialog .niti-reader-verified-source{display:inline-block;margin:6px 14px 6px 0;color:var(--md-primary);font-weight:750;line-height:1.8;text-decoration:underline}
+.niti-statute-dialog .niti-reader-pdf-optional{border:1px dashed var(--md-outline);padding:12px 16px;margin:17px 0;border-radius:12px}
+.niti-statute-dialog .niti-reader-pdf-optional summary{cursor:pointer;font-weight:800;color:var(--md-primary);line-height:1.8}
+.niti-statute-dialog .niti-reader-pdf-optional .niti-reader-pdf{margin:10px 0 0;width:100%}
+@media(max-width:640px){.niti-statute-dialog .niti-reader-exact-text{padding:13px}.niti-statute-dialog .niti-reader-exact-body{font-size:1rem}}
