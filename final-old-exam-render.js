@@ -19,9 +19,9 @@ function el(tag,cls,text){
  return e;
 }
 function normalizeSpacing(s){
- // PDF font extraction inserts spurious spaces inside Thai words.
- // Never change legal wording, figures, statutory citations, or punctuation.
- return String(s||"").replace(/[ \t]+/g," ").replace(/([\u0E00-\u0E7F]) +(?=[\u0E00-\u0E7F])/g,"$1").replace(/(\S)\n(?=\S)/g,"$1 ").replace(/\n+/g,"\n").trim();
+ // Corrected source text is already re-extracted from the PDF.
+ // Keep the Thai word boundaries and meaningful paragraph breaks readable.
+ return String(s||"").replace(/[ \t]+/g," ").replace(/ *\n */g,"\n").replace(/\n{3,}/g,"\n\n").trim();
 }
 function paint(parent,value){
  var s=normalizeSpacing(value);
@@ -91,5 +91,5 @@ function syncHash(){
 }
 window.addEventListener("hashchange",syncHash);
 syncHash();
-window.NITI_OLD_EXAM_RENDER={normalizeSpacing:normalizeSpacing,version:"20261017a"};
+window.NITI_OLD_EXAM_RENDER={normalizeSpacing:normalizeSpacing,version:"20261017c"};
 })();
