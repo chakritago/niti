@@ -65,6 +65,26 @@
 .subject-page .info{margin:15px 0 0;color:var(--sp-weak);font-size:.83rem}
 .subject-page .empty{padding:22px;color:var(--sp-weak);border:1px dashed var(--sp-outline);border-radius:12px}
 .subject-page footer{padding:26px 0}
+.subject-page .exam-guides{margin:34px 0 32px}
+.subject-page .exam-guides h2{font-size:1.55rem;margin:0 0 7px}
+.subject-page .exam-guide-sub{color:var(--sp-weak);line-height:1.9;margin:0 0 19px}
+.subject-page .exam-guide-list{display:grid;gap:14px}
+.subject-page .exam-guide{border:1px solid var(--sp-outline);border-radius:16px;background:var(--sp-card);overflow:hidden;scroll-margin-top:85px}
+.subject-page .exam-guide>summary{cursor:pointer;padding:17px 20px;font-size:1.06rem;line-height:1.6;font-weight:800;color:var(--sp-accent);list-style-position:inside}
+.subject-page .exam-guide[open]>summary{border-bottom:1px solid var(--sp-outline);background:var(--sp-accent-bg)}
+.subject-page .exam-guide .exam-guide-body{padding:19px 22px 22px;display:grid;gap:15px}
+.subject-page .exam-guide h3{font-size:1.05rem;margin:0 0 6px}
+.subject-page .exam-guide p{margin:0;line-height:2;white-space:pre-line}
+.subject-page .exam-guide .exam-fact{background:var(--sp-soft);padding:14px 16px;border-radius:10px}
+.subject-page .exam-guide .exam-part{border-left:4px solid var(--sp-accent);padding-left:16px}
+.subject-page .exam-guide .exam-part.app{border-left-color:var(--study-teal,#0e807e)}
+.subject-page .exam-guide .exam-part.conclusion{border-left-color:var(--study-orange,#c97d20)}
+.subject-page .exam-guide .exam-guide-link{justify-self:start;font-weight:800;color:var(--sp-accent)}
+.subject-page .answer-toggle .outlines{align-items:start}
+.subject-page .outline p{white-space:pre-line}
+.subject-page .exam-score-keyword,.subject-page .exam-guide .exam-score-keyword{color:#8c4305!important;background:#fff0c9!important;padding:0 .16em;border-radius:4px;font-weight:900;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+:root[data-theme="dark"] .exam-score-keyword{color:#ffe095!important;background:#633c10!important}
+.subject-page .exam-key-legend{display:inline-block;font-size:.85rem;line-height:1.85;margin:0 0 14px;color:var(--sp-weak)}
 @media(max-width:900px){.subject-page .cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:690px){.subject-page .cards,.subject-page .outlines{grid-template-columns:1fr}.subject-page .intro{padding:35px 0 38px}.subject-page .feature{padding:17px}.subject-page .subject-card{padding:18px}}
 </style>
@@ -91,6 +111,12 @@
 <div class="section-top"><div><h2>เลือกหัวข้อวิชา</h2><p>ข้อสอบจะกรองตามหัวข้อโดยไม่ทิ้งข้อสอบเดิม</p></div><label for="subject-search">ค้นหาหัวข้อ<br><input id="subject-search" class="subject-search" type="search" placeholder="เช่น ยืม, จำนอง, แลกเปลี่ยน"></label></div>
 <div id="subject-cards" class="cards" aria-live="polite"></div>
 <p id="subject-empty" class="empty" hidden>ไม่พบหัวข้อที่ตรงกับคำค้น</p>
+<section class="exam-guides" id="exam-guides" aria-labelledby="exam-guides-title">
+  <h2 id="exam-guides-title">หลักกฎหมายและตัวอย่างปรับบทสำหรับเขียนสอบ · ครบ 9 วิชา</h2>
+  <p class="exam-guide-sub">เรียงเหตุการณ์ก่อนหลัง ตรวจองค์ประกอบตามบทกฎหมาย และสรุปผลให้ตรงประเด็นของโจทย์ ตัวอย่างผูกกับข้อสอบ/โจทย์ฝึกในคลัง</p>
+  <p class="exam-key-legend"><strong class="exam-score-keyword">คำสำคัญ</strong> สีเหลืองคือถ้อยคำหรือองค์ประกอบที่ควรกล่าวถึงเพื่อให้การวิเคราะห์ครบถ้วน ไม่ใช่เกณฑ์ให้คะแนนอย่างเป็นทางการจากมหาวิทยาลัย</p>
+  <div class="exam-guide-list" id="subject-guide-list"></div>
+</section>
 <section id="featured-problem" class="feature" aria-labelledby="featured-title">
 <div class="feature-head"><div><span class="tag">ยืม · โจทย์จากผู้ใช้</span><h2 id="featured-title">ข้อ 1 · ยืมรถยนต์ไปขายให้บุคคลภายนอก</h2><p class="note">เป็นโจทย์ฝึกที่ผู้ใช้ส่งมา ไม่อ้างว่าเป็นข้อสอบเก่าของมหาวิทยาลัย</p></div><span class="tag">วินิจฉัย 2 ประเด็น</span></div>
 <div class="question" id="featured-question"></div>
@@ -188,6 +214,9 @@
 <script src="./surety-practice-02.js?v=20261016a"></script>
 <script src="./mortgage-practice-03.js?v=20261017a"></script>
 <script src="./land-sale-practice-04.js?v=20261017a"></script>
+<script src="./subject-exam-guides.js?v=20261017a"></script>
+<script src="./subject-answer-upgrades.js?v=20261017a"></script>
+<script src="./exam-keyword-ui.js?v=20261017a"></script>
 <script>
 (function(){
 "use strict";
@@ -198,6 +227,42 @@ var outlines=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})[window.NITI_SUBJECT_FEATUR
 function el(tag,cls,txt){var n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;}
 function a(url,txt,cls){var n=el("a",cls,txt);n.href=url;return n;}
 function matching(t){return exams.filter(function(q){return q.topic===t.topic&&(q.subject||"LAW2001")===t.subject;}).sort(function(a,b){return (a.id===window.NITI_SUBJECT_FEATURED_ID?-1:0)-(b.id===window.NITI_SUBJECT_FEATURED_ID?-1:0);});}
+function paint(node,value,topic){
+ var highlighter=window.NITI_EXAM_KEYWORDS;
+ if(highlighter)highlighter.apply(node,value,highlighter.termsFor(topic));
+ else node.textContent=value;
+}
+function renderExamGuides(){
+ var container=$("subject-guide-list"),guides=window.NITI_SUBJECT_EXAM_GUIDES||[];
+ guides.forEach(function(g){
+  var details=el("details","exam-guide");details.id="guide-"+g.id;
+  details.appendChild(el("summary","",g.topic+" · อ่านหลักกฎหมาย → ปรับบท → สรุป"));
+  var body=el("div","exam-guide-body");
+  var fact=el("div","exam-fact");fact.appendChild(el("h3","","ข้อเท็จจริงตัวอย่าง"));fact.appendChild(el("p","",g.fact));body.appendChild(fact);
+  [["rule","หลักกฎหมาย",""],["application","ปรับบทตามลำดับเหตุการณ์","app"],["conclusion","สรุปผลทางกฎหมาย","conclusion"]].forEach(function(row){
+   var block=el("section","exam-part "+row[2]);
+   block.appendChild(el("h3","",row[1]));
+   var p=el("p");paint(p,g[row[0]],g.id);block.appendChild(p);body.appendChild(block);
+  });
+  body.appendChild(a("./quiz.html?exam="+encodeURIComponent(g.exam),"เปิดโจทย์ที่เกี่ยวข้องเพื่อฝึกเขียนคำตอบ ↗","exam-guide-link"));
+  details.appendChild(body);container.appendChild(details);
+ });
+ function openHashGuide(){
+  var hash=window.location.hash.slice(1);
+  if(!/^guide-[a-z-]+$/.test(hash))return;
+  var target=document.getElementById(hash);
+  if(target&&target.tagName==="DETAILS")target.open=true;
+ }
+ document.addEventListener("click",function(e){
+  var anchor=e.target&&e.target.closest?e.target.closest('a[href^="#guide-"]'):null;
+  if(!anchor)return;
+  var target=document.getElementById(anchor.hash.slice(1));
+  if(target)target.open=true;
+ });
+ window.addEventListener("hashchange",openHashGuide);
+ openHashGuide();
+}
+renderExamGuides();
 function render(q){
  $("subject-cards").replaceChildren();var count=0;
  topics.forEach(function(t,i){
@@ -209,6 +274,7 @@ function render(q){
  card.appendChild(el("p","",t.caption));
  var links=el("div","subject-links");
  links.appendChild(a("./quiz.html?subject="+encodeURIComponent(t.subject)+"&topic="+encodeURIComponent(t.topic),"ฝึกข้อสอบหมวดนี้ ↗"));
+  links.appendChild(a("#guide-"+t.id,"อ่านหลักกฎหมาย + ปรับบท ↓","secondary"));
  if(t.id==="loan")links.appendChild(a("./quiz.html?exam="+encodeURIComponent(window.NITI_SUBJECT_FEATURED_ID),"เปิดโจทย์ข้อ 1 ↗","secondary"));
  if(t.id==="surety")links.appendChild(a("./quiz.html?exam=practice-surety-bank-02","เปิดโจทย์ข้อ 2 ↗","secondary"));
  if(t.id==="mortgage")links.appendChild(a("./quiz.html?exam=practice-mortgage-registration-03","เปิดโจทย์ข้อ 3 ↗","secondary"));
@@ -236,7 +302,7 @@ landSaleOutlines.forEach(function(item){
  d.appendChild(el("h3","",item.heading));
  d.appendChild(el("p","","หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(", ")));
  [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){
-  var p=el("p");p.appendChild(el("b","",row[0]+": "));p.appendChild(document.createTextNode(row[1]));d.appendChild(p);
+  var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"sale");d.appendChild(p);
  });
  $("land-sale-answer-body").appendChild(d);
 });
@@ -246,7 +312,7 @@ mortgageOutlines.forEach(function(item){
  d.appendChild(el("h3","",item.heading));
  d.appendChild(el("p","","หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(", ")));
  [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){
-  var p=el("p");p.appendChild(el("b","",row[0]+": "));p.appendChild(document.createTextNode(row[1]));d.appendChild(p);
+  var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"mortgage");d.appendChild(p);
  });
  $("mortgage-answer-body").appendChild(d);
 });
@@ -256,13 +322,13 @@ suretyOutlines.forEach(function(item){
  d.appendChild(el("h3","",item.heading));
  d.appendChild(el("p","","หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(", ")));
  [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){
-  var p=el("p");p.appendChild(el("b","",row[0]+": "));p.appendChild(document.createTextNode(row[1]));d.appendChild(p);
+  var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"surety");d.appendChild(p);
  });
  $("surety-answer-body").appendChild(d);
 });
 outlines.forEach(function(item){
  var d=el("article","outline");d.appendChild(el("h3","",item.heading));d.appendChild(el("p","", "หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(" และ ")));
- [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){var p=el("p");p.appendChild(el("b","",row[0]+": "));p.appendChild(document.createTextNode(row[1]));d.appendChild(p);});
+ [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"loan");d.appendChild(p);});
  $("featured-answer-body").appendChild(d);
 });
 render("");
