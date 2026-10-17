@@ -96,14 +96,16 @@ persist();$("coach-progress").textContent=coachStep>=4?"ฝึกตอบคร
 $("coach-input").disabled=coachStep>=4;$("coach-send").disabled=coachStep>=4;$("coach-skip").disabled=coachStep>=4;$("coach-hint").disabled=coachStep>=4;
 }
 function restart(){if(!currentId||!confirm("เริ่มบทสนทนาของข้อนี้ใหม่? กระดาษคำตอบที่บันทึกไว้จะไม่ถูกลบ"))return;delete cache[currentId];persist();render();}
-function addAnswerSection(parent,heading,text){
-var div=document.createElement("section");div.className="model-part";var h=document.createElement("h4");h.textContent=heading;var p=document.createElement("p");p.textContent=text;div.appendChild(h);div.appendChild(p);parent.appendChild(div);
+function addAnswerSection(parent,heading,text,topic){
+var div=document.createElement("section");div.className="model-part";var h=document.createElement("h4");h.textContent=heading;var p=document.createElement("p");var highlighter=window.NITI_EXAM_KEYWORDS;
+if(highlighter&&topic)highlighter.apply(p,text,highlighter.termsFor(topic));else p.textContent=text;
+div.appendChild(h);div.appendChild(p);parent.appendChild(div);
 }
 function setAnswerContent(q,a){
 var el=$("tutor-answer-parts");el.replaceChildren();
 addAnswerSection(el,"1. ประเด็นที่ต้องวินิจฉัย",q.issue);
-addAnswerSection(el,"2. หลักกฎหมาย",a.rule);
-addAnswerSection(el,"3. วินิจฉัยปรับบท",a.application);
+addAnswerSection(el,"2. หลักกฎหมาย",a.rule,q.topic);
+addAnswerSection(el,"3. วินิจฉัยปรับบท",a.application,q.topic);
 addAnswerSection(el,"4. สรุปคำตอบ",a.bottomLine);
 var note=document.createElement("p");note.className="model-caution";note.textContent="ข้อควรระวัง: "+q.pitfall;el.appendChild(note);
 $("tutor-answer-meta").textContent=q.course+" · "+((window.NITI_SUBJECT_PRACTICE_IDS||[window.NITI_SUBJECT_FEATURED_ID]).includes(q.id)?"โจทย์จากผู้ใช้ (ไม่ใช่ข้อสอบย้อนหลัง)":q.kind==="practice"?"โจทย์ฝึกแต่งใหม่ (ไม่ใช่ข้อสอบเก่า)":"ภาค "+q.semester+"/"+q.year+" · ข้อ "+q.number)+" · เฉลยเรียบเรียงใหม่เพื่อการศึกษา";
