@@ -282,6 +282,19 @@ function appendClause(parent,type,key,info,selected){
  section(article,"แนวเขียนสอบ",info.exam);
  parent.appendChild(article);
 }
+function articleTextPreview(body,id){
+ var store=window.NITI_STATUTE_PARAGRAPHS||null;
+ var info=store&&typeof store.get==="function"?store.get(id):null;
+ if(!info||!info.text)return false;
+ var sectionNode=element("section","niti-reader-exact-text");
+ sectionNode.appendChild(element("h3","niti-reader-exact-title","ตัวบท ป.พ.พ. มาตรา "+id+" · อ่านได้ทันที"));
+ sectionNode.appendChild(element("p","niti-reader-exact-body",info.text));
+ sectionNode.appendChild(element("p","niti-reader-exact-notice","แสดงข้อความตัวบทแทนกรอบ PDF ที่อาจไม่รองรับการฝังบนเว็บไซต์ โปรดตรวจสอบแหล่งอ้างอิงประกอบ"));
+ if(info.source)sectionNode.appendChild(link(info.source,"เทียบตัวบทมาตรา "+id+" กับแหล่งสำรอง ↗","niti-reader-verified-source"));
+ if(info.officialSearchUrl)sectionNode.appendChild(link(info.officialSearchUrl,"ค้นตัวบทจากสำนักงานคณะกรรมการกฤษฎีกา ↗","niti-reader-verified-source"));
+ body.appendChild(sectionNode);
+ return true;
+}
 function paragraphContent(body,id,selection){
  var store=window.NITI_STATUTE_PARAGRAPHS||null;
  var data=store&&typeof store.get==="function"?store.get(id):null;
@@ -462,6 +475,7 @@ function openStatute(value,opener){
   var description=element("p","niti-reader-disclaimer",model?"กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ":"มาตรานี้มีสรุปและตัวบทกฎหมายให้อ่าน แต่ยังไม่มีภาพประกอบโต้ตอบ โปรดตรวจต้นฉบับ PDF ของหน่วยงานรัฐประกอบ");
   description.id="niti-statute-dialog-description";
   body.appendChild(description);
+  var hasInlineStatute=articleTextPreview(body,id);
   paragraphContent(body,id,selection);
   var hasSummaryContent=!!(note&&(note.plain||note.exam||note.conditions||note.trap));
   if(note&&hasSummaryContent){
@@ -494,14 +508,31 @@ function openStatute(value,opener){
    }
    body.appendChild(actions);
    if(isPdf){
-    body.appendChild(element("h3","niti-reader-pdf-title","อ่านข้อความมาตราในเอกสารต้นฉบับ"));
-    body.appendChild(element("p","niti-reader-pdf-note",ref.page?"กรอบนี้แสดง PDF ของหน่วยงานรัฐ หน้า "+ref.page+" หากไม่เลื่อนไปหน้าที่กำหนด ให้กดเปิด PDF ด้านบน":"กรอบนี้แสดง PDF กฎหมายจากหน่วยงานรัฐ โปรดค้นหามาตรา "+id+" ในเอกสาร หากไม่แสดงผลให้ใช้ปุ่มเปิด PDF ด้านบน"));
-    viewer=element("iframe","niti-reader-pdf");
-    viewer.title="เอกสารกฎหมายทางการสำหรับมาตรา "+id+(ref.page?" หน้า "+ref.page:"");
-    viewer.setAttribute("loading","lazy");
-    viewer.setAttribute("referrerpolicy","no-referrer");
-    viewer.src=ref.primaryUrl;
-    body.appendChild(viewer);
+    if(hasInlineStatute){
+     var pdfDetails=document.createElement("details");
+     pdfDetails.className="niti-reader-pdf-optional";
+     pdfDetails.appendChild(element("summary","","ทดลองแสดง PDF ฉบับรวมในกรอบ (ต้นทางอาจไม่อนุญาต)"));
+     pdfDetails.appendChild(element("p","niti-reader-pdf-note","ข้อความมาตรามีให้อ่านด้านบนแล้ว หาก PDF ไม่แสดง ให้ใช้ลิงก์เปิดต้นฉบับในแท็บใหม่หรือแหล่งข้อมูลสำรอง"));
+     pdfDetails.addEventListener("toggle",function(){
+      if(!pdfDetails.open||viewer)return;
+      viewer=element("iframe","niti-reader-pdf");
+      viewer.title="PDF ฉบับรวมสำหรับมาตรา "+id;
+      viewer.setAttribute("loading","lazy");
+      viewer.setAttribute("referrerpolicy","no-referrer");
+      viewer.src=ref.primaryUrl;
+      pdfDetails.appendChild(viewer);
+     });
+     body.appendChild(pdfDetails);
+    }else{
+     body.appendChild(element("h3","niti-reader-pdf-title","อ่านข้อความมาตราในเอกสารต้นฉบับ"));
+     body.appendChild(element("p","niti-reader-pdf-note",ref.page?"กรอบนี้แสดง PDF ของหน่วยงานรัฐ หน้า "+ref.page+" หากไม่เลื่อนไปหน้าที่กำหนด ให้กดเปิด PDF ด้านบน":"กรอบนี้แสดง PDF กฎหมายจากหน่วยงานรัฐ โปรดค้นหามาตรา "+id+" ในเอกสาร หากไม่แสดงผลให้ใช้ปุ่มเปิด PDF ด้านบน"));
+     viewer=element("iframe","niti-reader-pdf");
+     viewer.title="เอกสารกฎหมายทางการสำหรับมาตรา "+id+(ref.page?" หน้า "+ref.page:"");
+     viewer.setAttribute("loading","lazy");
+     viewer.setAttribute("referrerpolicy","no-referrer");
+     viewer.src=ref.primaryUrl;
+     body.appendChild(viewer);
+    }
    }
    if(ref.sourceType==="gov-consolidated"){
     body.appendChild(element("p","niti-reader-pdf-note","เอกสารรวมบางฉบับอาจมีข้อความก่อนการแก้ไขเพิ่มเติม ควรตรวจฉบับปัจจุบันของศาลยุติธรรมประกอบ"));
@@ -546,5 +577,5 @@ document.addEventListener("click",function(event){
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017c"};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017d"};
 })();
