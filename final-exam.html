@@ -237,6 +237,9 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 .final-page .final-old-more[hidden]{display:none}
 .final-page .old-exam-empty{padding:18px;background:var(--f-card);border-radius:10px}
 @media(max-width:770px){.final-page .final-old-section{padding:14px}.final-page .final-old-tools{grid-template-columns:1fr}.final-page .old-exam-card{padding:13px}.final-page .old-exam-answer-body{padding:10px}.final-page .old-exam-stage{padding:12px}.final-page .old-exam-stage p{line-height:1.93}}
+.final-page .final-old-anchors{border-top:1px solid var(--f-line);padding-top:12px;margin-top:12px;display:grid;gap:6px}
+.final-page .final-old-anchors strong{font-size:.85rem;color:var(--f-text)}
+.final-page .final-old-anchor{font-size:.84rem;line-height:1.7;font-weight:750;color:var(--f-blue)}
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261017c">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
@@ -258,7 +261,7 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <section class="final-hero"><div class="wrap">
 <div class="final-eyebrow">LAW2001 / LAW2101 · FINAL EXAM PREPARATION</div>
 <h1>ข้อสอบปลายภาค<br>ทบทวนครบ 18 มาตรา</h1>
-<p>จัดกลุ่มมาตราตามรายการอ่านสอบ: อ่านประเด็นสำคัญ เปิดตัวบทกฎหมายจากหน่วยงานรัฐ ทดลองตอบโจทย์ฝึกที่เรียบเรียงใหม่ และเชื่อมไปยังข้อสอบย้อนหลังที่มีแหล่งต้นทางอยู่ในคลัง</p>
+<p>จัดกลุ่มมาตราตามรายการอ่านสอบ พร้อมข้อสอบเก่าเก่าเก่าที่คัดโจทย์และธงคำตอบจาก PDF ของผู้ใช้ ข้อสอบตามหนังสือ และคลังตัวบทกฎหมายสำหรับทบทวน</p>
 <div class="hero-actions"><a class="pill" href="#old-exams">ข้อสอบเก่าเก่าเก่า ↓</a><a class="pill outline" href="#book-exams">ข้อสอบตามหนังสือ ↓</a><a class="pill" href="#final-tools">เริ่มอ่านทีละมาตรา ↓</a><a class="pill outline" href="./quiz.html?subject=LAW2001">ฝึกข้อสอบย้อนหลังจริง ↗</a></div>
 </div></section>
 <main id="main" class="wrap final-main">
@@ -311,7 +314,7 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <output id="final-results" role="status" aria-live="polite">กำลังโหลด 18 มาตรา…</output>
 </section>
 <div id="final-groups"></div>
-<aside class="final-caution"><strong>หมายเหตุสำหรับเตรียมสอบ:</strong> โจทย์ในกล่อง “โจทย์ฝึกแต่งใหม่” เป็นสถานการณ์สมมติที่ NITI เรียบเรียงเพื่อฝึกเขียน ไม่ใช่ข้อสอบเก่าของมหาวิทยาลัย ส่วนลิงก์ที่ระบุ “ข้อสอบย้อนหลังในคลัง” เชื่อมเฉพาะรายการที่มีที่มาจริง ข้อความสรุปมาตราเป็นการถอดความเพื่อศึกษา ควรตรวจสอบตัวบทและกฎหมายแก้ไขล่าสุดก่อนอ้างในข้อสอบ</aside>
+<aside class="final-caution"><strong>หมายเหตุสำหรับเตรียมสอบ:</strong> โจทย์ในกล่อง “โจทย์ฝึกแต่งใหม่” เป็นสถานการณ์สมมติที่ NITI เรียบเรียงเพื่อฝึกเขียน ไม่ใช่ข้อสอบเก่าของมหาวิทยาลัย ส่วนชุด “ข้อสอบเก่าเก่าเก่า” คัดข้อความจากไฟล์แนวข้อสอบที่ผู้ใช้อัปโหลดและคงแนวเฉลยตามเอกสาร ไม่ได้รับรองว่าเป็นข้อสอบต้นฉบับจากมหาวิทยาลัย ส่วนลิงก์ที่ระบุ “ข้อสอบย้อนหลังในคลัง” เชื่อมเฉพาะรายการที่มีที่มาจริง ข้อความสรุปมาตราเป็นการถอดความเพื่อศึกษา ควรตรวจสอบตัวบทและกฎหมายแก้ไขล่าสุดก่อนอ้างในข้อสอบ</aside>
 </main>
 <footer class="final-footer"><div class="wrap">NITI · คู่มือเตรียมสอบเพื่อการศึกษา · <a href="https://www.ocs.go.th/searchlaw" target="_blank" rel="noopener noreferrer">ตรวจสอบกฎหมายที่กฤษฎีกา ↗</a> · <a href="./study.html">ดูแผนอ่านสอบ ↗</a></div></footer>
 <script src="./exam-data.js"></script>
@@ -321,16 +324,16 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <script src="./statute-notes-extra.js"></script>
 <script src="./final-book-questions.js?v=20261017a"></script>
 <script src="./final-old-exam-source.js?v=20261017a"></script>
-<script src="./final-exam.js?v=20261017b"></script>
+<script src="./final-exam.js?v=20261017c"></script>
 <script src="./exam-keyword-ui.js?v=20261017a"></script>
-<script src="./final-old-exam-render.js?v=20261017a"></script>
+<script src="./final-old-exam-render.js?v=20261017b"></script>
 <script src="./final-book-render.js?v=20261017a"></script>
 <script src="./surety-statute-notes.js?v=20261016a"></script>
 <script src="./statute-diorama-data.js"></script>
 <script src="./statute-illustration.js?v=20261015g"></script>
 <script src="./statute-reader.js?v=20261017d"></script>
 <script src="./statute-autolink.js?v=20261017c"></script>
-<script src="./final-person-colors.js?v=20261017a"></script>
+<script src="./final-person-colors.js?v=20261017b"></script>
 <script src="./theme.js"></script>
 </body>
 </html>
