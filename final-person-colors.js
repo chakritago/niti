@@ -10,6 +10,15 @@ var palette={
  "เทพ":"violet", "กรุง":"teal", "ครบ":"orange", "บุรี":"pink",
  "กล้า":"orange", "เข้ม":"teal", "แก้ว":"purple",
  "ทอง":"gold", "เทียม":"indigo", "เอก":"pink", "สอด":"teal",
+ "แก้ว":"purple","ขวด":"teal","ถ้วย":"orange","แห้ว":"violet","มัน":"teal",
+ "เสือ":"red","ช้าง":"blue","กลม":"green","เบี้ยว":"orange","มั่น":"violet",
+ "ป้อม":"pink","พลอย":"violet","เพชร":"gold","แรม":"pink","รุ่ง":"orange",
+ "แสง":"gold","โสม":"teal","สด":"purple","สวย":"pink","สี":"violet",
+ "ต้น":"green","ตั้ม":"blue","แสด":"orange","ศุกร์":"violet","พุธ":"teal",
+ "อาทิตย์":"gold","จันทร์":"purple","ฟ้า":"blue","ฝน":"teal","นาค":"orange",
+ "สาราญ":"green","สารวย":"violet","อิ่ม":"pink","สอน":"blue",
+ "ท้วม":"orange","เท่ง":"gold","น้า":"blue","เปลว":"red","พลิง":"orange",
+ "ดา":"blue","ขาว":"yellow","ดำ":"blue","เหลือง":"gold",
  "ก":"violet", "ข":"green", "ค":"orange", "ง":"purple"
 };
 var fullNames=Object.keys(palette).filter(function(n){return n.length>1;}).sort(function(a,b){return b.length-a.length;});
