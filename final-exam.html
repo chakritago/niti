@@ -133,6 +133,43 @@ body.final-page .final-caution,
 body.final-page .final-group-head p{color:var(--f-mute)!important}
 body.final-page .final-hero h1,
 body.final-page .final-hero p{color:#f4f8fd!important}
+
+/* Selected questions from the uploaded textbook: source grounded, not made-up exams. */
+.final-page .final-book-section{scroll-margin-top:20px;margin:24px 0 38px;padding:24px;border:1px solid var(--f-line);border-radius:17px;background:var(--f-card)}
+.final-page .final-book-kicker{font-weight:850;font-size:.8rem;color:var(--f-blue);letter-spacing:.08em}
+.final-page .final-book-intro h2{font-size:1.7rem;line-height:1.45;margin:6px 0 8px;color:var(--f-text)}
+.final-page .final-book-intro p{margin:8px 0;line-height:1.9}
+.final-page .book-toolbar{display:grid;grid-template-columns:minmax(210px,1fr) minmax(210px,1.3fr);gap:14px;margin:18px 0 7px}
+.final-page .book-field{display:grid;gap:5px}
+.final-page .book-field label{font-weight:800;font-size:.9rem}
+.final-page .book-field select,.final-page .book-field input{font:inherit;border:1px solid var(--f-line);border-radius:10px;padding:11px 13px;min-height:46px;max-width:100%;background:var(--f-bg);color:var(--f-text)}
+.final-page .book-count{font-size:.85rem;font-weight:700;color:var(--f-mute);margin:10px 0 15px}
+.final-page .final-book-list{display:grid;grid-template-columns:1fr;gap:17px}
+.final-page .book-card{border:1px solid var(--f-line);border-radius:14px;padding:19px 21px;background:var(--f-bg);scroll-margin-top:35px;min-width:0}
+.final-page .book-card-meta{display:flex;gap:9px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.final-page .book-tag{font-weight:900;font-size:.8rem;padding:3px 11px;background:var(--f-blue-soft);color:var(--f-blue);border-radius:100px}
+.final-page .book-source{font-size:.85rem;color:var(--f-mute);font-weight:750}
+.final-page .book-card h3{font-size:1.19rem;margin:10px 0 8px;color:var(--f-text);line-height:1.5}
+.final-page .book-statutes{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 13px}
+.final-page .book-law-ref{border:1px solid var(--f-line);border-radius:7px;padding:4px 10px;font-weight:750;background:var(--f-card)}
+.final-page .book-facts{padding:14px 17px;background:var(--f-card);border-left:4px solid var(--f-blue);border-radius:0 10px 10px 0}
+.final-page .book-facts h4{font-size:1.02rem;margin:0 0 5px;color:var(--f-blue)}
+.final-page .book-facts p{margin:0;line-height:1.92;white-space:pre-line}
+.final-page .book-answer{margin-top:13px;border:1px solid var(--f-line);border-radius:11px;background:var(--f-card)}
+.final-page .book-answer>summary{font-weight:850;cursor:pointer;line-height:1.7;padding:14px 16px;color:var(--f-blue)}
+.final-page .book-answer[open]>summary{border-bottom:1px solid var(--f-line)}
+.final-page .book-answer-inner{padding:15px;display:grid;gap:12px}
+.final-page .book-answer-notice{font-size:.87rem;color:var(--f-mute);margin:0}
+.final-page .book-answer-part{border:1px solid var(--f-line);border-left:4px solid var(--f-blue);padding:15px 18px;border-radius:10px;background:var(--f-bg)}
+.final-page .book-answer-part.application{border-left-color:#16857d}
+.final-page .book-answer-part.conclusion{border-left-color:#c78725}
+.final-page .book-answer-part h4{margin:0 0 8px;font-size:1.1rem;color:var(--f-text)}
+.final-page .book-answer-part p{margin:0;font-size:1rem;line-height:2.05;overflow-wrap:anywhere}
+.final-page .exam-score-keyword{font-weight:850;color:#7d3a00!important;background:#ffebad!important;border-radius:3px;padding:0 2px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+[data-theme="dark"] .final-page .exam-score-keyword{color:#ffe79a!important;background:#6b4415!important}
+.final-page .book-source-note{color:var(--f-mute);font-size:.84rem;line-height:1.8;margin:17px 0 0}
+.final-page .book-no-results{padding:17px;background:var(--f-card);border-radius:9px}
+@media(max-width:760px){.final-page .final-book-section{padding:15px}.final-page .book-toolbar{grid-template-columns:1fr}.final-page .book-card{padding:13px}.final-page .book-answer-inner{padding:10px}.final-page .book-answer-part{padding:12px}.final-page .book-answer-part p{line-height:1.92}}
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261017c">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
@@ -155,7 +192,7 @@ body.final-page .final-hero p{color:#f4f8fd!important}
 <div class="final-eyebrow">LAW2001 / LAW2101 · FINAL EXAM PREPARATION</div>
 <h1>ข้อสอบปลายภาค<br>ทบทวนครบ 18 มาตรา</h1>
 <p>จัดกลุ่มมาตราตามรายการอ่านสอบ: อ่านประเด็นสำคัญ เปิดตัวบทกฎหมายจากหน่วยงานรัฐ ทดลองตอบโจทย์ฝึกที่เรียบเรียงใหม่ และเชื่อมไปยังข้อสอบย้อนหลังที่มีแหล่งต้นทางอยู่ในคลัง</p>
-<div class="hero-actions"><a class="pill" href="#final-tools">เริ่มอ่านทีละมาตรา ↓</a><a class="pill outline" href="./quiz.html?subject=LAW2001">ฝึกข้อสอบย้อนหลังจริง ↗</a></div>
+<div class="hero-actions"><a class="pill" href="#book-exams">ข้อสอบตามหนังสือ ↓</a><a class="pill" href="#final-tools">เริ่มอ่านทีละมาตรา ↓</a><a class="pill outline" href="./quiz.html?subject=LAW2001">ฝึกข้อสอบย้อนหลังจริง ↗</a></div>
 </div></section>
 <main id="main" class="wrap final-main">
 <div class="final-overview" aria-label="สรุปเมนูปลายภาค">
@@ -166,6 +203,23 @@ body.final-page .final-hero p{color:#f4f8fd!important}
 <div class="final-jump" aria-label="ทางลัดแต่ละกลุ่ม">
 <a href="#final-group-1">1 · ทรัพย์และส่วนควบ</a><a href="#final-group-2">2 · ทรัพยสิทธิ</a><a href="#final-group-3">3 · ทรัพย์สินแผ่นดิน</a><a href="#final-group-4">4 · สิทธิครอบครอง</a>
 </div>
+<section class="final-book-section" id="book-exams" aria-labelledby="book-heading">
+ <div class="final-book-intro">
+  <div><span class="final-book-kicker">SOURCE-BASED EXAM PRACTICE</span><h2 id="book-heading">ข้อสอบตามหนังสือ · คัดจาก PDF ที่อัปโหลด</h2>
+   <p>คัดเฉพาะคำถามท้ายบทที่สัมพันธ์กับขอบเขต 18 มาตราที่กำหนด เรียบเรียงโจทย์จากต้นฉบับและระบุหน้า PDF / ข้อที่มา ไม่ใช่ข้อสอบย้อนหลังของมหาวิทยาลัย</p>
+   <p>คำตอบมี <b>หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</b> พร้อม <strong class="exam-score-keyword">คีย์เวิร์ดภาษากฎหมาย</strong> สำหรับฝึกเขียนสอบระดับปริญญาตรี</p>
+  </div>
+ </div>
+ <div class="book-toolbar">
+  <div class="book-field"><label for="book-filter">เลือกมาตราที่ต้องการฝึก</label>
+   <select id="book-filter"><option value="all">โจทย์ทุกมาตราที่คัดได้</option></select></div>
+  <div class="book-field"><label for="book-search">ค้นหาโจทย์ตามหนังสือ</label>
+   <input type="search" id="book-search" placeholder="เช่น น.ส.3, ภาระจำยอม, ครอบครองปรปักษ์" autocomplete="off"></div>
+ </div>
+ <p id="book-count" class="book-count" aria-live="polite">กำลังโหลดโจทย์จากหนังสือ…</p>
+ <div id="final-book-list" class="final-book-list"></div>
+ <p class="book-source-note">ที่มา: ไฟล์ “การบ้านคำถามท้ายบททุกบท เขียน 1.pdf” จำนวน 10 หน้า ซึ่งแนบในบทสนทนา เลขหน้าที่ระบุเป็นหน้า PDF ไม่ใช่เลขหน้าพิมพ์ในหนังสือ ข้อที่มีประเด็นนอก 18 มาตราจะวิเคราะห์เฉพาะประเด็นในขอบเขต ไม่แต่งข้อเท็จจริงหรืออ้างว่าเป็นเฉลยจากหนังสือ</p>
+</section>
 <section id="final-tools" class="final-toolbar" aria-label="ค้นหามาตราสอบปลายภาค">
 <div class="field"><label for="final-search">ค้นหามาตรา / หัวข้อ / แนวโจทย์</label><input id="final-search" type="search" placeholder="เช่น 1375, สาธารณสมบัติ, ไม้ยืนต้น" autocomplete="off"></div>
 <div class="field"><label for="final-filter">สถานะการอ่าน</label><select id="final-filter"><option value="all">แสดงทั้งหมด</option><option value="unread">ยังไม่ได้อ่าน</option><option value="done">อ่านแล้ว</option></select></div>
@@ -181,6 +235,9 @@ body.final-page .final-hero p{color:#f4f8fd!important}
 <script src="./statute-notes.js"></script>
 <script src="./statute-notes-extra.js"></script>
 <script src="./final-exam.js?v=20261016b"></script>
+<script src="./final-book-questions.js?v=20261017a"></script>
+<script src="./exam-keyword-ui.js?v=20261017a"></script>
+<script src="./final-book-render.js?v=20261017a"></script>
 <script src="./surety-statute-notes.js?v=20261016a"></script>
 <script src="./statute-diorama-data.js"></script>
 <script src="./statute-illustration.js?v=20261015g"></script>
