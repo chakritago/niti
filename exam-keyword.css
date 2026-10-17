@@ -1,0 +1,12 @@
+/* Exam-study highlight: color emphasizes legal elements, not official marking criteria. */
+.exam-score-keyword{
+ color:#8c4305!important;background:#fff0c9!important;
+ padding:0 .16em;border-radius:4px;font-weight:900;
+ box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+:root[data-theme="dark"] .exam-score-keyword{
+ color:#ffe095!important;background:#633c10!important;
+}
+.model-part p .exam-score-keyword{
+ font-weight:900;line-height:inherit;
+}
