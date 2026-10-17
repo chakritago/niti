@@ -200,6 +200,43 @@ body.final-page .niti-person--indigo{color:#324c85!important;background:#e8edfd!
 [data-theme="dark"] body.final-page .niti-person--gold{color:#ffe4a1!important;background:#56431b!important}
 [data-theme="dark"] body.final-page .niti-person--indigo{color:#ccd8ff!important;background:#2c3d62!important}
 body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:11px 0 0;line-height:2}
+
+/* Source-copied historical exams, with filters and readable exam stages. */
+.final-page .final-old-section{scroll-margin-top:24px;margin:26px 0 39px;border:1px solid var(--f-line);background:var(--f-card);border-radius:17px;padding:24px}
+.final-page .final-old-kicker{display:block;font-weight:850;color:var(--f-blue);font-size:.79rem;letter-spacing:.08em}
+.final-page .final-old-intro h2{font-size:1.75rem;margin:6px 0 11px;line-height:1.5;color:var(--f-text)}
+.final-page .final-old-intro p{line-height:1.88;margin:7px 0}
+.final-page .final-old-tools{display:grid;grid-template-columns:minmax(170px,.9fr) minmax(130px,.65fr) minmax(210px,1.45fr);gap:12px;margin:19px 0 9px}
+.final-page .final-old-field{display:grid;gap:5px}
+.final-page .final-old-field label{font-weight:800;color:var(--f-text);font-size:.89rem}
+.final-page .final-old-field select,.final-page .final-old-field input{background:var(--f-bg);color:var(--f-text);border:1px solid var(--f-line);min-height:45px;border-radius:9px;padding:9px 12px;font:inherit;width:100%}
+.final-page .final-old-count{font-size:.85rem;color:var(--f-mute);font-weight:750;margin:10px 0 16px}
+.final-page .final-old-list{display:grid;grid-template-columns:1fr;gap:16px}
+.final-page .old-exam-card{background:var(--f-bg);border:1px solid var(--f-line);border-radius:14px;padding:18px 21px;min-width:0;scroll-margin-top:25px}
+.final-page .old-exam-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.final-page .old-exam-tag{font-weight:850;color:var(--f-blue);background:var(--f-blue-soft);padding:4px 12px;font-size:.82rem;border-radius:99px}
+.final-page .old-exam-provenance{color:var(--f-mute);font-size:.82rem}
+.final-page .old-exam-card h3{color:var(--f-text);font-size:1.16rem;line-height:1.5;margin:12px 0 9px}
+.final-page .old-exam-statutes{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px}
+.final-page .old-exam-law{font-weight:800;color:var(--f-blue);background:var(--f-card);border:1px solid var(--f-line);border-radius:8px;padding:4px 9px;font-size:.87rem}
+.final-page .old-exam-question{padding:16px 18px;border-left:4px solid var(--f-blue);background:var(--f-card);border-radius:0 11px 11px 0}
+.final-page .old-exam-question h4{color:var(--f-blue);font-size:1.05rem;margin:0 0 7px}
+.final-page .old-exam-question p{line-height:2;margin:0;overflow-wrap:anywhere}
+.final-page .old-exam-answer{margin-top:15px;border:1px solid var(--f-line);border-radius:11px;background:var(--f-card)}
+.final-page .old-exam-answer>summary{padding:14px 17px;cursor:pointer;line-height:1.7;font-weight:850;color:var(--f-blue)}
+.final-page .old-exam-answer[open]>summary{border-bottom:1px solid var(--f-line)}
+.final-page .old-exam-answer-body{padding:15px;display:grid;gap:13px}
+.final-page .old-exam-note,.final-page .old-exam-extra{font-size:.85rem;color:var(--f-mute);line-height:1.75;margin:0}
+.final-page .old-exam-stage{border:1px solid var(--f-line);border-left:4px solid var(--f-blue);background:var(--f-bg);padding:16px 18px;border-radius:10px}
+.final-page .old-exam-stage.application{border-left-color:#16857d}
+.final-page .old-exam-stage.conclusion{border-left-color:#c78725}
+.final-page .old-exam-stage h4{font-size:1.11rem;color:var(--f-text);margin:0 0 9px}
+.final-page .old-exam-stage p{font-size:1rem;line-height:2.05;white-space:pre-line;overflow-wrap:anywhere;margin:0}
+.final-page .final-old-disclaimer{font-size:.84rem;line-height:1.85;color:var(--f-mute);margin:15px 0 0}
+.final-page .final-old-more{display:block;margin:18px auto 0;border:1px solid var(--f-line);border-radius:10px;background:var(--f-blue-soft);color:var(--f-blue);font:800 .98rem/1.5 inherit;padding:12px 17px;cursor:pointer}
+.final-page .final-old-more[hidden]{display:none}
+.final-page .old-exam-empty{padding:18px;background:var(--f-card);border-radius:10px}
+@media(max-width:770px){.final-page .final-old-section{padding:14px}.final-page .final-old-tools{grid-template-columns:1fr}.final-page .old-exam-card{padding:13px}.final-page .old-exam-answer-body{padding:10px}.final-page .old-exam-stage{padding:12px}.final-page .old-exam-stage p{line-height:1.93}}
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261017c">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
@@ -222,7 +259,7 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <div class="final-eyebrow">LAW2001 / LAW2101 · FINAL EXAM PREPARATION</div>
 <h1>ข้อสอบปลายภาค<br>ทบทวนครบ 18 มาตรา</h1>
 <p>จัดกลุ่มมาตราตามรายการอ่านสอบ: อ่านประเด็นสำคัญ เปิดตัวบทกฎหมายจากหน่วยงานรัฐ ทดลองตอบโจทย์ฝึกที่เรียบเรียงใหม่ และเชื่อมไปยังข้อสอบย้อนหลังที่มีแหล่งต้นทางอยู่ในคลัง</p>
-<div class="hero-actions"><a class="pill" href="#book-exams">ข้อสอบตามหนังสือ ↓</a><a class="pill" href="#final-tools">เริ่มอ่านทีละมาตรา ↓</a><a class="pill outline" href="./quiz.html?subject=LAW2001">ฝึกข้อสอบย้อนหลังจริง ↗</a></div>
+<div class="hero-actions"><a class="pill" href="#old-exams">ข้อสอบเก่าเก่าเก่า ↓</a><a class="pill outline" href="#book-exams">ข้อสอบตามหนังสือ ↓</a><a class="pill" href="#final-tools">เริ่มอ่านทีละมาตรา ↓</a><a class="pill outline" href="./quiz.html?subject=LAW2001">ฝึกข้อสอบย้อนหลังจริง ↗</a></div>
 </div></section>
 <main id="main" class="wrap final-main">
 <div class="final-overview" aria-label="สรุปเมนูปลายภาค">
@@ -233,6 +270,23 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <div class="final-jump" aria-label="ทางลัดแต่ละกลุ่ม">
 <a href="#final-group-1">1 · ทรัพย์และส่วนควบ</a><a href="#final-group-2">2 · ทรัพยสิทธิ</a><a href="#final-group-3">3 · ทรัพย์สินแผ่นดิน</a><a href="#final-group-4">4 · สิทธิครอบครอง</a>
 </div>
+<section class="final-old-section" id="old-exams" aria-labelledby="old-exams-heading">
+<div class="final-old-intro">
+ <span class="final-old-kicker">HISTORICAL EXAMS · SOURCE ANSWERS</span>
+ <h2 id="old-exams-heading">ข้อสอบเก่าเก่าเก่า · โจทย์พร้อมธงคำตอบจากไฟล์</h2>
+ <p>คัดเฉพาะโจทย์ที่มีธงคำตอบและอ้างถึงมาตราในรายการอ่านสอบ 18 มาตรา จากไฟล์ “แนวข้อสอบเก่าวิชาทรัพย์สิน.pdf” ที่อัปโหลด คงข้อความจากเอกสารเดิม ไม่แต่งแนวคำตอบขึ้นใหม่</p>
+ <p>เปิดอ่าน <b>หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</b> พร้อมเน้นคำสำคัญทางกฎหมายเพื่อช่วยจำประเด็น ทั้งนี้ <b>สีที่เน้นไม่ใช่เกณฑ์คะแนนทางการ</b></p>
+</div>
+<div class="final-old-tools">
+ <div class="final-old-field"><label for="old-exam-section">คัดเลือกตามมาตรา</label><select id="old-exam-section"><option value="all">ทุกมาตราที่มีข้อสอบ</option></select></div>
+ <div class="final-old-field"><label for="old-exam-year">ปีการศึกษา</label><select id="old-exam-year"><option value="all">ทุกปี</option></select></div>
+ <div class="final-old-field"><label for="old-exam-search">ค้นหาชื่อบุคคล / คำในโจทย์ / หลักกฎหมาย</label><input type="search" id="old-exam-search" placeholder="เช่น ครอบครองปรปักษ์, ภาระจำยอม, นายแดง" autocomplete="off"></div>
+</div>
+<p class="final-old-count" id="old-exam-count" role="status" aria-live="polite">กำลังโหลดธงคำตอบจากไฟล์…</p>
+<div class="final-old-list" id="old-exam-list"></div>
+<button type="button" id="old-exam-more" class="final-old-more" hidden>แสดงข้อสอบเพิ่มอีก 12 ข้อ ↓</button>
+<p class="final-old-disclaimer">แหล่งข้อมูล: ไฟล์ “แนวข้อสอบเก่าวิชาทรัพย์สิน.pdf” (132 หน้า) ที่แนบในบทสนทนา ใช้เลขหน้า PDF และปี/ภาคตามต้นฉบับ ข้อความแปลงจาก PDF อาจมีช่องไฟหรืออักขระคลาดเคลื่อนบางตำแหน่ง กรุณาตรวจเทียบกับเอกสารเดิมก่อนนำไปอ้างอิง</p>
+</section>
 <section class="final-book-section" id="book-exams" aria-labelledby="book-heading">
  <div class="final-book-intro">
   <div><span class="final-book-kicker">SOURCE-BASED EXAM PRACTICE</span><h2 id="book-heading">ข้อสอบตามหนังสือ · คัดจาก PDF ที่อัปโหลด</h2>
@@ -266,8 +320,10 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <script src="./statute-notes.js"></script>
 <script src="./statute-notes-extra.js"></script>
 <script src="./final-book-questions.js?v=20261017a"></script>
+<script src="./final-old-exam-source.js?v=20261017a"></script>
 <script src="./final-exam.js?v=20261017b"></script>
 <script src="./exam-keyword-ui.js?v=20261017a"></script>
+<script src="./final-old-exam-render.js?v=20261017a"></script>
 <script src="./final-book-render.js?v=20261017a"></script>
 <script src="./surety-statute-notes.js?v=20261016a"></script>
 <script src="./statute-diorama-data.js"></script>
