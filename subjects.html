@@ -87,6 +87,21 @@
 .subject-page .exam-key-legend{display:inline-block;font-size:.85rem;line-height:1.85;margin:0 0 14px;color:var(--sp-weak)}
 @media(max-width:900px){.subject-page .cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:690px){.subject-page .cards,.subject-page .outlines{grid-template-columns:1fr}.subject-page .intro{padding:35px 0 38px}.subject-page .feature{padding:17px}.subject-page .subject-card{padding:18px}}
+
+/* Complete undergraduate model answers: one readable essay column. */
+.subject-page .answer-toggle .exam-answer-full{display:grid;grid-template-columns:minmax(0,1fr);gap:17px;margin:18px 0 2px}
+.subject-page .exam-answer-preface{font-size:.87rem;line-height:1.8;color:var(--sp-weak);margin:0}
+.subject-page .exam-answer-issue{border-radius:11px;border:1px solid var(--sp-outline);background:var(--sp-soft);padding:13px 17px;line-height:1.8}
+.subject-page .exam-answer-issue b{color:var(--sp-accent)}
+.subject-page .exam-answer-issue p{margin:5px 0 0;line-height:1.85}
+.subject-page .exam-answer-part{padding:20px 22px;border:1px solid var(--sp-outline);border-left:5px solid var(--sp-accent);border-radius:13px;background:var(--sp-card);min-width:0}
+.subject-page .exam-answer-part.application{border-left-color:var(--study-teal,#0e807e)}
+.subject-page .exam-answer-part.conclusion{border-left-color:var(--study-orange,#c97d20);background:var(--sp-soft)}
+.subject-page .exam-answer-part h3{font-size:1.18rem;color:var(--sp-accent);margin:0 0 11px;line-height:1.5}
+.subject-page .exam-answer-part.application h3{color:var(--study-teal,#0e807e)}
+.subject-page .exam-answer-part p{line-height:2.05;margin:0 0 14px;white-space:normal;overflow-wrap:anywhere}
+.subject-page .exam-answer-part p:last-child{margin-bottom:0}
+@media(max-width:690px){.subject-page .exam-answer-part{padding:15px}.subject-page .exam-answer-part p{line-height:1.95}}
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261017c">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
@@ -125,7 +140,7 @@
 <div class="outline"><h3>วินิจฉัย — ประเด็นที่ 1</h3><p><strong>นาย ข. มีหน้าที่คืนรถยนต์ให้นาย ก. หรือไม่</strong></p><p><b>หลักกฎหมาย:</b> ป.พ.พ. มาตรา 640 และ 641</p><p>ลำดับ: หลักกฎหมาย → ปรับบท → สรุป</p></div>
 <div class="outline"><h3>วินิจฉัย — ประเด็นที่ 2</h3><p><strong>นาย ก. มีสิทธิเรียกรถยนต์จากนาย ค. หรือไม่</strong></p><p><b>หลักกฎหมาย:</b> ป.พ.พ. มาตรา 1336 ประกอบมาตรา 1332</p><p>ลำดับ: หลักกฎหมาย → ปรับบท → สรุป และตรวจข้อยกเว้นผู้ซื้อสุจริต</p></div>
 </div>
-<details class="answer-toggle" id="featured-answer"><summary>ดูแนววินิจฉัยและคำตอบทั้ง 2 ประเด็น</summary><div id="featured-answer-body" class="outlines"></div></details>
+<details class="answer-toggle" id="featured-answer"><summary>อ่านธงคำตอบข้อ 1 · หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</summary><div id="featured-answer-body" class="outlines"></div></details>
 <div class="feature-actions"><a href="./quiz.html?exam=practice-loan-car-01">เปิดข้อ 1 เพื่อเขียนคำตอบและจับเวลา ↗</a><a class="alt" href="./study.html#statute-notes">อ่านสรุปมาตราและตัวบท ↗</a></div>
 <p class="info">จุดระวัง: ผู้ซื้อโดยสุจริตมิได้รับความคุ้มครองตามมาตรา 1332 ทุกกรณี ต้องตรวจว่าเป็นการซื้อในช่องทางที่มาตราดังกล่าวกำหนดหรือไม่</p>
 </section>
@@ -141,7 +156,7 @@
  <div class="outline"><h3>ประเด็นที่ 1</h3><p><strong>นาย ข. มีความรับผิดในฐานะผู้ค้ำประกันหรือไม่</strong></p><p><b>หลักกฎหมาย:</b> ป.พ.พ. มาตรา 680 ประกอบมาตรา 681/1</p><p>แยกหนี้ค้ำประกันออกจากความรับผิดอย่างลูกหนี้ชั้นต้น</p></div>
  <div class="outline"><h3>ประเด็นที่ 2</h3><p><strong>ธนาคารเรียกให้นาย ข. ชำระหนี้ 500,000 บาททันทีได้หรือไม่</strong></p><p><b>หลักกฎหมาย:</b> ป.พ.พ. มาตรา 686, 688 และมาตรา 689–690 เมื่อมีข้อเท็จจริงเข้าองค์ประกอบ</p><p>ตรวจหนังสือบอกกล่าว สิทธิขอให้เรียกลูกหนี้ก่อน และสิทธิบังคับทรัพย์ของลูกหนี้ก่อน</p></div>
 </div>
-<details id="surety-answer" class="answer-toggle"><summary>ดูแนวตอบข้อ 2 แยกหลักกฎหมาย → ปรับบท → สรุป</summary><div id="surety-answer-body" class="outlines"></div></details>
+<details id="surety-answer" class="answer-toggle"><summary>อ่านธงคำตอบข้อ 2 · หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</summary><div id="surety-answer-body" class="outlines"></div></details>
 <div class="feature-actions">
  <a href="./quiz.html?exam=practice-surety-bank-02">เปิดข้อ 2 เพื่อเขียนคำตอบและจับเวลา ↗</a>
  <a class="alt" href="./quiz.html?subject=LAW2010&amp;topic=%E0%B8%84%E0%B9%89%E0%B8%B3%E0%B8%9B%E0%B8%A3%E0%B8%B0%E0%B8%81%E0%B8%B1%E0%B8%99">ข้อสอบหมวดค้ำประกัน ↗</a>
@@ -168,7 +183,7 @@
  <p>ตรวจเงื่อนไขทั้งการทำหนังสือและการจดทะเบียนต่อพนักงานเจ้าหน้าที่</p></div>
 </div>
 <details id="mortgage-answer" class="answer-toggle">
- <summary>ดูแนวตอบข้อ 3 — หลักกฎหมาย → ปรับบท → สรุป</summary>
+ <summary>อ่านธงคำตอบข้อ 3 · หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</summary>
  <div id="mortgage-answer-body" class="outlines"></div>
 </details>
 <div class="feature-actions">
@@ -197,7 +212,7 @@
  <p>ตรวจการวางมัดจำหรือชำระราคาบางส่วนเพื่อฟ้องบังคับคดีตามสัญญาจะซื้อจะขาย</p></div>
 </div>
 <details id="land-sale-answer" class="answer-toggle">
- <summary>ดูแนวตอบข้อ 4 — หลักกฎหมาย → ปรับบท → สรุป</summary>
+ <summary>อ่านธงคำตอบข้อ 4 · หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป</summary>
  <div id="land-sale-answer-body" class="outlines"></div>
 </details>
 <div class="feature-actions">
@@ -216,6 +231,7 @@
 <script src="./land-sale-practice-04.js?v=20261017a"></script>
 <script src="./subject-exam-guides.js?v=20261017a"></script>
 <script src="./subject-answer-upgrades.js?v=20261017a"></script>
+<script src="./featured-exam-answers.js?v=20261017a"></script>
 <script src="./exam-keyword-ui.js?v=20261017a"></script>
 <script>
 (function(){
@@ -296,41 +312,40 @@ var mortgage=(window.NITI_EXAMS||[]).find(function(q){return q.id==="practice-mo
 if(mortgage)$("mortgage-question").textContent=mortgage.synopsis;
 var landSale=(window.NITI_EXAMS||[]).find(function(q){return q.id==="practice-land-sale-deposit-04";});
 if(landSale)$("land-sale-question").textContent=landSale.synopsis;
-var landSaleOutlines=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})["practice-land-sale-deposit-04"]||[];
-landSaleOutlines.forEach(function(item){
- var d=el("article","outline");
- d.appendChild(el("h3","",item.heading));
- d.appendChild(el("p","","หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(", ")));
- [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){
-  var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"sale");d.appendChild(p);
+/* The four user-supplied problems are rendered as complete, exam-style answers.
+ * Keep their issue outlines above the fold; inside each answer panel show
+ * three distinct stages instead of four repeated two-column issue summaries. */
+function renderFeaturedExamAnswer(id,targetId){
+ var answer=(window.NITI_FEATURED_EXAM_ANSWERS||{})[id];
+ var container=$(targetId);
+ if(!container||!answer)return;
+ container.replaceChildren();
+ container.classList.add("exam-answer-full");
+ var preface=el("p","exam-answer-preface","แนวเขียนตอบระดับปริญญาตรี · เรียบเรียงจากข้อเท็จจริงในโจทย์ ไม่ใช่ธงคำตอบของมหาวิทยาลัย");
+ container.appendChild(preface);
+ var issue=el("div","exam-answer-issue");
+ issue.appendChild(el("b","","ประเด็นปัญหา"));
+ issue.appendChild(el("p","",answer.issue));
+ container.appendChild(issue);
+ [["rule","หลักกฎหมาย","rule"],["application","วินิจฉัย (ปรับบท)","application"],["conclusion","สรุป","conclusion"]].forEach(function(part){
+  var block=el("section","exam-answer-part "+part[2]);
+  block.appendChild(el("h3","",part[1]));
+  (answer[part[0]]||[]).forEach(function(paragraph){
+   var p=el("p");
+   var highlighter=window.NITI_EXAM_KEYWORDS;
+   if(highlighter)highlighter.apply(p,paragraph,answer.keywords.concat(highlighter.termsFor(answer.topic)));
+   else p.textContent=paragraph;
+   block.appendChild(p);
+  });
+  container.appendChild(block);
  });
- $("land-sale-answer-body").appendChild(d);
-});
-var mortgageOutlines=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})["practice-mortgage-registration-03"]||[];
-mortgageOutlines.forEach(function(item){
- var d=el("article","outline");
- d.appendChild(el("h3","",item.heading));
- d.appendChild(el("p","","หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(", ")));
- [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){
-  var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"mortgage");d.appendChild(p);
- });
- $("mortgage-answer-body").appendChild(d);
-});
-var suretyOutlines=(window.NITI_SUBJECT_ISSUE_OUTLINES||{})["practice-surety-bank-02"]||[];
-suretyOutlines.forEach(function(item){
- var d=el("article","outline");
- d.appendChild(el("h3","",item.heading));
- d.appendChild(el("p","","หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(", ")));
- [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){
-  var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"surety");d.appendChild(p);
- });
- $("surety-answer-body").appendChild(d);
-});
-outlines.forEach(function(item){
- var d=el("article","outline");d.appendChild(el("h3","",item.heading));d.appendChild(el("p","", "หลักกฎหมาย: ป.พ.พ. มาตรา "+item.sections.join(" และ ")));
- [["หลักกฎหมาย",item.rule],["ปรับบท",item.application],["สรุป",item.conclusion]].forEach(function(row){var p=el("p");p.appendChild(el("b","",row[0]+": "));paint(p,row[1],"loan");d.appendChild(p);});
- $("featured-answer-body").appendChild(d);
-});
+}
+[
+ ["practice-loan-car-01","featured-answer-body"],
+ ["practice-surety-bank-02","surety-answer-body"],
+ ["practice-mortgage-registration-03","mortgage-answer-body"],
+ ["practice-land-sale-deposit-04","land-sale-answer-body"]
+].forEach(function(pair){renderFeaturedExamAnswer(pair[0],pair[1]);});
 render("");
 })();
 </script>
