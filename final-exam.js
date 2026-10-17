@@ -132,6 +132,15 @@ function render(){
     });
     card.appendChild(bookRefs);
    }
+   var old=(window.NITI_OLD_EXAMS||[]).filter(function(q){return q.sections.indexOf(id)>=0;});
+   if(old.length){
+    var oldLinks=el("div","final-old-anchors");oldLinks.appendChild(el("strong","","ข้อสอบเก่าเก่าเก่า ("+old.length+" ข้อ)"));
+    old.slice(0,5).forEach(function(q){
+     oldLinks.appendChild(anchor("#"+q.id,"ปี "+q.year+" "+q.semester+" ข้อ "+q.number+" · PDF หน้า "+q.page,"final-old-anchor"));
+    });
+    if(old.length>5)oldLinks.appendChild(anchor("#old-exams","ดูทั้งหมด ("+old.length+" ข้อ) ↑","final-old-anchor"));
+    card.appendChild(oldLinks);
+   }
    var pq=cases[id]||[];
    var details=el("details","final-practice");var summary=el("summary","","โจทย์ฝึกแต่งใหม่ · ฝึกเขียนตอบ ↓");details.appendChild(summary);
    var wrap=el("div","final-practice-body");
