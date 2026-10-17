@@ -514,7 +514,7 @@ function openStatute(value,opener){
      pdfDetails.appendChild(element("summary","","ทดลองแสดง PDF ฉบับรวมในกรอบ (ต้นทางอาจไม่อนุญาต)"));
      pdfDetails.appendChild(element("p","niti-reader-pdf-note","ข้อความมาตรามีให้อ่านด้านบนแล้ว หาก PDF ไม่แสดง ให้ใช้ลิงก์เปิดต้นฉบับในแท็บใหม่หรือแหล่งข้อมูลสำรอง"));
      pdfDetails.addEventListener("toggle",function(){
-      if(!pdfDetails.open||viewer)return;
+      if(!pdfDetails.open||pdfDetails.querySelector("iframe"))return;
       viewer=element("iframe","niti-reader-pdf");
       viewer.title="PDF ฉบับรวมสำหรับมาตรา "+id;
       viewer.setAttribute("loading","lazy");
