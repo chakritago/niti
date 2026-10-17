@@ -1,0 +1,32 @@
+/* Clickable citations use the existing NITI statute-reader dialog. */
+main a.niti-inline-statute{
+  color:inherit!important;
+  text-decoration:underline!important;
+  text-decoration-style:dotted!important;
+  text-decoration-color:var(--md-primary)!important;
+  text-underline-offset:.2em;
+  font-weight:700;
+  border-radius:4px;
+  cursor:pointer;
+  overflow-wrap:normal;
+}
+main a.niti-inline-statute:hover{
+  color:var(--md-primary)!important;
+  text-decoration-style:solid!important;
+}
+main a.niti-inline-statute:focus-visible{
+  outline:3px solid var(--md-focus,var(--md-primary))!important;
+  outline-offset:3px;
+}
+body .niti-statute-dialog .niti-reader-primary{
+  color:var(--md-on-primary)!important;
+  background:var(--md-primary)!important;
+}
+body .niti-statute-dialog .niti-reader-inside,
+body .niti-statute-dialog .niti-reader-updated{
+  color:var(--md-primary)!important;
+}
+body .niti-statute-dialog .niti-reader-close{
+  background:var(--md-surface)!important;
+  color:var(--md-text)!important;
+}
