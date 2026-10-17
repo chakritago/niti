@@ -6,6 +6,7 @@
 var records=window.NITI_OLD_EXAMS||[],list=document.getElementById("old-exam-list");
 if(!list)return;
 var sel=document.getElementById("old-exam-section"),years=document.getElementById("old-exam-year"),search=document.getElementById("old-exam-search"),count=document.getElementById("old-exam-count");
+var more=document.getElementById("old-exam-more"),pageSize=12,limit=pageSize;
 var allowed=["139","144","145","146","147","148","1298","1299","1382","1387","1401","1304","1307","1367","1368","1373","1375","1377"];
 var keywords=["ได้มาโดยนิติกรรม","ได้มาโดยทางอื่นนอกจากนิติกรรม","ทำเป็นหนังสือและจดทะเบียน","ทาเป็นหนังสือและจดทะเบียน","ยังมิได้จดทะเบียน","บุคคลภายนอก","โดยสุจริต","สุจริต","เสียค่าตอบแทน","บุคคลสิทธิ","ทรัพยสิทธิ","ทรัพย์สินของแผ่นดิน","สาธารณสมบัติของแผ่นดิน","ส่วนควบ","ไม่ถือเป็นส่วนควบ","โรงเรือน","กรรมสิทธิ์","สิทธิครอบครอง","สละเจตนาครอบครอง","ยึดถือทรัพย์สิน","เจตนาจะยึดถือเพื่อตน","ส่งมอบ","ครอบครองปรปักษ์","ความสงบ","โดยเปิดเผย","เจตนาเป็นเจ้าของ","ติดต่อกันเป็นเวลาสิบปี","สิบปี","ห้าปี","หนึ่งปี","ภาระจำยอม","ภาระจายอม","สามยทรัพย์","ภารยทรัพย์","เพิ่มภาระ","ถูกรบกวน","ถูกแย่งการครอบครอง","ฟ้องภายในหนึ่งปี","สิ้นสุดลง","มูลเหตุแห่งสิทธิ","จดทะเบียน","พนักงานเจ้าหน้าที่","มาตรา 1299","มาตรา 1382","มาตรา 1401","มาตรา 1375"];
 var highlighter=window.NITI_EXAM_KEYWORDS;
@@ -68,21 +69,23 @@ function render(){
   return !term||([q.title,q.question,q.rule,q.application,q.conclusion,q.year,q.semester].concat(q.sections)).join(" ").toLocaleLowerCase("th").includes(term);
  });
  list.replaceChildren();
- rows.forEach(function(q){list.appendChild(makeCard(q));});
+ rows.slice(0,limit).forEach(function(q){list.appendChild(makeCard(q));});
  if(!rows.length)list.appendChild(el("p","old-exam-empty","ไม่พบข้อสอบจากไฟล์ที่ตรงกับเงื่อนไขที่เลือก"));
- count.textContent="แสดง "+rows.length+" / "+records.length+" ข้อจากไฟล์แนวข้อสอบเก่า";
+ if(more){more.hidden=rows.length<=limit;more.textContent="แสดงเพิ่มเติม ("+Math.min(pageSize,Math.max(0,rows.length-limit))+" ข้อ) ↓";}
+ count.textContent="แสดง "+Math.min(rows.length,limit)+" จาก "+rows.length+" ข้อที่ตรงเงื่อนไข · ทั้งหมด "+records.length+" ข้อจากไฟล์";
 }
 allowed.forEach(function(id){
  var label="มาตรา "+id+(referenced.has(id)?"":" · ไม่พบธงคำตอบตรงในชุดที่คัด");
  var option=el("option","",label);option.value=id;sel.appendChild(option);
 });
 byYear.forEach(function(year){var o=el("option","",String(year));o.value=year;years.appendChild(o);});
-sel.addEventListener("change",render);years.addEventListener("change",render);search.addEventListener("input",render);
+sel.addEventListener("change",function(){limit=pageSize;render();});years.addEventListener("change",function(){limit=pageSize;render();});search.addEventListener("input",function(){limit=pageSize;render();});
+if(more)more.addEventListener("click",function(){limit+=pageSize;render();});
 render();
 function syncHash(){
  var id=String(window.location.hash||"").replace(/^#/,"");
  if(!records.some(function(x){return x.id===id;}))return;
- if(!document.getElementById(id)){sel.value="all";years.value="all";search.value="";render();}
+ if(!document.getElementById(id)){sel.value="all";years.value="all";search.value="";limit=records.length;render();}
  var card=document.getElementById(id),answer=card&&card.querySelector("details.old-exam-answer");
  if(answer)answer.open=true;
 }
