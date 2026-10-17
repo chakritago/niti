@@ -316,9 +316,22 @@ q.sections.forEach(function(label){
  chip.className="topic-tag statute-direct-chip";
  chip.textContent="ป.พ.พ. ม. "+label+(ref?" · ดูภาพโต้ตอบ ↗":"");
  if(ref){
-  chip.href="./study.html#statute-"+ref.id.replace(/\//g,"-");
+  var raw=String(label||"");
+  var item=(raw.match(/^\s*\d+(?:\/\d+)?\s*\(([1-9])\)/)||[])[1]||"";
+  var suffix=(raw.match(/วรรค\s*(?:ที่\s*)?(แรก|หนึ่ง|สอง|สาม|สี่|ห้า|หก|[1-6๑-๖])(?:\s*(?:-|–|—|ถึง|และ)\s*(?:วรรค\s*)?(แรก|หนึ่ง|สอง|สาม|สี่|ห้า|หก|[1-6๑-๖]))?/)||[]);
+  var wordNum={"แรก":1,"หนึ่ง":1,"สอง":2,"สาม":3,"สี่":4,"ห้า":5,"หก":6,"๑":1,"๒":2,"๓":3,"๔":4,"๕":5,"๖":6};
+  var paraIds=[];
+  if(suffix[1])paraIds.push(String(wordNum[suffix[1]]||Number(suffix[1])));
+  if(suffix[2]){
+   var end=Number(wordNum[suffix[2]]||suffix[2]);
+   if(/-|–|—|ถึง/.test(suffix[0]))for(var j=Number(paraIds[0])+1;j<=end&&j<=6;j++)paraIds.push(String(j));
+   else paraIds.push(String(end));
+  }
+  chip.href="#statute-"+ref.id.replace(/\//g,"-")+(paraIds.length?"-p"+paraIds.join("_"):"")+(item?"-i"+item:"");
   chip.setAttribute("data-statute",ref.id);
-  chip.title="เปิดภาพสถานการณ์ตามมาตรา "+label+" ภายในเว็บไซต์";
+  if(paraIds.length)chip.setAttribute("data-paragraphs",paraIds.join(","));
+  if(item)chip.setAttribute("data-statute-item",item);
+  chip.title="เปิดคำอธิบายมาตรา "+label+" ในหน้าต่างภายในเว็บไซต์";
  }
  statutesArea.appendChild(chip);
 });
