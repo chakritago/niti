@@ -74,7 +74,7 @@
  background:var(--md-surface-low);color:var(--md-text-secondary);
  font-size:.91rem;line-height:1.85
 }
-.niti-statute-dialog .niti-law-keyword{
+:where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword{
  display:inline;
  padding:.02em .16em;
  border-radius:4px;
@@ -85,23 +85,23 @@
  background:#ffefae;
  text-decoration:none;
 }
-.niti-statute-dialog .niti-law-keyword--exception{
+:where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword--exception{
  color:#8c1e48;
  background:#ffe3ed;
 }
-.niti-statute-dialog .niti-law-keyword--result{
+:where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword--result{
  color:#075a51;
  background:#d4f3e8;
 }
-:root[data-theme="dark"] .niti-statute-dialog .niti-law-keyword{
+:root[data-theme="dark"] :where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword{
  color:#ffeba8;
  background:#544116;
 }
-:root[data-theme="dark"] .niti-statute-dialog .niti-law-keyword--exception{
+:root[data-theme="dark"] :where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword--exception{
  color:#ffbed2;
  background:#57243d;
 }
-:root[data-theme="dark"] .niti-statute-dialog .niti-law-keyword--result{
+:root[data-theme="dark"] :where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword--result{
  color:#abefdb;
  background:#1b4a42;
 }
