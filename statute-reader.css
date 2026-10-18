@@ -106,7 +106,7 @@
  background:#1b4a42;
 }
 @media(forced-colors:active){
- .niti-statute-dialog .niti-law-keyword{
+ :where(.niti-statute-dialog,.statute-card,.statute-small,.final-card) .niti-law-keyword{
   background:Highlight;
   color:HighlightText;
   outline:1px solid CanvasText;
