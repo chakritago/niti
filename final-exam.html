@@ -272,6 +272,37 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
  .final-page .book-answer-part .book-analysis-paragraph{line-height:1.95}
 }
 
+
+/* Textbook essay format: one referenced statute per line, clear undergraduate IRAC. */
+.final-page .book-statutes{display:block;margin:13px 0 16px;padding:12px 14px;border:1px solid var(--f-line);border-radius:11px;background:var(--f-card)}
+.final-page .book-statutes-label{color:var(--f-mute);font-size:.86rem;line-height:1.7;font-weight:850;margin:0 0 7px}
+.final-page .book-statute-line{display:block;width:100%;line-height:1.75;margin:0;padding:4px 0}
+.final-page .book-statute-line+.book-statute-line{border-top:1px dashed var(--f-line)}
+.final-page .book-statute-line .book-law-ref{display:inline-block;color:var(--f-blue);border:1px solid var(--f-line);border-radius:8px;background:var(--f-bg);padding:5px 11px;font-weight:850;line-height:1.6;text-decoration:none}
+.final-page .book-statute-line .book-law-ref:focus-visible,.final-page .book-statute-line .book-law-ref:hover{outline:2px solid var(--f-blue);outline-offset:2px}
+.final-page .book-issue{border:1px solid var(--f-line);border-left:4px solid var(--f-blue);background:var(--f-bg);padding:13px 17px;border-radius:10px}
+.final-page .book-issue h4,.final-page .book-keyword-guide h4{margin:0 0 7px;color:var(--f-text);font-size:1.03rem;line-height:1.5}
+.final-page .book-issue p{margin:0;line-height:1.9}
+.final-page .book-keyword-guide{background:var(--f-bg);border:1px solid var(--f-line);border-radius:11px;padding:14px 17px}
+.final-page .book-keyword-guide p{font-size:.86rem;line-height:1.7;margin:0 0 12px;color:var(--f-mute)}
+.final-page .book-keyword-list{display:flex;gap:7px;flex-wrap:wrap;align-items:start}
+.final-page .book-keyword-chip{font-size:.86rem;line-height:1.7;padding:4px 8px!important;display:inline-block;max-width:100%}
+.final-page .book-answer-part{display:grid;gap:12px}
+.final-page .book-answer-part>h4{margin:0;font-size:1.15rem;line-height:1.55}
+.final-page .book-rule-list{display:grid;gap:12px}
+.final-page .book-rule-item{border:1px solid var(--f-line);border-radius:9px;background:var(--f-card);padding:13px 15px}
+.final-page .book-rule-item+.book-rule-item{border-top:1px solid var(--f-line)}
+.final-page .book-rule-article{font-size:1rem;font-weight:900;color:var(--f-blue);line-height:1.7;margin:0 0 9px}
+.final-page .book-answer-part .book-analysis-paragraph{margin:0;line-height:2;white-space:pre-line;overflow-wrap:anywhere}
+.final-page .book-answer-part .book-analysis-paragraph+.book-analysis-paragraph{margin-top:11px;padding-top:11px;border-top:1px solid var(--f-line)}
+.final-page .book-answer-part.conclusion{background:var(--f-card)}
+@media(max-width:760px){
+ .final-page .book-statutes{padding:10px}
+ .final-page .book-rule-item{padding:11px}
+ .final-page .book-keyword-guide{padding:12px}
+ .final-page .book-keyword-chip{font-size:.82rem}
+ .final-page .book-answer-part .book-analysis-paragraph{line-height:1.9}
+}
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261018b">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
