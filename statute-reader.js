@@ -270,7 +270,7 @@ function requestedParts(value){
 }
 var NUM_NAMES={"1":"หนึ่ง","2":"สอง","3":"สาม","4":"สี่","5":"ห้า","6":"หก"};
 function paragraphTitle(p){return "วรรค"+(NUM_NAMES[String(p)]||String(p));}
-function appendClause(parent,type,key,info,selected){
+function appendClause(parent,type,key,info,selected,id){
  var article=element("article","niti-reader-clause"+(selected?" is-selected":""));
  var heading=(type==="item"?"ข้อ ("+key+")":paragraphTitle(key))+" · "+(info.title||"");
  article.appendChild(element("h4","niti-reader-clause-title",heading));
@@ -278,8 +278,8 @@ function appendClause(parent,type,key,info,selected){
   article.appendChild(element("p","niti-reader-clause-text-label","ข้อความตัวบทกฎหมาย"));
   article.appendChild(element("p","niti-reader-clause-legal-text",info.text));
  }
- section(article,"ความหมายและองค์ประกอบ",info.summary);
- section(article,"แนวเขียนสอบ",info.exam);
+ section(article,"ความหมายและองค์ประกอบ",info.summary,id);
+ section(article,"แนวเขียนสอบ",info.exam,id);
  parent.appendChild(article);
 }
 function articleTextPreview(body,id){
@@ -311,12 +311,12 @@ function paragraphContent(body,id,selection){
  Object.keys(paras).forEach(function(k){
   var chosen=requested.indexOf(k)!==-1;
   if(chosen)found++;
-  appendClause(chosen||!any?selectedBox:others,"paragraph",k,paras[k],chosen);
+  appendClause(chosen||!any?selectedBox:others,"paragraph",k,paras[k],chosen,id);
  });
  Object.keys(items).forEach(function(k){
   var chosen=requestedItem===k;
   if(chosen)found++;
-  appendClause(chosen||!any?selectedBox:others,"item",k,items[k],chosen);
+  appendClause(chosen||!any?selectedBox:others,"item",k,items[k],chosen,id);
  });
  if(any&&(found<requested.length+(requestedItem?1:0)))selectedBox.appendChild(element("p","niti-reader-missing","บางวรรคหรืออนุมาตราที่ยกขึ้นอ้างยังไม่มีคำอธิบายที่ตรวจทานแล้วในฐานข้อมูล โปรดตรวจตัวบทฉบับปัจจุบัน"));
  wrapper.appendChild(selectedBox);
@@ -341,11 +341,15 @@ function link(href,label,cls){
  if(/^https:\/\//.test(href)){a.target="_blank";a.rel="noopener noreferrer";}
  return a;
 }
-function section(parent,title,text){
+function section(parent,title,text,id){
  if(!text)return;
  var group=element("section","reader-summary-part");
  group.appendChild(element("h3","",title));
- group.appendChild(element("p","",text));
+ var p=element("p","");
+ var keywords=window.NITI_STATUTE_HIGHLIGHTS;
+ if(id&&keywords&&typeof keywords.apply==="function")keywords.apply(p,text,id);
+ else p.textContent=text;
+ group.appendChild(p);
  parent.appendChild(group);
 }
 function setup(){
@@ -475,15 +479,19 @@ function openStatute(value,opener){
   var description=element("p","niti-reader-disclaimer",model?"กดจุดในภาพเพื่อศึกษาประเด็นทางกฎหมาย คำอธิบายเป็นสื่อการศึกษา ไม่ใช่ถ้อยคำตามตัวบทฉบับทางการ โปรดอ่านต้นฉบับจาก PDF ของหน่วยงานรัฐประกอบ":"มาตรานี้มีสรุปและตัวบทกฎหมายให้อ่าน แต่ยังไม่มีภาพประกอบโต้ตอบ โปรดตรวจต้นฉบับ PDF ของหน่วยงานรัฐประกอบ");
   description.id="niti-statute-dialog-description";
   body.appendChild(description);
+  var highlighter=window.NITI_STATUTE_HIGHLIGHTS;
+  if(highlighter&&typeof highlighter.termsFor==="function"&&highlighter.termsFor(id).length){
+   body.appendChild(element("p","niti-reader-keyword-hint","✍️ คำที่เน้นสีในคำอธิบายคือศัพท์และองค์ประกอบสำคัญสำหรับฝึกเขียนสอบ ไม่ใช่เกณฑ์คะแนนอย่างเป็นทางการ และไม่ได้เปลี่ยนข้อความตัวบทกฎหมาย"));
+  }
   var hasInlineStatute=articleTextPreview(body,id);
   paragraphContent(body,id,selection);
   var hasSummaryContent=!!(note&&(note.plain||note.exam||note.conditions||note.trap));
   if(note&&hasSummaryContent){
    var summary=element("div","niti-reader-summary niti-summary-top-priority");
-   section(summary,"ความหมายโดยสรุป",note.plain);
-   section(summary,"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",note.exam);
-   section(summary,"องค์ประกอบที่ต้องพิจารณา",note.conditions);
-   section(summary,"ข้อควรระวัง",note.trap);
+   section(summary,"ความหมายโดยสรุป",note.plain,id);
+   section(summary,"หลักกฎหมายที่ใช้ฝึกเขียนตอบ",note.exam,id);
+   section(summary,"องค์ประกอบที่ต้องพิจารณา",note.conditions,id);
+   section(summary,"ข้อควรระวัง",note.trap,id);
    body.appendChild(summary);
   }
   if(model){
@@ -577,5 +585,5 @@ document.addEventListener("click",function(event){
 if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",maybeOpenFromHash); }
 else { setTimeout(maybeOpenFromHash,0); }
 window.addEventListener("hashchange",maybeOpenFromHash);
-window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261017d"};
+window.NITI_STATUTE_READER={open:openStatute,anchorId:anchorId,__build:"20261018a"};
 })();
