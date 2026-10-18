@@ -88,6 +88,14 @@
 @media(max-width:900px){.subject-page .cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:690px){.subject-page .cards,.subject-page .outlines{grid-template-columns:1fr}.subject-page .intro{padding:35px 0 38px}.subject-page .feature{padding:17px}.subject-page .subject-card{padding:18px}}
 
+/* Scoring keywords for the suretyship essay. They are pedagogical, not a faculty marking scheme. */
+.subject-page .exam-scoring-guide{padding:17px 19px;border:1px solid var(--sp-outline);border-radius:13px;background:var(--sp-soft);display:grid;gap:8px}
+.subject-page .exam-scoring-guide h3{font-size:1.05rem;line-height:1.55;color:var(--sp-accent);margin:0}
+.subject-page .exam-scoring-guide p{margin:0;color:var(--sp-weak);font-size:.87rem;line-height:1.75}
+.subject-page .exam-scoring-terms{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:6px}
+.subject-page .exam-score-term{display:inline-block;padding:4px 9px!important;font-size:.88rem;line-height:1.55}
+@media(max-width:690px){.subject-page .exam-scoring-guide{padding:13px 14px}}
+
 /* Complete undergraduate model answers: one readable essay column. */
 .subject-page .answer-toggle .exam-answer-full{display:grid;grid-template-columns:minmax(0,1fr);gap:17px;margin:18px 0 2px}
 .subject-page .exam-answer-preface{font-size:.87rem;line-height:1.8;color:var(--sp-weak);margin:0}
@@ -231,7 +239,7 @@
 <script src="./land-sale-practice-04.js?v=20261017a"></script>
 <script src="./subject-exam-guides.js?v=20261017a"></script>
 <script src="./subject-answer-upgrades.js?v=20261017a"></script>
-<script src="./featured-exam-answers.js?v=20261017a"></script>
+<script src="./featured-exam-answers.js?v=20261018a"></script>
 <script src="./exam-keyword-ui.js?v=20261017a"></script>
 <script>
 (function(){
@@ -327,6 +335,15 @@ function renderFeaturedExamAnswer(id,targetId){
  issue.appendChild(el("b","","ประเด็นปัญหา"));
  issue.appendChild(el("p","",answer.issue));
  container.appendChild(issue);
+ if(Array.isArray(answer.scoreKeywords)&&answer.scoreKeywords.length){
+  var rubric=el("aside","exam-scoring-guide");
+  rubric.appendChild(el("h3","","คีย์เวิร์ดกฎหมายสำคัญที่ควรปรากฏในคำตอบ"));
+  rubric.appendChild(el("p","","คำที่เน้นสีเป็นแนวฝึกเขียนให้ครบองค์ประกอบ ไม่ใช่เกณฑ์ตรวจให้คะแนนจากมหาวิทยาลัย"));
+  var terms=el("div","exam-scoring-terms");
+  answer.scoreKeywords.forEach(function(term){terms.appendChild(el("span","exam-score-keyword exam-score-term",term));});
+  rubric.appendChild(terms);
+  container.appendChild(rubric);
+ }
  [["rule","หลักกฎหมาย","rule"],["application","วินิจฉัย (ปรับบท)","application"],["conclusion","สรุป","conclusion"]].forEach(function(part){
   var block=el("section","exam-answer-part "+part[2]);
   block.appendChild(el("h3","",part[1]));
