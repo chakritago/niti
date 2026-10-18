@@ -80,6 +80,13 @@ try{saved=JSON.parse(localStorage.getItem(key)||"{}")||{};}catch(e){saved={};}
 function el(tag,cls,txt){
  var v=document.createElement(tag);if(cls)v.className=cls;if(txt!==undefined)v.textContent=txt;return v;
 }
+function examKeywordText(tag,cls,value,id){
+ var node=el(tag,cls);
+ var highlighter=window.NITI_STATUTE_HIGHLIGHTS;
+ if(highlighter&&typeof highlighter.apply==="function")highlighter.apply(node,value,id);
+ else node.textContent=String(value||"");
+ return node;
+}
 function anchor(url,label,cls,external){
  var a=el("a",cls,label);a.href=url;if(external){a.target="_blank";a.rel="noopener noreferrer";}return a;
 }
@@ -112,7 +119,7 @@ function render(){
    var cbLabel=el("label","final-check");var cb=document.createElement("input");cb.type="checkbox";cb.checked=!!saved[id];cb.setAttribute("aria-label","อ่านมาตรา "+id+" แล้ว");
    cb.addEventListener("change",function(){saved[id]=cb.checked;try{localStorage.setItem(key,JSON.stringify(saved));}catch(e){}tally();if(filter!=="all")render();});
    cbLabel.appendChild(cb);cbLabel.appendChild(document.createTextNode(" อ่านแล้ว"));top.appendChild(cbLabel);card.appendChild(top);
-   card.appendChild(el("h3","",note.title));card.appendChild(el("p","final-summary",note.plain||"โปรดตรวจตัวบทมาตรานี้"));
+   card.appendChild(el("h3","",note.title));card.appendChild(examKeywordText("p","final-summary",note.plain||"โปรดตรวจตัวบทมาตรานี้",id));
    var line=el("div","final-links");
    line.appendChild(anchor("./study.html#statute-"+id,"สรุปมาตรา + ตัวบทในเว็บไซต์ ↗","final-link"));
    var direct=sources.direct&&sources.direct[id];
@@ -146,8 +153,9 @@ function render(){
    var wrap=el("div","final-practice-body");
    wrap.appendChild(el("p","",pq[0]||"ศึกษาตัวบทและตั้งประเด็นวินิจฉัย"));wrap.appendChild(el("p","final-question",pq[1]||"หลักกฎหมายในมาตรานี้มีองค์ประกอบใดบ้าง?"));
    var ans=el("details","final-answer");ans.appendChild(el("summary","","ดูแนวตอบสั้น ๆ"));
-   ans.appendChild(el("p","",note.exam||note.plain||"ตรวจตัวบทและองค์ประกอบตามข้อเท็จจริง"));
-   if(note.trap)ans.appendChild(el("p","final-trap","จุดระวัง: "+note.trap));
+   ans.appendChild(examKeywordText("p","",note.exam||note.plain||"ตรวจตัวบทและองค์ประกอบตามข้อเท็จจริง",id));
+   if(note.conditions)ans.appendChild(examKeywordText("p","final-conditions","องค์ประกอบที่ต้องตรวจ: "+note.conditions,id));
+   if(note.trap)ans.appendChild(examKeywordText("p","final-trap","จุดระวัง: "+note.trap,id));
    wrap.appendChild(ans);details.appendChild(wrap);card.appendChild(details);grid.appendChild(card);
   });
   section.appendChild(grid);container.appendChild(section);
