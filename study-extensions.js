@@ -51,6 +51,12 @@ function renderRanking(){
  });
 }
 
+function examKeywordText(tag,cls,text,id){
+ var target=newNode(tag,cls),helper=window.NITI_STATUTE_HIGHLIGHTS;
+ if(helper&&typeof helper.apply==="function")helper.apply(target,text,id);
+ else target.textContent=String(text||"");
+ return target;
+}
 function makeStatuteCard(note,small,reference){
  var detail=newNode("article",small?"statute-small":"statute-card");
  if(!small)detail.id="statute-"+String(note.id).replace(/\//g,"-");
@@ -71,17 +77,17 @@ function makeStatuteCard(note,small,reference){
  }
  head.appendChild(title);
  detail.appendChild(head);
- if(note.plain)detail.appendChild(newNode("p","statute-plain",note.plain));
+ if(note.plain)detail.appendChild(examKeywordText("p","statute-plain",note.plain,note.id));
  else detail.appendChild(newNode("p","statute-plain","หัวข้อกฎหมาย: "+note.title+" — โปรดตรวจข้อความตามตัวบทและฉบับแก้ไขจากเอกสารทางการด้านล่าง"));
  if(note.exam){
   var example=newNode("div","statute-example");
   example.appendChild(newNode("strong","","ประโยคหลักกฎหมายสำหรับเขียนข้อสอบ (สรุปเรียบเรียงใหม่)"));
-  example.appendChild(newNode("p","",note.exam));
+  example.appendChild(examKeywordText("p","",note.exam,note.id));
   detail.appendChild(example);
  }
  if(!small){
-  if(note.conditions)detail.appendChild(newNode("p","statute-conditions","องค์ประกอบที่ต้องตรวจ: "+note.conditions));
-  if(note.trap)detail.appendChild(newNode("p","statute-warning","จุดระวัง: "+note.trap));
+  if(note.conditions)detail.appendChild(examKeywordText("p","statute-conditions","องค์ประกอบที่ต้องตรวจ: "+note.conditions,note.id));
+  if(note.trap)detail.appendChild(examKeywordText("p","statute-warning","จุดระวัง: "+note.trap,note.id));
  }
  var links=newNode("div","statute-sources");
  links.appendChild(newNode("strong","statute-sources-title","แหล่งตัวบทกฎหมาย"));
