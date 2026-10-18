@@ -240,6 +240,38 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 .final-page .final-old-anchors{border-top:1px solid var(--f-line);padding-top:12px;margin-top:12px;display:grid;gap:6px}
 .final-page .final-old-anchors strong{font-size:.85rem;color:var(--f-text)}
 .final-page .final-old-anchor{font-size:.84rem;line-height:1.7;font-weight:750;color:var(--f-blue)}
+
+/* Textbook exam answer structure: source statutes retained, one article per line. */
+.final-page .book-statutes{display:grid!important;grid-template-columns:minmax(0,1fr)!important;align-items:start;justify-items:start;gap:7px;margin:13px 0 15px}
+.final-page .book-statutes-label{font-size:.86rem;font-weight:850;line-height:1.6;color:var(--f-mute);margin:0 0 2px}
+.final-page .book-statute-line{display:block;width:100%;line-height:1.75}
+.final-page .book-law-ref{display:inline-block;max-width:100%;font-weight:850;line-height:1.65}
+.final-page .book-answer-inner{display:grid;grid-template-columns:minmax(0,1fr);gap:17px}
+.final-page .book-issue{background:var(--f-card);border:1px solid var(--f-line);border-left:4px solid var(--f-blue);border-radius:10px;padding:15px 18px}
+.final-page .book-issue h4{font-size:1.04rem;color:var(--f-blue);margin:0 0 7px}
+.final-page .book-issue p{margin:0;line-height:1.9}
+.final-page .book-keyword-guide{padding:14px 18px;border:1px solid var(--f-line);border-radius:11px;background:var(--f-bg)}
+.final-page .book-keyword-guide h4{font-size:1.04rem;font-weight:900;color:var(--f-text);margin:0 0 5px;line-height:1.5}
+.final-page .book-keyword-guide p{font-size:.85rem;color:var(--f-mute);line-height:1.8;margin:0 0 11px}
+.final-page .book-keyword-list{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+.final-page .book-keyword-chip{display:inline-block;padding:4px 9px!important;line-height:1.65;font-size:.86rem}
+.final-page .book-answer-part{display:grid;gap:10px}
+.final-page .book-answer-part h4{font-size:1.18rem;margin:0 0 1px;line-height:1.5}
+.final-page .book-rule-list{display:grid;grid-template-columns:minmax(0,1fr);gap:13px}
+.final-page .book-rule-item{padding:14px 16px;border:1px solid var(--f-line);border-left:4px solid var(--f-blue);border-radius:10px;background:var(--f-card);min-width:0}
+.final-page .book-rule-article{font-size:1.01rem;font-weight:900;color:var(--f-blue);line-height:1.5;margin:0 0 7px}
+.final-page .book-answer-part .book-analysis-paragraph{margin:0;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere}
+.final-page .book-answer-part .book-analysis-paragraph + .book-analysis-paragraph{margin-top:6px}
+.final-page .book-answer-part.application .book-analysis-paragraph:first-of-type{margin-top:2px}
+.final-page .book-answer-part.conclusion{background:var(--f-card)}
+.final-page .book-answer-part.conclusion .book-analysis-paragraph{font-weight:600}
+@media(max-width:760px){
+ .final-page .book-answer-inner{gap:13px}
+ .final-page .book-keyword-guide,.final-page .book-issue,.final-page .book-rule-item{padding:12px}
+ .final-page .book-keyword-chip{font-size:.84rem}
+ .final-page .book-answer-part .book-analysis-paragraph{line-height:1.95}
+}
+
 </style>
 <link rel="stylesheet" href="./statute-reader.css?v=20261018b">
 <link rel="stylesheet" href="./statute-illustration.css?v=20261016c">
@@ -322,13 +354,13 @@ body.final-page .book-person-legend{font-size:.91rem;color:var(--f-mute);margin:
 <script src="./statute-paragraphs.js?v=20261017c"></script>
 <script src="./statute-notes.js"></script>
 <script src="./statute-notes-extra.js"></script>
-<script src="./final-book-questions.js?v=20261017a"></script>
+<script src="./final-book-questions.js?v=20261018b"></script>
 <script src="./final-old-exam-source.js?v=20261017b"></script>
 <script src="./statute-exam-keywords.js?v=20261018b"></script>
 <script src="./final-exam.js?v=20261018a"></script>
 <script src="./exam-keyword-ui.js?v=20261017a"></script>
 <script src="./final-old-exam-render.js?v=20261017c"></script>
-<script src="./final-book-render.js?v=20261017a"></script>
+<script src="./final-book-render.js?v=20261018b"></script>
 <script src="./surety-statute-notes.js?v=20261016a"></script>
 <script src="./statute-diorama-data.js"></script>
 <script src="./statute-illustration.js?v=20261015g"></script>
