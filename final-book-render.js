@@ -1,111 +1,139 @@
-/* NITI · textbook exercise gallery in the 18-section final-exam menu.
- * Each card carries the original PDF page/question reference. No fake scores.
- * Highlights are pedagogical indicators, not an official grading rubric.
+/* NITI | textbook law-school exam practice.
+ * The 12 textbook questions and ORIGINAL section references remain unchanged.
+ * Render each statutory principle on its own line and in its own reading block;
+ * distinguish newly-written model analyses from the source textbook questions.
+ * Safely render highlights with DOM nodes (never unsanitized innerHTML).
  */
 (function(){
 "use strict";
-var list=window.NITI_FINAL_BOOK_QUESTIONS||[],root=document.getElementById("final-book-list");
+var list=window.NITI_FINAL_BOOK_QUESTIONS||[];
+var root=document.getElementById("final-book-list");
 if(!root)return;
-var selected=document.getElementById("book-filter"),search=document.getElementById("book-search"),count=document.getElementById("book-count");
-var highlighter=window.NITI_EXAM_KEYWORDS||null;
+var selected=document.getElementById("book-filter");
+var search=document.getElementById("book-search");
+var count=document.getElementById("book-count");
+var highlight=window.NITI_EXAM_KEYWORDS||null;
 var scope=["139","144","145","146","147","148","1298","1299","1382","1387","1401","1304","1307","1367","1368","1373","1375","1377"];
-var found=[...new Set(list.reduce(function(acc,q){return acc.concat(q.sections);},[]))];
-function el(tag,cls,label){var n=document.createElement(tag);if(cls)n.className=cls;if(label!==undefined)n.textContent=String(label);return n;}
-function paragraph(parent,string,words){
- var p=el("p");
- if(highlighter&&typeof highlighter.apply==="function")highlighter.apply(p,string,words);else p.textContent=string;
- parent.appendChild(p);return p;
+var covered=new Set(list.reduce(function(a,q){return a.concat(q.sections||[]);},[]));
+var basicKeywords=["กรรมสิทธิ์","ทรัพยสิทธิ","อสังหาริมทรัพย์","สังหาริมทรัพย์","ส่วนควบ","อุปกรณ์","ดอกผลธรรมดา","ดอกผลนิตินัย","สิทธิครอบครอง","ครอบครองปรปักษ์","ภาระจำยอม","ภารยทรัพย์","สามยทรัพย์","สาธารณสมบัติของแผ่นดิน","ลงลายมือชื่อ","ทำเป็นหนังสือและจดทะเบียน","บุคคลภายนอก","สุจริต","เสียค่าตอบแทน","โดยเปิดเผย","เจตนาเป็นเจ้าของ","ส่งมอบ","หักล้างข้อสันนิษฐาน"];
+function el(tag,cls,label){
+ var n=document.createElement(tag);
+ if(cls)n.className=cls;
+ if(label!==undefined)n.textContent=String(label);
+ return n;
+}
+function examTerms(q){
+ var priorities=Array.isArray(q.scoreKeywords)?q.scoreKeywords:[];
+ return [...new Set(priorities.concat(q.keywords||[],basicKeywords).filter(Boolean))];
+}
+function highlightedParagraph(parent,text,terms,cls){
+ var p=el("p",cls);
+ if(highlight&&typeof highlight.apply==="function")highlight.apply(p,String(text||""),terms);
+ else p.textContent=String(text||"");
+ parent.appendChild(p);
+ return p;
+}
+function splitParagraphs(s){
+ return String(s||"").split(/\n\s*\n/).map(function(x){return x.trim();}).filter(Boolean);
+}
+function renderParagraphs(parent,value,terms){
+ var parts=Array.isArray(value)?value:splitParagraphs(value);
+ parts.forEach(function(t){highlightedParagraph(parent,t,terms,"book-analysis-paragraph");});
+}
+function statuteLinks(q){
+ var group=el("div","book-statutes");
+ group.appendChild(el("p","book-statutes-label","มาตราที่ใช้ตอบ (คงตามโจทย์เดิม)"));
+ (q.sections||[]).forEach(function(id){
+  var line=el("div","book-statute-line");
+  var a=el("a","book-law-ref","ป.พ.พ. มาตรา "+id);
+  a.href="#statute-"+id.replace(/\//g,"-");
+  a.setAttribute("data-statute",id);
+  a.setAttribute("aria-label","เปิดคำอธิบายมาตรา "+id);
+  line.appendChild(a);group.appendChild(line);
+ });
+ return group;
+}
+function statuteRules(q,container,terms){
+ var items=Array.isArray(q.ruleSections)&&q.ruleSections.length
+  ?q.ruleSections:(q.sections||[]).map(function(id){return{id:id,text:(q.ruleBySection||{})[id]||q.rule||""};});
+ var listNode=el("div","book-rule-list");
+ // Enforce one statute per distinct block, retaining the ORIGINAL section order.
+ (q.sections||[]).forEach(function(id,index){
+  var item=items.find(function(v){return String(v.id||v.section)===String(id);})||items[index]||{};
+  var rule=el("div","book-rule-item");
+  rule.appendChild(el("h5","book-rule-article","มาตรา "+id));
+  renderParagraphs(rule,item.text||q.ruleBySection&&q.ruleBySection[id]||"",terms);
+  listNode.appendChild(rule);
+ });
+ container.appendChild(listNode);
+}
+function scoringGuide(q){
+ var box=el("aside","book-keyword-guide");
+ box.appendChild(el("h4","","คีย์เวิร์ดกฎหมายที่ควรกล่าวถึง"));
+ box.appendChild(el("p","","เน้นองค์ประกอบที่ควรเขียนให้ครบเมื่อปรับบท เป็นแนวฝึกตอบ ไม่ใช่เกณฑ์คะแนนของมหาวิทยาลัย"));
+ var chips=el("div","book-keyword-list");
+ (q.scoreKeywords||q.keywords||[]).forEach(function(word){
+  chips.appendChild(el("span","book-keyword-chip exam-score-keyword",word));
+ });
+ box.appendChild(chips);
+ return box;
+}
+function stage(name,title,build){
+ var sec=el("section","book-answer-part "+name);
+ sec.appendChild(el("h4","",title));
+ build(sec);
+ return sec;
 }
 function bookCard(q){
  var card=el("article","book-card");card.id=q.id;
- var top=el("div","book-card-meta");
- top.appendChild(el("span","book-tag","ข้อสอบตามหนังสือ"));
- top.appendChild(el("span","book-source","ไฟล์ PDF หน้า "+q.page+" · "+q.bookQuestion));
- card.appendChild(top);
+ var head=el("div","book-card-meta");
+ head.appendChild(el("span","book-tag","ข้อสอบตามหนังสือ"));
+ head.appendChild(el("span","book-source","PDF หน้า "+q.page+" · "+q.bookQuestion));
+ card.appendChild(head);
  card.appendChild(el("h3","",q.title));
- var refs=el("section","book-statutes");
- refs.appendChild(el("h4","book-statutes-title","มาตราที่ใช้วินิจฉัย (คงตามโจทย์เดิม)"));
- var laws=el("div","book-law-lines");
- q.sections.forEach(function(id){
-  var line=el("div","book-law-line");
-  var a=el("a","book-law-ref","มาตรา "+id+" ↗");
-  a.href="#statute-"+id;
-  a.setAttribute("data-statute",id);
-  a.setAttribute("aria-label","เปิดคำอธิบายมาตรา "+id);
-  line.appendChild(a);
-  laws.appendChild(line);
- });
- refs.appendChild(laws);card.appendChild(refs);
+ card.appendChild(statuteLinks(q));
  var facts=el("section","book-facts");
  facts.appendChild(el("h4","","โจทย์จากหนังสือ (เรียบเรียงย่อ)"));
- paragraph(facts,q.question,[]);
+ highlightedParagraph(facts,q.question,[],"book-fact-text");
  card.appendChild(facts);
  var details=el("details","book-answer");
- details.appendChild(el("summary","","อ่านแนววินิจฉัยระดับปริญญาตรี · หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป"));
+ details.appendChild(el("summary","","อ่านเฉลยแบบเขียนสอบ ป.ตรี · หลักกฎหมาย → วินิจฉัย (ปรับบท) → สรุป"));
  var answer=el("div","book-answer-inner");
- answer.appendChild(el("p","book-answer-notice","ตัวอย่างแนวเขียนตอบระดับปริญญาตรี · ไฮไลต์คำสำคัญที่ควรกล่าวถึงเพื่อช่วยเก็บประเด็นในการสอบ ไม่ใช่เกณฑ์ให้คะแนนอย่างเป็นทางการ"));
- var terms=(q.scoreKeywords||q.keywords||[]).filter(Boolean);
- function keyTerms(text){return [...new Set(terms.concat(q.keywords||[],["อสังหาริมทรัพย์","กรรมสิทธิ์","สิทธิครอบครอง","ภาระจำยอม","สาธารณสมบัติของแผ่นดิน","ส่วนควบ","อุปกรณ์","ดอกผลธรรมดา","ดอกผลนิตินัย","ทรัพยสิทธิ","ครอบครองปรปักษ์","สุจริต"]))];}
- var issue=el("section","book-issue");
- issue.appendChild(el("h4","","ประเด็นปัญหาที่ต้องวินิจฉัย"));
- paragraph(issue,q.issue||q.title,[]);
- answer.appendChild(issue);
- if(terms.length){
-  var guide=el("aside","book-scoreguide");
-  guide.appendChild(el("h4","","คีย์เวิร์ดที่ควรเขียนให้ครบ"));
-  guide.appendChild(el("p","","ข้อความเน้นสีเป็นแนวจำองค์ประกอบกฎหมาย ไม่ใช่ธงคะแนนทางการของผู้ตรวจข้อสอบ"));
-  var chips=el("div","book-scorechips");
-  terms.forEach(function(term){chips.appendChild(el("span","exam-score-keyword book-scorechip",term));});
-  guide.appendChild(chips);answer.appendChild(guide);
+ answer.appendChild(el("p","book-answer-notice","แนววินิจฉัยเรียบเรียงใหม่จากโจทย์ในหนังสือ ไม่ใช่ธงคำตอบที่คัดจากผู้แต่ง คีย์เวิร์ดสีเหลืองช่วยฝึกเขียนสอบ ไม่ใช่คะแนนที่ผู้สอนกำหนด"));
+ if(q.issue){
+  var issue=el("div","book-issue");
+  issue.appendChild(el("h4","","ประเด็นปัญหา"));
+  issue.appendChild(el("p","",q.issue));
+  answer.appendChild(issue);
  }
- var rules=el("section","book-answer-part rule");
- rules.appendChild(el("h4","","1. หลักกฎหมาย"));
- var byStatute=q.ruleBySection||{};
- if(q.sections&&q.sections.length){
-  q.sections.forEach(function(id){
-   var part=el("div","book-rule-clause");
-   var head=el("h5","book-rule-heading");
-   var ref=el("a","book-rule-link","ประมวลกฎหมายแพ่งและพาณิชย์ มาตรา "+id+" ↗");
-   ref.href="#statute-"+id;
-   ref.setAttribute("data-statute",id);
-   ref.setAttribute("aria-label","เปิดคำอธิบายมาตรา "+id);
-   head.appendChild(ref);part.appendChild(head);
-   var text=byStatute[id]||q.rule||"";
-   String(text).split(/\\n\\n+/).filter(Boolean).forEach(function(chunk){paragraph(part,chunk,keyTerms(chunk));});
-   rules.appendChild(part);
-  });
- }else paragraph(rules,q.rule||"",keyTerms(q.rule||""));
- answer.appendChild(rules);
- var analysis=el("section","book-answer-part application");
- analysis.appendChild(el("h4","","2. วินิจฉัย (ปรับบท)"));
- (Array.isArray(q.applicationParagraphs)?q.applicationParagraphs:[q.application||""]).forEach(function(part,i){
-  paragraph(analysis,part,keyTerms(part));
- });
- answer.appendChild(analysis);
- var conclusion=el("section","book-answer-part conclusion");
- conclusion.appendChild(el("h4","","3. สรุป"));
- var result=String(q.conclusion||"").replace(/^สรุป[\\s:：-]*/,"");
- paragraph(conclusion,result,keyTerms(result));
- answer.appendChild(conclusion);
- details.appendChild(answer);card.appendChild(details);
+ var terms=examTerms(q);
+ answer.appendChild(scoringGuide(q));
+ answer.appendChild(stage("rule","1. หลักกฎหมาย",function(part){statuteRules(q,part,terms);}));
+ answer.appendChild(stage("application","2. วินิจฉัย (ปรับบท)",function(part){
+  renderParagraphs(part,q.applicationParagraphs||q.application,terms);
+ }));
+ answer.appendChild(stage("conclusion","3. สรุป",function(part){
+  renderParagraphs(part,q.conclusion,terms);
+ }));
+ details.appendChild(answer);
+ card.appendChild(details);
  return card;
 }
 function draw(){
- var chosen=selected.value,word=search.value.trim().toLocaleLowerCase("th");
- var visible=list.filter(function(q){
-  if(chosen!=="all"&&q.sections.indexOf(chosen)<0)return false;
+ var selectedSection=selected.value,word=search.value.trim().toLocaleLowerCase("th");
+ var displayed=list.filter(function(q){
+  if(selectedSection!=="all"&&!(q.sections||[]).includes(selectedSection))return false;
   if(!word)return true;
-  return ([q.title,q.question,q.issue,q.rule,q.application,q.conclusion,q.bookQuestion,"PDF หน้า "+q.page].concat(q.scoreKeywords||[],q.sections)).join(" ").toLocaleLowerCase("th").includes(word);
+  return ([q.title,q.issue,q.question,q.rule,q.application,q.conclusion,q.bookQuestion,"PDF หน้า "+q.page].concat(q.sections||[])).join(" ").toLocaleLowerCase("th").includes(word);
  });
  root.replaceChildren();
- visible.forEach(function(q){root.appendChild(bookCard(q));});
- if(!visible.length)root.appendChild(el("p","book-no-results","ไม่พบโจทย์ตามมาตราหรือคำค้นนี้ในไฟล์หนังสือที่คัดเลือกไว้"));
- count.textContent="แสดง "+visible.length+" / "+list.length+" โจทย์ตามหนังสือ";
+ displayed.forEach(function(q){root.appendChild(bookCard(q));});
+ if(!displayed.length)root.appendChild(el("p","book-no-results","ไม่พบโจทย์ที่ตรงกับมาตราหรือคำค้นนี้ในไฟล์หนังสือที่คัดเลือกไว้"));
+ count.textContent="แสดง "+displayed.length+" / "+list.length+" โจทย์ตามหนังสือ";
 }
 scope.forEach(function(id){
- var op=el("option","",("มาตรา "+id)+(found.indexOf(id)<0?" · ยังไม่มีโจทย์ตรงในไฟล์":""));
- op.value=id;
- selected.appendChild(op);
+ var op=el("option","","มาตรา "+id+(covered.has(id)?"":" · ไม่มีโจทย์ตรงในไฟล์"));
+ op.value=id;selected.appendChild(op);
 });
 selected.addEventListener("change",draw);
 search.addEventListener("input",draw);
@@ -114,9 +142,12 @@ function openDeepLink(){
  var id=String(window.location.hash||"").replace(/^#/,"");
  var q=list.find(function(x){return x.id===id});
  if(!q)return;
- if(selected.value!=="all"&&q.sections.indexOf(selected.value)<0){selected.value="all";draw();}
+ if(selected.value!=="all"&&!(q.sections||[]).includes(selected.value)){selected.value="all";draw();}
  var card=document.getElementById(id);
- if(card){var d=card.querySelector("details.book-answer");if(d)d.open=true;}
+ if(card){
+  var d=card.querySelector("details.book-answer");
+  if(d)d.open=true;
+ }
 }
 window.addEventListener("hashchange",openDeepLink);
 openDeepLink();
